@@ -1,0 +1,214 @@
+﻿
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TuristRegistar</title>
+
+    @*<environment include="Development">
+            <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+            <link rel="stylesheet" href="~/css/site.css" />
+        </environment>
+        <environment exclude="Development">
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+                  asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+                  asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+            <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        </environment>*@
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/css/bootstrap.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/lib/css/bootstrap.min.css" />
+    </environment>
+    <link href="~/fontawesome/css/all.css" rel="stylesheet" />
+    <script src="~/js/toast-show.js"></script>
+</head>
+<body>
+    @if (TempData["Notification"] != null)
+    {
+        <div class="toast toast-position successgreen-background text-white" data-autohide="false">
+            <div class="toast-header successgreen-background">
+                <strong class="mr-auto text-primary"><i class="fas fa-check text-white"></i></strong>
+                <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast">&times;</button>
+            </div>
+            <div class="toast-body">
+                &nbsp;&nbsp;&nbsp;
+                @TempData["Notification"]
+                &nbsp;&nbsp;&nbsp;
+            </div>
+        </div>
+    }
+    @if (TempData["Error-Notification"] != null)
+    {
+        <div class="toast toast-position error-background text-white" data-autohide="false">
+            <div class="toast-header error-background">
+                <strong class="mr-auto text-primary"><i class="fas fa-check text-white"></i></strong>
+                <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast">&times;</button>
+            </div>
+            <div class="toast-body">
+                &nbsp;&nbsp;&nbsp;
+                @TempData["Error-Notification"]
+                &nbsp;&nbsp;&nbsp;
+            </div>
+        </div>
+    }
+    <!--Navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark  fixed-top">
+
+        <!-- Navbar brand -->
+        <a class="navbar-brand" href="#">Navbar</a>
+
+        <!-- Collapse button -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
+                aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Collapsible content -->
+        <div class="collapse navbar-collapse" id="basicExampleNav">
+
+            <!-- Links -->
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">
+                        Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Pricing</a>
+                </li>
+
+                <!-- Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                    <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+
+            </ul>
+            <!-- Links -->
+
+            <form class="form-inline">
+                <div class="md-form my-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                </div>
+            </form>
+            @*<div class="nav-item">*@
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-2x text-white"></i></a>
+                    <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink" style="right:5%;left:auto">
+                        <a asp-controller="Auth" asp-action="Signout" class="dropdown-item">Moj nalog</a>
+                        <a asp-controller="Auth" asp-action="Signout" class="dropdown-item">Podešavanja&nbsp;&nbsp;<i class="fas fa-user-cog pull-right"></i></a>
+                        <a asp-controller="Auth" asp-action="Signout" class="dropdown-item">Odjava&nbsp;&nbsp;<i class="fas fa-sign-out-alt pull-right"></i></a>
+                    </div>
+                </div>
+                <span>&nbsp;</span>
+            }
+            else
+            {
+                <a asp-controller="Auth" asp-action="Login"> <i class="fas fa-user-circle fa-2x text-white"></i></a>
+            }
+            @*</div>*@
+        </div>
+        <!-- Collapsible content -->
+
+    </nav>
+    <!--/.Navbar-->
+    @*<nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">TuristRegistar</a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>*@
+
+    <partial name="_CookieConsentPartial" />
+
+    <div class=" body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; 2019 - TuristRegistar</p>
+        </footer>
+    </div>
+
+    @*<environment include="Development">
+            <script src="~/lib/jquery/dist/jquery.js"></script>
+            <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+            <script src="~/js/site.js" asp-append-version="true"></script>
+        </environment>
+        <environment exclude="Development">
+            <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
+                    asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                    asp-fallback-test="window.jQuery"
+                    crossorigin="anonymous"
+                    integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT">
+            </script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+                    asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                    asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                    crossorigin="anonymous"
+                    integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd">
+            </script>
+            <script src="~/js/site.min.js" asp-append-version="true"></script>
+        </environment>*@
+    <environment include="Development">
+        <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+        <script src="~/lib/jquery/jquery.js"></script>
+        <script src="~/lib/bootstrap/js/bootstrap.bundle.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/lib/jquery/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    </environment>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>
+<script>
+    $(document).scroll(function () {
+        var scroll = $(window).scrollTop();
+        if (scroll < 300) {
+            $('.fixed-top').css('background', 'transparent');
+        } else {
+            $('.fixed-top').css('background', 'rgba(15,29,95, 1)');
+        }
+    });
+    //$(document).ready(function () {
+
+    //    $('.fixed-top').css('background', 'rgba(0,0,0, 1)');
+
+    //});
+
+</script>

@@ -1,0 +1,151 @@
+﻿@model RegisterViewModel;
+
+<link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<link href="~/css/regst.css" rel="stylesheet" />
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!------ Include the above in your HEAD tag ---------->
+<br /><br /><br /><br />
+<div class="container">
+    <div class="container register">
+        <div class="row">
+            <div class="col-md-3 register-left">
+                <i class="fas fa-users fa-3x"></i>
+                <h3>Dobrodošli</h3>
+                <p>Postanite dio turističkog registra!</p>
+                <input type="submit" name="" value="Prijavite se" /><br />
+            </div>
+            <div class="col-md-9 register-right">
+                <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Poslovno</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Fizičko lice</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <h3 class="register-heading">Registruj se kao pravno lice</h3>
+                        <form method="post" asp-controller="Auth" asp-action="Register">
+                            <input type="hidden" asp-for="LegalPerson" value="true" />
+                            <div class="row register-form">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input asp-for="Username" type="text" class="form-control" placeholder="Korisničko ime *" value="" />
+                                        <span asp-validation-for="Username" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Password" type="password" class="form-control" placeholder="Lozinka *" value="" />
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Potvrdite lozinku *" value="" />
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Name" type="text" class="form-control" placeholder="Naziv *" value="" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input asp-for="ContactAddress" type="text" class="form-control" placeholder="Kontakt adresa" value="" />
+                                        <span asp-validation-for="ContactAddress" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="Email" value="" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Phone" type="text" class="form-control" placeholder="Telefon" value="" />
+                                        <span asp-validation-for="Phone" class="text-danger"></span>
+                                    </div>
+                                    <br /><br />
+                                    <input type="submit" class="btnRegister" value="Registrujte se" />
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="tab-pane fade show" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <h3 class="register-heading">Registruj se kao fizičko lice</h3>
+                        <form method="post" asp-controller="Auth" asp-action="Register">
+                            <input type="hidden" asp-for="LegalPerson" value="false" />
+                            <div class="row register-form">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input asp-for="Username" type="text" class="form-control" placeholder="Korisničko ime *" value="" />
+                                        <span asp-validation-for="Username" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Password" type="password" class="form-control" placeholder="Lozinka *" value="" />
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Potvrdite lozinku *" value="" />
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Name" type="text" class="form-control" placeholder="Ime *" value="" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input asp-for="LastName" type="text" class="form-control" placeholder="Prezime *" value="" />
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="ContactAddress" type="text" class="form-control" placeholder="Kontakt adresa" value="" />
+                                        <span asp-validation-for="ContactAddress" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="Email" value="" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Phone" type="text" name="txtEmpPhone" class="form-control" placeholder="Telefon" value="" />
+                                        <span asp-validation-for="Phone" class="text-danger"></span>
+                                    </div>
+                                    <input type="submit" class="btnRegister" value="Registrujte se" />
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+<script src="~/lib/jquery/jquery.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.bundle.js"></script>
+
+<script src="~/lib/jquery/jquery.min.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(window).scroll(function () {
+        var scroll = $(window).scrollTop();
+        if (scroll < 300) {
+            //rgba(15, 29, 95, 0.8)
+            $('.fixed-top').css('background', 'rgba(15,29,95, 0.8)');
+        } else {
+            $('.fixed-top').css('background', 'rgba(15,29,95, 0.8)');
+        }
+    });
+
+    $(document).ready(function () {
+
+        $('.fixed-top').css('background', 'rgba(15,29,95, 0.8)');
+
+    });
+
+</script>

@@ -1,0 +1,89 @@
+﻿@model UpdateProfileViewModel;
+
+@{
+}
+<script src="~/js/ClienSideInputValidation.js"></script>
+
+<div class="row">
+    <div class="col-md-2">
+        <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+            @{ var legal_cls = "";
+                var physical_cls = "";}
+            @if (Model.LegalPerson)
+            {
+                legal_cls = "active";
+            }
+            else
+            {
+                physical_cls = "active";
+            }
+            <li class="nav-item">
+                <a class="nav-link @legal_cls sub-tabs-clr" id="legal-tab" data-toggle="tab" href="#legal" role="tab" aria-controls="legal" aria-selected="true">Poslovno lice</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @physical_cls sub-tabs-clr" id="physical-tab" data-toggle="tab" href="#physical" role="tab" aria-controls="physical" aria-selected="false">Fizičko lice</a>
+            </li>
+        </ul>
+    </div>
+    <div class="tab-content m-auto col-md-6" id="myTabContent">
+        <div class="tab-pane fade @legal_cls show " id="legal" role="tabpanel" aria-labelledby="legal-tab">
+            <form method="post" asp-controller="Auth" asp-action="UpdateProfile">
+                <input type="hidden" asp-for="LegalPerson" value="true" />
+                <input type="hidden" asp-for="KorisnikId" />
+                <input type="hidden" asp-for="Username" />
+                <input type="hidden" asp-for="UserId" />
+                        <br />
+                        <div class="form-group">
+                            <input asp-for="Name" type="text" class="form-control myinput" placeholder="Naziv *" required/>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input asp-for="ContactAddress" type="text" class="form-control" placeholder="Kontakt adresa" />
+                            <span asp-validation-for="ContactAddress" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input asp-for="Email" type="email" class="form-control mymailvalidation" placeholder="Email"  />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input asp-for="Phone" type="text" class="form-control" placeholder="Telefon" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+                        <br /><br />
+                        <input type="submit" class="btnRegister" value="Ažurirajte profil" />
+            </form>
+
+        </div>
+        <div class="tab-pane fade @physical_cls show" id="physical" role="tabpanel" aria-labelledby="physical-tab">
+            <form method="post" asp-controller="Auth" asp-action="UpdateProfile">
+                <input type="hidden" asp-for="LegalPerson" value="false" />
+                <input type="hidden" asp-for="KorisnikId" />
+                <input type="hidden" asp-for="Username" />
+                <input type="hidden" asp-for="UserId" />
+                <br />
+                <div class="form-group">
+                    <input asp-for="Name" type="text" class="form-control myinput" placeholder="Ime *" required />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="LastName" type="text" class="form-control" placeholder="Prezime" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="ContactAddress" type="text" class="form-control" placeholder="Kontakt adresa" />
+                    <span asp-validation-for="ContactAddress" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Email" type="email" class="form-control  mymailvalidation" placeholder="Email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Phone" type="text" class="form-control" placeholder="Telefon" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+                <input type="submit" class="btnRegister" value="Ažurirajte profil" />
+            </form>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,74 @@
+﻿
+<link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
+<link href="~/css/regst.css" rel="stylesheet" />
+<link href="~/css/tabs.css" rel="stylesheet" />
+<link href="~/css/site.css" rel="stylesheet" />
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+<script src="~/js/toast-show.js"></script>
+
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Settings";
+}
+@*<div class="d-none d-sm-block"><br /><br /><br /><br /></div>*@
+
+@*@if (TempData["Notification"] != null)
+{
+    <div class="toast toast-position successgreen-background text-white" data-autohide="false">
+        <div class="toast-header successgreen-background">
+            <strong class="mr-auto text-primary"><i class="fas fa-check text-white"></i></strong>
+            <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast">&times;</button>
+        </div>
+        <div class="toast-body">
+            &nbsp;&nbsp;&nbsp;
+            @TempData["Notification"]
+            &nbsp;&nbsp;&nbsp;
+        </div>
+    </div>
+}*@
+
+
+<!-- Tabs -->
+<section id="tabs">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-lg-12">
+                <nav>
+                    <div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+                        <a class="nav-item nav-link active" id="nav-user-tab" data-toggle="tab" href="#nav-user" role="tab" aria-controls="nav-user" aria-selected="true">Korisnik</a>
+                        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Profil</a>
+                        <a class="nav-item nav-link" id="nav-password-tab" data-toggle="tab" href="#nav-password" role="tab" aria-controls="nav-password" aria-selected="false">Lozinka</a>
+                    </div>
+                </nav>
+                <div class="tab-content py-3 px-3 px-sm-0" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-user" role="tabpanel" aria-labelledby="nav-user-tab">
+                    </div>
+                    <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                    </div>
+                    <div class="tab-pane fade" id="nav-password" role="tabpanel" aria-labelledby="nav-password-tab">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ./Tabs -->
+<script src="~/js/Navbarcolor.js"></script>
+<script>
+
+    $.get('@Url.Action("_ChangePassword", "Auth")', function (content) {
+        $("#nav-password").html(content);
+    });
+    $.get('@Url.Action("_UpdateProfile", "Auth")', function (content) {
+        $("#nav-profile").html(content);
+    });
+    $.get('@Url.Action("_UpdateUser", "Auth")', function (content) {
+        $("#nav-user").html(content);
+    });
+    </script>

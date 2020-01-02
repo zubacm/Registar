@@ -1,0 +1,28 @@
+﻿@model UserViewModel;
+
+@{
+}
+<link href="~/css/site.css" rel="stylesheet" />
+<script src="~/js/ClienSideInputValidation.js"></script>
+<div>
+    <form asp-action="UpdateUser" asp-controller="Auth" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <input type="hidden" asp-for="Id"/>
+        <br />
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-3 col-xs-12">
+                    <i class="fas fa-user fa-3x float-md-right float-xs-left"></i>
+                </div>
+                <div class="col-md-4 pull-right col-xs-12">
+                    <input asp-for="Username" class="form-control myinput" placeholder="Korisničko ime" required />
+                </div>
+                @*<div class=".d-none .d-sm-block .d-md-none"><br />govno</div>*@
+                <div class="col-md-5 col-xs-12 mb-3 mt-3">
+                    <input type="submit" class="btnRegister max-width-xs  m-auto to-left" value="Ažurirajte korisničko ime" />
+                </div>
+            </div>
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+    </form>
+</div>
