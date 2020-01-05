@@ -9,7 +9,7 @@ namespace TuristRegistar.Data.Models
     {
         public int Id { get; set; }
         public int SpecialOfferId { get; set; }
-        public SpecialOffers SpecialOffer { get; set; }
+        public SpecialOffersPrices SpecialOffersPrices { get; set; }
         public bool IncludedInOriginalPrice { get; set; }
         public float Price { get; set; }
     }

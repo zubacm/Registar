@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TuristRegistar.Data;
 
 namespace TuristRegistar.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200103193626_Three")]
+    partial class Three
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,21 +216,11 @@ namespace TuristRegistar.Migrations
                     b.HasIndex("CountriesId");
 
                     b.ToTable("Cities");
-                });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.CntObjAttributesCount", b =>
-                {
-                    b.Property<int>("CountableObjAttrId");
-
-                    b.Property<int>("ObjectId");
-
-                    b.Property<int>("Count");
-
-                    b.HasKey("CountableObjAttrId", "ObjectId");
-
-                    b.HasIndex("ObjectId");
-
-                    b.ToTable("CntObjAttributesCount");
+                    b.HasData(
+                        new { Id = 13, CountriesId = 5, Name = "Skoplje" },
+                        new { Id = 14, CountriesId = 5, Name = "Ohrid" }
+                    );
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.CountableObjectAttributes", b =>
@@ -237,9 +229,15 @@ namespace TuristRegistar.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("Count");
+
                     b.Property<string>("Name");
 
+                    b.Property<int?>("ObjectsId");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ObjectsId");
 
                     b.ToTable("CountableObjectAttributes");
                 });
@@ -255,19 +253,6 @@ namespace TuristRegistar.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Counries");
-                });
-
-            modelBuilder.Entity("TuristRegistar.Data.Models.Currencies", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Key");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Currencies");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.ObjectAttributes", b =>
@@ -318,13 +303,9 @@ namespace TuristRegistar.Migrations
 
                     b.Property<int>("SpecialOfferId");
 
-                    b.Property<int?>("SpecialOffersPricesObjectId");
-
-                    b.Property<int?>("SpecialOffersPricesSpecialOfferId");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("SpecialOffersPricesSpecialOfferId", "SpecialOffersPricesObjectId");
+                    b.HasIndex("SpecialOfferId");
 
                     b.ToTable("ObjectOffers");
                 });
@@ -469,19 +450,21 @@ namespace TuristRegistar.Migrations
                     b.ToTable("RatingsAndReviews");
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.SpecialOffersPrices", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.SpecialOffers", b =>
                 {
-                    b.Property<int>("SpecialOfferId");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ObjectId");
+                    b.Property<string>("Name");
 
-                    b.Property<float>("Price");
+                    b.Property<int?>("ObjectsId");
 
-                    b.HasKey("SpecialOfferId", "ObjectId");
+                    b.HasKey("Id");
 
-                    b.HasAlternateKey("ObjectId", "SpecialOfferId");
+                    b.HasIndex("ObjectsId");
 
-                    b.ToTable("SpecialOffersPrices");
+                    b.ToTable("SpecialOffers");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.StandardPricingModel", b =>
@@ -597,17 +580,11 @@ namespace TuristRegistar.Migrations
                         .HasForeignKey("CountriesId");
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.CntObjAttributesCount", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.CountableObjectAttributes", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.CountableObjectAttributes", "CountableObjAttr")
-                        .WithMany()
-                        .HasForeignKey("CountableObjAttrId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("TuristRegistar.Data.Models.Objects", "Object")
-                        .WithMany("CntObjAttributesCount")
-                        .HasForeignKey("ObjectId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("TuristRegistar.Data.Models.Objects")
+                        .WithMany("CountableObjectAttributes")
+                        .HasForeignKey("ObjectsId");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.ObjectAttributes", b =>
@@ -626,9 +603,10 @@ namespace TuristRegistar.Migrations
 
             modelBuilder.Entity("TuristRegistar.Data.Models.ObjectOffers", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.SpecialOffersPrices", "SpecialOffersPrices")
+                    b.HasOne("TuristRegistar.Data.Models.SpecialOffers", "SpecialOffer")
                         .WithMany()
-                        .HasForeignKey("SpecialOffersPricesSpecialOfferId", "SpecialOffersPricesObjectId");
+                        .HasForeignKey("SpecialOfferId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.Objects", b =>
@@ -681,17 +659,11 @@ namespace TuristRegistar.Migrations
                         .HasForeignKey("UserId1");
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.SpecialOffersPrices", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.SpecialOffers", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.Objects", "Object")
+                    b.HasOne("TuristRegistar.Data.Models.Objects")
                         .WithMany("SpecialOffers")
-                        .HasForeignKey("ObjectId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("TuristRegistar.Data.Models.ObjectAttributes", "SpecialOffer")
-                        .WithMany()
-                        .HasForeignKey("SpecialOfferId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ObjectsId");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.Users", b =>

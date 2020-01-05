@@ -38,9 +38,13 @@ namespace TuristRegistar
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            //Za cookie
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             //Ovo
             services.AddSingleton(Configuration);
             services.AddScoped<IUser, UserService>();
+            services.AddScoped<ITouristObject, TouristObjectService>();
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(

@@ -53,5 +53,10 @@ namespace TuristRegistar.Services
             _context.Userss.FirstOrDefault(u => u.IdentUserId == identUserId).UserName = username;
             _context.SaveChanges();
         }
+
+        public IEnumerable<Currencies> GetCurrencies()
+        {
+            return _context.Currencies;
+        }
     }
 }

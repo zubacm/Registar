@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TuristRegistar.Data.Models
 {
-    public class CountableObjectAttributes
+    public class Cities
     {
         public int Id { get; set; }
         public String Name { get; set; }

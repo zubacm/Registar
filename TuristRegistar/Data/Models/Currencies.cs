@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace TuristRegistar.Data.Models
 {
-    public class CountableObjectAttributes
+    public class Currencies
     {
         public int Id { get; set; }
-        public String Name { get; set; }
+        public String Key { get; set; }
     }
 }

@@ -27,9 +27,10 @@ namespace TuristRegistar.Data.Models
         public bool StandardPricingM { get; set; }
 
         public ICollection<ObjectAttributes> ObjectAttributes { get; set; }
-        public ICollection<CountableObjectAttributes> CountableObjectAttributes { get; set; }
+        //public ICollection<CountableObjectAttributes> CountableObjectAttributes { get; set; }
+        public ICollection<CntObjAttributesCount> CntObjAttributesCount { get; set; }
         public ICollection<RatingsAndReviews> RatingsAndReviews { get; set; }
-        public ICollection<SpecialOffers> SpecialOffers { get; set; }
+        public ICollection<SpecialOffersPrices> SpecialOffers { get; set; }
         public ICollection<AvailablePeriods> AvailablePeriods { get; set; }//This will become unavailable periods
         public ICollection<ObjectImages> ObjectImages { get; set; }
         public int ObejectTypeId { get; set; }
@@ -40,5 +41,10 @@ namespace TuristRegistar.Data.Models
         public StandardPricingModel StandardPricingModel { get; set; }
         public int OccupancyBasedPricingId { get; set; }
         public OccupancyBasedPricing OccupancyBasedPricing { get; set; }
+
+        public int CountryId { get; set; }
+        public Countries Country { get; set; }
+        public int CityId { get; set; }
+        public Cities City { get; set; }
     }
 }

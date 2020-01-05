@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TuristRegistar.Data.Models
+namespace TuristRegistar.Models
 {
-    public class CountableObjectAttributes
+    public class CountryModel
     {
         public int Id { get; set; }
-        public String Name { get; set; }
+        public string Name { get; set; }
+        public bool Selected { get; set; }
     }
 }

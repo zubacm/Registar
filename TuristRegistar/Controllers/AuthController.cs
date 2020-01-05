@@ -32,7 +32,7 @@ namespace TuristRegistar.Controllers
             _user = user;
         }
 
-        [Route("register")] // /login
+        [Route("register")] // /register
         public IActionResult Register()
         {
             return View();
@@ -150,6 +150,7 @@ namespace TuristRegistar.Controllers
         {
             if (!ModelState.IsValid)
             {
+                TempData["Notification"] = "Greška prilikom ažuriranja profila.";
                 return View("Settings");
             }
 
@@ -165,6 +166,7 @@ namespace TuristRegistar.Controllers
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("", "Ne valja.");
+                TempData["Notification"] = "Greška prilikom mijenjanja lozinka.";
                 return View("Settings");
                 //return PartialView(model);
             }
@@ -182,6 +184,7 @@ namespace TuristRegistar.Controllers
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
+                TempData["Notification"] = "Molimo vas da navedete ispravnu staru lozinku.";
                 return View("Settings");
             }
 
@@ -223,6 +226,7 @@ namespace TuristRegistar.Controllers
         {
             if (!ModelState.IsValid)
             {
+                TempData["Notification"] = "Greška prilikom ažuriranja profila.";
                 return View("Settings");
             }
             Users updateUser = new Users()

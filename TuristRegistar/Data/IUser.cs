@@ -13,5 +13,6 @@ namespace TuristRegistar.Data
         Users GetUser(string id);
         void UpdateUser(Users user);
         void ChangeUsername(string identUserId, string username);
+        IEnumerable<Currencies> GetCurrencies();
     }
 }

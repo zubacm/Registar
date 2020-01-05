@@ -10,8 +10,8 @@ using TuristRegistar.Data;
 namespace TuristRegistar.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20191229202254_NewForeignKeysInObjects")]
-    partial class NewForeignKeysInObjects
+    [Migration("20200103193231_Ajmooo")]
+    partial class Ajmooo
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -43,11 +43,6 @@ namespace TuristRegistar.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
-
-                    b.HasData(
-                        new { Id = "1", Name = "User", NormalizedName = "USER" },
-                        new { Id = "2", Name = "Admin", NormalizedName = "ADMIN" }
-                    );
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -206,6 +201,28 @@ namespace TuristRegistar.Migrations
                     b.ToTable("AvailablePeriods");
                 });
 
+            modelBuilder.Entity("TuristRegistar.Data.Models.Cities", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("CountriesId");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountriesId");
+
+                    b.ToTable("Cities");
+
+                    b.HasData(
+                        new { Id = 10, CountriesId = 5, Name = "Skoplje" },
+                        new { Id = 11, CountriesId = 5, Name = "Ohrid" }
+                    );
+                });
+
             modelBuilder.Entity("TuristRegistar.Data.Models.CountableObjectAttributes", b =>
                 {
                     b.Property<int>("Id")
@@ -223,6 +240,19 @@ namespace TuristRegistar.Migrations
                     b.HasIndex("ObjectsId");
 
                     b.ToTable("CountableObjectAttributes");
+                });
+
+            modelBuilder.Entity("TuristRegistar.Data.Models.Countries", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Counries");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.ObjectAttributes", b =>
@@ -286,6 +316,12 @@ namespace TuristRegistar.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Address");
+
+                    b.Property<int>("CityId");
+
+                    b.Property<int>("CountryId");
+
                     b.Property<int>("CreatorId");
 
                     b.Property<string>("CreatorId1");
@@ -309,8 +345,6 @@ namespace TuristRegistar.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<int>("NumberOfRooms");
-
                     b.Property<int>("ObejectTypeId");
 
                     b.Property<int?>("ObjectTypeId");
@@ -319,6 +353,8 @@ namespace TuristRegistar.Migrations
 
                     b.Property<string>("PhoneNumberContact");
 
+                    b.Property<bool>("StandardPricingM");
+
                     b.Property<int>("StandardPricingModelId");
 
                     b.Property<float>("Surface");
@@ -326,6 +362,10 @@ namespace TuristRegistar.Migrations
                     b.Property<string>("WebContact");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("CountryId");
 
                     b.HasIndex("CreatorId1");
 
@@ -533,6 +573,13 @@ namespace TuristRegistar.Migrations
                         .HasForeignKey("ObjectsId");
                 });
 
+            modelBuilder.Entity("TuristRegistar.Data.Models.Cities", b =>
+                {
+                    b.HasOne("TuristRegistar.Data.Models.Countries")
+                        .WithMany("Cities")
+                        .HasForeignKey("CountriesId");
+                });
+
             modelBuilder.Entity("TuristRegistar.Data.Models.CountableObjectAttributes", b =>
                 {
                     b.HasOne("TuristRegistar.Data.Models.Objects")
@@ -564,6 +611,16 @@ namespace TuristRegistar.Migrations
 
             modelBuilder.Entity("TuristRegistar.Data.Models.Objects", b =>
                 {
+                    b.HasOne("TuristRegistar.Data.Models.Cities", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristRegistar.Data.Models.Countries", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("TuristRegistar.Data.Models.Users", "Creator")
                         .WithMany("BookmarkedObjects")
                         .HasForeignKey("CreatorId1");
