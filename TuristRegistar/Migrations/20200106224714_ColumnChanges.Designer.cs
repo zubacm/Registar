@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TuristRegistar.Data;
 
 namespace TuristRegistar.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200106224714_ColumnChanges")]
+    partial class ColumnChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,22 +280,13 @@ namespace TuristRegistar.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<int?>("ObjectsId");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("ObjectsId");
+
                     b.ToTable("ObjectAttributes");
-                });
-
-            modelBuilder.Entity("TuristRegistar.Data.Models.ObjectHasAttributes", b =>
-                {
-                    b.Property<int>("ObjectId");
-
-                    b.Property<int>("AttributeId");
-
-                    b.HasKey("ObjectId", "AttributeId");
-
-                    b.HasAlternateKey("AttributeId", "ObjectId");
-
-                    b.ToTable("ObjectHasAttributes");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.ObjectImages", b =>
@@ -417,15 +410,15 @@ namespace TuristRegistar.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("OccunapncyBasedPricingId");
-
                     b.Property<int>("Occupancy");
+
+                    b.Property<int?>("OccupancyBasedPricingId");
 
                     b.Property<float>("PricePerNight");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OccunapncyBasedPricingId");
+                    b.HasIndex("OccupancyBasedPricingId");
 
                     b.ToTable("OccupancyBasedPrices");
                 });
@@ -619,17 +612,11 @@ namespace TuristRegistar.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.ObjectHasAttributes", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.ObjectAttributes", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.ObjectAttributes", "Attribute")
-                        .WithMany()
-                        .HasForeignKey("AttributeId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("TuristRegistar.Data.Models.Objects", "Object")
-                        .WithMany("ObjectHasAttributes")
-                        .HasForeignKey("ObjectId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("TuristRegistar.Data.Models.Objects")
+                        .WithMany("ObjectAttributes")
+                        .HasForeignKey("ObjectsId");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.ObjectImages", b =>
@@ -679,10 +666,9 @@ namespace TuristRegistar.Migrations
 
             modelBuilder.Entity("TuristRegistar.Data.Models.OccupancyBasedPrices", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.OccupancyBasedPricing", "OccunapncyBasedPricing")
+                    b.HasOne("TuristRegistar.Data.Models.OccupancyBasedPricing")
                         .WithMany("Prices")
-                        .HasForeignKey("OccunapncyBasedPricingId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("OccupancyBasedPricingId");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.RatingsAndReviews", b =>

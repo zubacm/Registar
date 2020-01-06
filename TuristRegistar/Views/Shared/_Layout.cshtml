@@ -249,7 +249,10 @@
  
         document.cookie = "Currency" + "=" + (value || "") + expires + "; path=/";
 
-        //$('#mycurrency').html(value);
-        $("#currency-container").load(window.location.href + " #currency-container1");
+        //this reload only this container
+        //$("#currency-container").load(window.location.href + " #currency-container1");
+
+        //this reloads current page
+        location.reload();
     }
 </script>

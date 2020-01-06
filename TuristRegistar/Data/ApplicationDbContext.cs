@@ -37,6 +37,7 @@ namespace TuristRegistar.Data
         public DbSet<Countries> Counries { get; set; }
         public DbSet<CntObjAttributesCount> CntObjAttributesCount { get; set; }
         public DbSet<Currencies> Currencies { get; set; }
+        public DbSet<ObjectHasAttributes> ObjectHasAttributes { get; set; }
 
 
 
@@ -50,6 +51,8 @@ namespace TuristRegistar.Data
                 .HasKey(c => new { c.CountableObjAttrId, c.ObjectId });
             modelBuilder.Entity<SpecialOffersPrices>()
                 .HasKey(c => new { c.SpecialOfferId, c.ObjectId });
+            modelBuilder.Entity<ObjectHasAttributes>()
+                .HasKey(o => new { o.ObjectId, o.AttributeId });
 
             #region "Seed data"
 

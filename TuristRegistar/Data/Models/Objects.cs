@@ -17,16 +17,11 @@ namespace TuristRegistar.Data.Models
         public String EmailContact { get; set; }
         public String PhoneNumberContact { get; set; }
         public String WebContact { get; set; }
-        //public int NumberOfRooms { get; set; }//maybe delete this is attribute
         public float Surface { get; set; }
-        public int MinOccupancy { get; set; }
-        public int MaxOccupancy { get; set; }
         public String Description { get; set; }
-        public int MinDaysOffer { get; set; }
-        public int MaxDaysOffer { get; set; }
         public bool StandardPricingM { get; set; }
 
-        public ICollection<ObjectAttributes> ObjectAttributes { get; set; }
+        public ICollection<ObjectHasAttributes> ObjectHasAttributes { get; set; }
         //public ICollection<CountableObjectAttributes> CountableObjectAttributes { get; set; }
         public ICollection<CntObjAttributesCount> CntObjAttributesCount { get; set; }
         public ICollection<RatingsAndReviews> RatingsAndReviews { get; set; }

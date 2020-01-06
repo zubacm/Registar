@@ -10,5 +10,8 @@ namespace TuristRegistar.Data.Models
         public int Id { get; set; }
         public int Occupancy { get; set; }
         public float PricePerNight { get; set; }
+
+        public int OccunapncyBasedPricingId { get; set; }
+        public OccupancyBasedPricing OccunapncyBasedPricing { get; set; }
     }
 }

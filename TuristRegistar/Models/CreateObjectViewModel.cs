@@ -32,14 +32,7 @@ namespace TuristRegistar.Models
         public String WebContact { get; set; }
         [Display(Name = "Površina")]
         public float Surface { get; set; }
-        [Display(Name = "Mininmalan broj posjetilaca")]
-        public int MinOccupancy { get; set; }
-        [Display(Name = "Maksimalan broj posjetilaca")]
-        public int MaxOccupancy { get; set; }
-        [Display(Name = "Mininmalan broj dana boravka")]
-        public int MinDaysOffer { get; set; }
-        [Display(Name = "Maksimalan broj dana boravka")]
-        public int MaxDaysOffer { get; set; }
+       
 
         public bool StandardPricingM { get; set; }
 
@@ -54,12 +47,23 @@ namespace TuristRegistar.Models
 
         public IEnumerable<SelectListItem> CountableOffers { get; set; }
         public String AddedCountableOffers { get; set; }
-        //public String SelectListCountableOffers { get; set; }
         public List<CountableOffers> ListOfAddedCntOffers { get; set; }
 
         public IEnumerable<SelectListItem> SpecialOffers { get; set; }
         public String AddedSpecialOffers { get; set; }
         public List<SpecialOffers> ListOfAddedSpecialOffersId { get; set; }
+
+        [Display(Name = "Mininmalan broj dana boravka")]
+        public int MinDaysOffer { get; set; }
+        [Display(Name = "Maksimalan broj dana boravka")]
+        public int MaxDaysOffer { get; set; }
+
+        public bool StandardPrModel { get; set; } 
+        public StandardPricingModel StandardPricingModel { get; set; }
+        public OccupancyBasedPricing OccupancyBasedPricing { get; set; }
+        public string OccubancBasedPrices { get; set; }
+
+
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿@model CreateObjectViewModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
@@ -6,14 +7,23 @@
 @*<link href="~/css/regst.css" rel="stylesheet" />*@
 <link href="~/css/tabs.css" rel="stylesheet" />
 <link href="~/css/site.css" rel="stylesheet" />
+<link href="~/css/paying-model-style.css" rel="stylesheet" />
 
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+
 
 @{
     ViewData["Title"] = "CreateObject";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+@{ var mycurrency = "BAM";}
+@if (HttpContextAccessor.HttpContext.Request.Cookies["Currency"] != null)
+{
+    mycurrency = HttpContextAccessor.HttpContext.Request.Cookies["Currency"];
+}
+
 
 <!-- Tabs -->
 <form method="post" asp-action="CreateObject" asp-controller="Object" onsubmit="fillValues()">
@@ -35,7 +45,7 @@
                         <div class="tab-pane fade show active" id="nav-basic" role="tabpanel" aria-labelledby="nav-basic-tab">
 
                             <br />
-                            <div class="row">
+                            <div class="row bg-white rounded-lg shadow-sm p-5">
                                 @*mapa*@
                                 <div class="col-md-4 order-md-2 mb-4">
                                     <h4 class="d-flex justify-content-between align-items-center mb-3">
@@ -159,65 +169,65 @@
 
 
                                     @*<hr class="mb-4">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="same-address">
-                                        <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
-                                    </div>
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="save-info">
-                                        <label class="custom-control-label" for="save-info">Save this information for next time</label>
-                                    </div>
-                                    <hr class="mb-4">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="same-address">
+                                            <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="save-info">
+                                            <label class="custom-control-label" for="save-info">Save this information for next time</label>
+                                        </div>
+                                        <hr class="mb-4">
 
-                                    <h4 class="mb-3">Payment</h4>
+                                        <h4 class="mb-3">Payment</h4>
 
-                                    <div class="d-block my-3">
-                                        <div class="custom-control custom-radio">
-                                            <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked="" required="">
-                                            <label class="custom-control-label" for="credit">Credit card</label>
-                                        </div>
-                                        <div class="custom-control custom-radio">
-                                            <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" required="">
-                                            <label class="custom-control-label" for="debit">Debit card</label>
-                                        </div>
-                                        <div class="custom-control custom-radio">
-                                            <input id="paypal" name="paymentMethod" type="radio" class="custom-control-input" required="">
-                                            <label class="custom-control-label" for="paypal">PayPal</label>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="cc-name">Name on card</label>
-                                            <input type="text" class="form-control" id="cc-name" placeholder="" required="">
-                                            <small class="text-muted">Full name as displayed on card</small>
-                                            <div class="invalid-feedback">
-                                                Name on card is required
+                                        <div class="d-block my-3">
+                                            <div class="custom-control custom-radio">
+                                                <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked="" required="">
+                                                <label class="custom-control-label" for="credit">Credit card</label>
+                                            </div>
+                                            <div class="custom-control custom-radio">
+                                                <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" required="">
+                                                <label class="custom-control-label" for="debit">Debit card</label>
+                                            </div>
+                                            <div class="custom-control custom-radio">
+                                                <input id="paypal" name="paymentMethod" type="radio" class="custom-control-input" required="">
+                                                <label class="custom-control-label" for="paypal">PayPal</label>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="cc-number">Credit card number</label>
-                                            <input type="text" class="form-control" id="cc-number" placeholder="" required="">
-                                            <div class="invalid-feedback">
-                                                Credit card number is required
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="cc-name">Name on card</label>
+                                                <input type="text" class="form-control" id="cc-name" placeholder="" required="">
+                                                <small class="text-muted">Full name as displayed on card</small>
+                                                <div class="invalid-feedback">
+                                                    Name on card is required
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="cc-number">Credit card number</label>
+                                                <input type="text" class="form-control" id="cc-number" placeholder="" required="">
+                                                <div class="invalid-feedback">
+                                                    Credit card number is required
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-3 mb-3">
-                                            <label for="cc-expiration">Expiration</label>
-                                            <input type="text" class="form-control" id="cc-expiration" placeholder="" required="">
-                                            <div class="invalid-feedback">
-                                                Expiration date required
+                                        <div class="row">
+                                            <div class="col-md-3 mb-3">
+                                                <label for="cc-expiration">Expiration</label>
+                                                <input type="text" class="form-control" id="cc-expiration" placeholder="" required="">
+                                                <div class="invalid-feedback">
+                                                    Expiration date required
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-3 mb-3">
-                                            <label for="cc-cvv">CVV</label>
-                                            <input type="text" class="form-control" id="cc-cvv" placeholder="" required="">
-                                            <div class="invalid-feedback">
-                                                Security code required
+                                            <div class="col-md-3 mb-3">
+                                                <label for="cc-cvv">CVV</label>
+                                                <input type="text" class="form-control" id="cc-cvv" placeholder="" required="">
+                                                <div class="invalid-feedback">
+                                                    Security code required
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>*@
+                                        </div>*@
                                     <hr class="mb-4">
                                     <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
                                     @*</form>*@
@@ -276,19 +286,125 @@
 
                         <!--Plaćanje-->
                         <div class="tab-pane fade" id="nav-payment" role="tabpanel" aria-labelledby="nav-payment-tab">
-                            <h4 class="mb-3">Plaćanje</h4>
+                            <div class="container py-5">
+                                <div class="row">
+                                    <div class="col-lg-7 mx-auto">
+                                        <div class="bg-white rounded-lg shadow-sm p-5">
+                                            <!-- Naplata tabs -->
+                                            <input type="hidden" asp-for="StandardPricingM" value="true" id="spmodel"/>
+                                            <ul role="tablist" class="nav bg-light nav-pills rounded-pill nav-fill mb-3">
+                                                <li class="nav-item">
+                                                    <a data-toggle="pill" onclick="changeToStandardModel()" href="#nav-tab-standardpm" class="nav-link active rounded-pill">
+                                                        @*<i class="fa fa-credit-card"></i>*@
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        &nbsp;&nbsp;&nbsp;Standardni model&nbsp;&nbsp;&nbsp;
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a data-toggle="pill" onclick="changeToOccupancyBModel()" href="#nav-tab-occupancyb" class="nav-link rounded-pill">
+                                                        Model baziran na broju posjetilaca
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                            <!-- End -->
+                                            <!-- form content -->
+                                            <div class="tab-content">
+                                                <!--Standard model-->
+                                                <div id="nav-tab-standardpm" class="tab-pane fade show active">
+                                                    <div class="row">
+                                                        <div class="col-md-6 form-group">
+                                                            <label asp-for="StandardPricingModel.StandardOccupancy"></label>
+                                                            <input type="number" asp-for="StandardPricingModel.StandardOccupancy" min="0" required class="form-control">
+                                                        </div>
+                                                        <div class="col-md-6 form-group">
+                                                            <label asp-for="StandardPricingModel.StandardPricePerNight"></label>
+                                                            <div class="input-group">
+                                                                <input pattern="[0-9]+([\.][0-9]{1,2})?" asp-for="StandardPricingModel.StandardPricePerNight" class="form-control" required>
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text text-muted">
+                                                                        @mycurrency
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="form-group col-md-4">
+                                                            <label asp-for="StandardPricingModel.MinOccupancy">@*<span class="hidden-xs">Expiration</span>*@</label>
+                                                            <div class="input-group">
+                                                                <input type="number" asp-for="StandardPricingModel.MinOccupancy" class="form-control" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-md-4">
+                                                            <label asp-for="StandardPricingModel.MaxOccupancy">@*<span class="hidden-xs">Expiration</span>*@</label>
+                                                            <div class="input-group">
+                                                                <input type="number" asp-for="StandardPricingModel.MaxOccupancy" class="form-control" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-md-4">
+                                                            <label asp-for="StandardPricingModel.OffsetPercentage"></label>
+                                                            <input type="text" pattern="[0-9]+([\.][0-9]{1,2})?" required class="form-control" asp-for="StandardPricingModel.OffsetPercentage">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 form-group">
+                                                            <label asp-for="StandardPricingModel.MinDaysOffer"></label>
+                                                            <input type="number" asp-for="StandardPricingModel.MinDaysOffer" min="1" class="form-control">
+                                                        </div>
+                                                        <div class="col-md-6 form-group">
+                                                            <label asp-for="StandardPricingModel.MaxDaysOffer"></label>
+                                                             <input  asp-for="StandardPricingModel.MaxDaysOffer" class="form-control" type="number" min="1">
+                                                        </div>
+                                                    </div>
+                                                    @*<button type="button" class="subscribe btn btn-primary btn-block rounded-pill shadow-sm"> Confirm  </button>*@
+                                                </div>
+                                                <!-- End -->
 
-                            <div class="d-block my-3">
-                                <div class="custom-control custom-radio">
-                                    <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked="" required="">
-                                    <label class="custom-control-label" for="credit">Standardni model</label>
+                                                <!-- occupancy based model -->
+                                                <div id="nav-tab-occupancyb" class="tab-pane fade">
+                                                    <div class="row">
+                                                        <div class="col-md-6 form-group">
+                                                            <label asp-for="OccupancyBasedPricing.MinDaysOffer"></label>
+                                                            <input type="number" asp-for="OccupancyBasedPricing.MinDaysOffer" min="1" class="form-control">
+                                                        </div>
+                                                        <div class="col-md-6 form-group">
+                                                            <label asp-for="OccupancyBasedPricing.MaxDaysOffer"></label>
+                                                            <input asp-for="OccupancyBasedPricing.MaxDaysOffer" class="form-control" type="number" min="1">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="form-group col-md-6">
+                                                            <label asp-for="OccupancyBasedPricing.MinOccupancy"></label>
+                                                            <div class="input-group">
+                                                                <input id="min-occ-ob" type="number" asp-for="OccupancyBasedPricing.MinOccupancy" class="form-control" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            <label asp-for="OccupancyBasedPricing.MaxOccupancy"></label>
+                                                            <div class="input-group">
+                                                                <input id="max-occ-ob" type="number" asp-for="OccupancyBasedPricing.MinOccupancy" class="form-control" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="subscribe btn btn-primary btn-block rounded-pill shadow-sm" onclick="formPrices()"> Formiraj cijene  </button>
+                                                    <hr />
+                                                    <input type="hidden" asp-for="OccubancBasedPrices" id="occupancybased-prices"/>
+                                                    <div id="prices">
+                                                    </div>
+                                                </div>
+                                                <!-- End -->
+                                                <a href="#" onclick="fillValues()">Filllllll</a>
+                                            </div>
+                                            <!-- End -->
+
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="custom-control custom-radio">
-                                    <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" required="">
-                                    <label class="custom-control-label" for="debit">Model baziran na broju posjetilaca</label>
-                                </div>
-                                
                             </div>
+
+
+
                         </div>
 
 
@@ -307,303 +423,331 @@
 
 </form>
 
-    <script src="~/js/Navbarcolor.js"></script>
-    <script>
-        var payedOffers = [];
-        var payedOffersWithValues = [];
 
-        function GetSpecialOffersAttributes() {
-            var sel = document.getElementById("specialoffer-select");
-            var text = sel.options[sel.selectedIndex].text;
-            var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed" id-value="'
-                + sel.value + '" value="">'
-                + '<span class="my-0 col-md-12"><div class="row">'
-                + '<h5 class="col-md-4">' + text + '</h6>'
-                + '<input class="col-md-4 form-control form-control-sm" placeholder="Unesite cijenu" required pattern="[0-9]+([\.][0-9]{1,2})?" />'
-                + '<div class="col-md-4"><a href="#"  class="btn btn-error" onclick="removeSpecialOffer(this);"  style="float:right;padding:0;line-height:0;">'
-                + '<i class="fa fa-times"></i></a></div></div></h5></li>';
-            $("#specialoffers-container").append(
-                myhtml
+
+
+<script src="~/js/Navbarcolor.js"></script>
+
+<script>
+    function changeToStandardModel() {
+        $('#spmodel').val(true);
+    }
+    function changeToOccupancyBModel() {
+        $('#spmodel').val(false);
+    }
+
+    function formPrices() {
+        $('#prices').empty();
+        occupancabasedprices = [];
+
+        var minocc = $('#min-occ-ob').val();
+        var maxocc = $('#max-occ-ob').val();
+        
+        if ((!maxocc) || (!minocc) || ((+maxocc) < 1) || ((+minocc) < 1) || ((+minocc) > (+maxocc))) {
+            alert("Unesite ispravne podatke za broj posjetilaca");
+        }
+        else
+        {
+            $('#prices').append(
+                '<label><span class="hidden-xs">Broj posjetilaca</span></label>'
             );
-
-            payedOffers.push(sel.value);
-            $("#selectlist-specialoffers").val(payedOffers);
-            RefreshSpecialOffersSelectList();
-        }
-
-        function removeSpecialOffer(ev) {
-            var myelement = $(ev).parent().parent().parent().parent();
-            var removedidvalue = $(myelement).attr('id-value');
-            const index = payedOffers.indexOf(removedidvalue);
-            if (index > -1) {
-                payedOffers.splice(index, 1);
-            }
-            $("#selectlist-cntoffers").val(payedOffers);
-            $(myelement).remove();
-            RefreshSpecialOffersSelectList();
-        }
-
-        function RefreshSpecialOffersSelectList() {
-            $.ajax({
-                type: 'GET',
-                url: "/Object/GetObjectAttributes",
-                contentType: "application/json",
-                data: { excludedAttributesId: document.getElementById('selectlist-specialoffers').value },
-                dataType: 'json',
-                success: function (data) {
-                    var offersSelectList = $('#specialoffer-select');
-                    offersSelectList.empty();
-                    offersSelectList.append(
-                        '<option disabled selected>Izaberite...</option>'
-                    );
-
-                    //console.log(data);//Da vidiš u konzoli
-                    $.each(data, function (index, model) {
-                        offersSelectList.append(
-                            $('<option>', {
-                                value: model.value
-                            }).text(model.text)
-                        );
-                    });
-                },
-                error: function () {
-                    alert('Greška prilikom pribavljanja podataka.');
-                }
-            });
-        }
-
-    </script>
-
-    <script>
-        var countableOffers = [];
-        var cntOffersAndValues = []
-
-        function GetCntAttributes() {
-            var sel = document.getElementById("cnt-attr-select");
-            var text = sel.options[sel.selectedIndex].text;
-            var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed" id-value="'
-                + sel.value + '" value="">'
-                + '<span class="my-0 col-md-12"><div class="row">'
-                + '<h5 class="col-md-4">' + text + '</h6>'
-                + '<input class="col-md-4 form-control form-control-sm" placeholder="Unesite vrijednost" required type="number" min="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"/>'
-                + '<div class="col-md-4"><a href="#"  class="btn btn-error" onclick="removeCntOffer(this);"  style="float:right;padding:0;line-height:0;">'
-                + '<i class="fa fa-times"></i></a></div></div></h5></li>';
-            $("#countable-attr-container").append(
-                myhtml
-            );
-
-            countableOffers.push(sel.value);
-            $("#selectlist-cntoffers").val(countableOffers);
-            RefreshCntOffersSelectList();
-        }
-
-        function removeCntOffer(ev) {
-            var myelement = $(ev).parent().parent().parent().parent();
-            console.log(removedidvalue);
-            var removedidvalue = $(myelement).attr('id-value');
-            const index = countableOffers.indexOf(removedidvalue);
-            if (index > -1) {
-                countableOffers.splice(index, 1);
-            }
-            $("#selectlist-cntoffers").val(offers);
-            $(myelement).remove();
-            RefreshCntOffersSelectList();
-        }
-
-
-        function RefreshCntOffersSelectList() {
-            $.ajax({
-                type: 'GET',
-                url: "/Object/GetObjectCntAttributes",
-                contentType: "application/json",
-                data: { excludedAttributesId: document.getElementById('selectlist-cntoffers').value },
-                dataType: 'json',
-                success: function (data) {
-                    var offersSelectList = $('#cnt-attr-select');
-                    offersSelectList.empty();
-                    offersSelectList.append(
-                        '<option disabled selected>Izaberite...</option>'
-                    );
-
-                    //console.log(data);//Da vidiš u konzoli
-                    $.each(data, function (index, model) {
-                        offersSelectList.append(
-                            $('<option>', {
-                                value: model.value
-                            }).text(model.text)
-                        );
-                    });
-                },
-                error: function () {
-                    alert('Greška prilikom pribavljanja podataka.');
-                }
-            });
-        }
-
-
-        function fillValues() {
-            var mylist = document.getElementById('countable-attr-container').getElementsByTagName("li");
-            for (var i = 0; i < mylist.length; i++) {
-                var idvalue = $(mylist[i]).attr('id-value');
-                var myvalue = $(mylist[i]).find('input')[0].value;
-                cntOffersAndValues.push(idvalue + ":" + myvalue);
-                $('#countable-offers').val(cntOffersAndValues);
-            }
-
-
-            var specialofferslist = document.getElementById('specialoffers-container').getElementsByTagName("li");
-            for (var i = 0; i < specialofferslist.length; i++) {
-                var idvalue = $(specialofferslist[i]).attr('id-value');
-                var myvalue = $(specialofferslist[i]).find('input')[0].value;
-                payedOffersWithValues.push(idvalue + ":" + myvalue);
-                $('#special-offersvwithval').val(payedOffersWithValues);
+            for (var i = 0; i < (maxocc - minocc + 1); i++) {
+                var visitors = (+minocc) + i; 
+                var myhtml = '<div class="form-group">'
+                    + '<div class="input-group row">'
+                    + '<input class="form-control" value="' + visitors + '" disabled>'
+                    + '<input type="number" placeholder="Unesite cijenu" name="" class="form-control" required="">'
+                    + '<div class="input-group-append"><span class="input-group-text text-muted">' + currency + '</span></div></div></div>';
+                $('#prices').append(myhtml);
             }
         }
+    }
 
-    </script>
-    <script>
-        var offers = [];
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+</script>
+
+@*ovo je za one roza tabove*@
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
 
 
+<script>
+    var currency = getCookie('Currency');
+    if (!currency)
+        currency = "BAM";
+    var payedOffers = [];
+    var payedOffersWithValues = [];
 
-        function GetAttributes() {
-            var sel = document.getElementById("attribute-select");
-            var text = sel.options[sel.selectedIndex].text;
-            var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed"  value="'
-                + sel.value + '"> <h5 class="my-0 col-md-12">'
-                + text
-                + '<a href="#"  class="btn btn-error" onclick="attributeRemove(this);"  style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a></h5></li >';
-            $("#attributes-container").append(
-                myhtml
-            );
-            offers.push(sel.value);
-            //var dataToSend = JSON.stringify(offers);
-            $("#added-offers").val(offers);
+    function GetSpecialOffersAttributes() {
+       
 
-            RefreshOffersSelectList();
+        var sel = document.getElementById("specialoffer-select");
+        var text = sel.options[sel.selectedIndex].text;
+        var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed" id-value="'
+            + sel.value + '" value="">'
+            + '<span class="my-0 col-md-12"><div class="row">'
+            + '<h5 class="col-md-4">' + text + '</h6>'
+            + '<input class="col-md-4 form-control form-control-sm" placeholder="Unesite cijenu" required pattern="[0-9]+([\.][0-9]{1,2})?" />'
+            + '<div class="form-control-sm input-group-append col-md-1"><span class="input-group-text text-muted">' + currency + '</span></div>'
+            + '<div class="col-md-3"><a href="#"  class="btn btn-error" onclick="removeSpecialOffer(this);"  style="float:right;padding:0;line-height:0;">'
+            + '<i class="fa fa-times"></i></a></div></div></h5></li>';
+        $("#specialoffers-container").append(
+            myhtml
+        );
+
+        payedOffers.push(sel.value);
+        $("#selectlist-specialoffers").val(payedOffers);
+        RefreshSpecialOffersSelectList();
+    }
+
+    function removeSpecialOffer(ev) {
+        var myelement = $(ev).parent().parent().parent().parent();
+        var removedidvalue = $(myelement).attr('id-value');
+        const index = payedOffers.indexOf(removedidvalue);
+        if (index > -1) {
+            payedOffers.splice(index, 1);
         }
+        $("#selectlist-cntoffers").val(payedOffers);
+        $(myelement).remove();
+        RefreshSpecialOffersSelectList();
+    }
 
-        function RefreshOffersSelectList() {
-            $.ajax({
-                type: 'GET',
-                url: "/Object/GetObjectAttributes",
-                contentType: "application/json",
-                data: { excludedAttributesId: document.getElementById('added-offers').value },
-                dataType: 'json',
-                success: function (data) {
-                    var offersSelectList = $('#attribute-select');
-                    offersSelectList.empty();
-                    offersSelectList.append(
-                        '<option disabled selected>Izaberite...</option>'
-                    );
-
-                    //console.log(data);//Da vidiš u konzoli
-                    $.each(data, function (index, model) {
-                        offersSelectList.append(
-                            $('<option>', {
-                                value: model.value
-                            }).text(model.text)
-                        );
-                    });
-                },
-                error: function () {
-                    alert('Greška prilikom pribavljanja podataka.');
-                }
-            });
-        }
-
-        function attributeRemove(ev) {
-
-            var removedvalue = $(ev).parent().parent().attr('value');
-            //console.log(removedvalue);
-            const index = offers.indexOf(removedvalue);
-            if (index > -1) {
-                offers.splice(index, 1);
-            }
-            $("#added-offers").val(offers);
-            $(ev).parent().parent().remove();
-            RefreshOffersSelectList();
-        }
-    </script>
-    <script>
-        $("#country-select").change(function () {
-            GetCities();
-        })
-        function GetCities() {
-            $.ajax({
-                type: 'GET',
-                url: "/Object/GetCitiesInCountry",
-                contentType: "application/json",
-                data: { countryId: document.getElementById('country-select').value },
-                dataType: 'json',
-                success: function (data) {
-                    var citySelectList = $('#city-select');
-                    citySelectList.empty();
-                    citySelectList.append(
-                        '<option disabled selected>Izaberite...</option>'
-                    );
-
-                    // console.log(data);//Da vidiš u konzoli
-                    $.each(data, function (index, model) {
-                        citySelectList.append(
-                            $('<option>', {
-                                value: model.value
-                            }).text(model.text)
-                        );
-                    });
-                },
-                error: function () {
-                    alert('Greška prilikom pribavljanja podataka.');
-                }
-            });
-        }
-    </script>
-
-    <script>
-        var map;
-        var marker;
-
-        function centerToUsersLocation() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    function success(position) {
-                        var pos = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        map.setCenter(pos);
-                        map.setZoom(12);
-                        marker.setPosition(pos);
-                        document.getElementById("latitude-value").value = pos.lat;
-                        document.getElementById("longitude-value").value = pos.lng;
-                    }
+    function RefreshSpecialOffersSelectList() {
+        $.ajax({
+            type: 'GET',
+            url: "/Object/GetObjectAttributes",
+            contentType: "application/json",
+            data: { excludedAttributesId: document.getElementById('selectlist-specialoffers').value },
+            dataType: 'json',
+            success: function (data) {
+                var offersSelectList = $('#specialoffer-select');
+                offersSelectList.empty();
+                offersSelectList.append(
+                    '<option disabled selected>Izaberite...</option>'
                 );
+
+                //console.log(data);//Da vidiš u konzoli
+                $.each(data, function (index, model) {
+                    offersSelectList.append(
+                        $('<option>', {
+                            value: model.value
+                        }).text(model.text)
+                    );
+                });
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
             }
+        });
+    }
+
+</script>
+
+<script>
+    var occupancabasedprices = [];
+    var countableOffers = [];
+    var cntOffersAndValues = [];
+
+    function GetCntAttributes() {
+        var sel = document.getElementById("cnt-attr-select");
+        var text = sel.options[sel.selectedIndex].text;
+        var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed" id-value="'
+            + sel.value + '" value="">'
+            + '<span class="my-0 col-md-12"><div class="row">'
+            + '<h5 class="col-md-4">' + text + '</h6>'
+            + '<input class="col-md-4 form-control form-control-sm" placeholder="Unesite vrijednost" required type="number" min="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"/>'
+            + '<div class="col-md-4"><a href="#"  class="btn btn-error" onclick="removeCntOffer(this);"  style="float:right;padding:0;line-height:0;">'
+            + '<i class="fa fa-times"></i></a></div></div></h5></li>';
+        $("#countable-attr-container").append(
+            myhtml
+        );
+
+        countableOffers.push(sel.value);
+        $("#selectlist-cntoffers").val(countableOffers);
+        RefreshCntOffersSelectList();
+    }
+
+    function removeCntOffer(ev) {
+        var myelement = $(ev).parent().parent().parent().parent();
+        console.log(removedidvalue);
+        var removedidvalue = $(myelement).attr('id-value');
+        const index = countableOffers.indexOf(removedidvalue);
+        if (index > -1) {
+            countableOffers.splice(index, 1);
+        }
+        $("#selectlist-cntoffers").val(offers);
+        $(myelement).remove();
+        RefreshCntOffersSelectList();
+    }
+
+
+    function RefreshCntOffersSelectList() {
+        $.ajax({
+            type: 'GET',
+            url: "/Object/GetObjectCntAttributes",
+            contentType: "application/json",
+            data: { excludedAttributesId: document.getElementById('selectlist-cntoffers').value },
+            dataType: 'json',
+            success: function (data) {
+                var offersSelectList = $('#cnt-attr-select');
+                offersSelectList.empty();
+                offersSelectList.append(
+                    '<option disabled selected>Izaberite...</option>'
+                );
+
+                //console.log(data);//Da vidiš u konzoli
+                $.each(data, function (index, model) {
+                    offersSelectList.append(
+                        $('<option>', {
+                            value: model.value
+                        }).text(model.text)
+                    );
+                });
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+
+
+    function fillValues() {
+        var mylist = document.getElementById('countable-attr-container').getElementsByTagName("li");
+        for (var i = 0; i < mylist.length; i++) {
+            var idvalue = $(mylist[i]).attr('id-value');
+            var myvalue = $(mylist[i]).find('input')[0].value;
+            cntOffersAndValues.push(idvalue + ":" + myvalue);
+            $('#countable-offers').val(cntOffersAndValues);
         }
 
-        function initMap() {
-            centerToUsersLocation();
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: 43.823508, lng: 18.374364 },
-                zoom: 7
-            });
-            marker = new google.maps.Marker({
-                position: { lat: 43.823508, lng: 18.374364 },
-                map: map,
-                draggable: true,
-                title: "Lokacija"
-            });
 
-            document.getElementById("latitude-value").value = "43.823508";
-            document.getElementById("longitude-value").value = "18.374364";
-
-            google.maps.event.addListener(marker, 'dragend', function () {
-                document.getElementById("latitude-value").value = marker.getPosition().lat();
-                document.getElementById("longitude-value").value = marker.getPosition().lng();
-            });
+        var specialofferslist = document.getElementById('specialoffers-container').getElementsByTagName("li");
+        for (var i = 0; i < specialofferslist.length; i++) {
+            var idvalue = $(specialofferslist[i]).attr('id-value');
+            var myvalue = $(specialofferslist[i]).find('input')[0].value;
+            payedOffersWithValues.push(idvalue + ":" + myvalue);
+            $('#special-offersvwithval').val(payedOffersWithValues);
         }
 
-    </script>
+        //Check if it works
+        if (($('#spmodel').val()) == "false") {
+            var occ_b_prices = document.getElementById('prices').getElementsByTagName("input");
+            for (var i = 0; i < occ_b_prices.length; i+=2) {
+                var visitors = $(occ_b_prices[i]).attr('value');
+                var pricevalue = $(occ_b_prices[i + 1]).val();
+                occupancabasedprices.push(visitors + ":" + pricevalue);
+            }
+            $('#occupancybased-prices').val(occupancabasedprices);
+            console.log($('#occupancybased-prices').val());
+        }
+    }
+
+</script>
+<script>
+    var offers = [];
 
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>
+
+    function GetAttributes() {
+        var sel = document.getElementById("attribute-select");
+        var text = sel.options[sel.selectedIndex].text;
+        var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed"  value="'
+            + sel.value + '"> <h5 class="my-0 col-md-12">'
+            + text
+            + '<a href="#"  class="btn btn-error" onclick="attributeRemove(this);"  style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a></h5></li >';
+        $("#attributes-container").append(
+            myhtml
+        );
+        offers.push(sel.value);
+        //var dataToSend = JSON.stringify(offers);
+        $("#added-offers").val(offers);
+
+        RefreshOffersSelectList();
+    }
+
+    function RefreshOffersSelectList() {
+        $.ajax({
+            type: 'GET',
+            url: "/Object/GetObjectAttributes",
+            contentType: "application/json",
+            data: { excludedAttributesId: document.getElementById('added-offers').value },
+            dataType: 'json',
+            success: function (data) {
+                var offersSelectList = $('#attribute-select');
+                offersSelectList.empty();
+                offersSelectList.append(
+                    '<option disabled selected>Izaberite...</option>'
+                );
+
+                //console.log(data);//Da vidiš u konzoli
+                $.each(data, function (index, model) {
+                    offersSelectList.append(
+                        $('<option>', {
+                            value: model.value
+                        }).text(model.text)
+                    );
+                });
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+
+    function attributeRemove(ev) {
+
+        var removedvalue = $(ev).parent().parent().attr('value');
+        //console.log(removedvalue);
+        const index = offers.indexOf(removedvalue);
+        if (index > -1) {
+            offers.splice(index, 1);
+        }
+        $("#added-offers").val(offers);
+        $(ev).parent().parent().remove();
+        RefreshOffersSelectList();
+    }
+</script>
+<script>
+    $("#country-select").change(function () {
+        GetCities();
+    })
+    function GetCities() {
+        $.ajax({
+            type: 'GET',
+            url: "/Object/GetCitiesInCountry",
+            contentType: "application/json",
+            data: { countryId: document.getElementById('country-select').value },
+            dataType: 'json',
+            success: function (data) {
+                var citySelectList = $('#city-select');
+                citySelectList.empty();
+                citySelectList.append(
+                    '<option disabled selected>Izaberite...</option>'
+                );
+
+                // console.log(data);//Da vidiš u konzoli
+                $.each(data, function (index, model) {
+                    citySelectList.append(
+                        $('<option>', {
+                            value: model.value
+                        }).text(model.text)
+                    );
+                });
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+</script>
+
+
+<script src="~/js/mapa.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>
