@@ -11,7 +11,9 @@
 
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
-
+@*<link href="~/css/customdatetimepicker.css" rel="stylesheet" />*@
+<script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
 
 @{
     ViewData["Title"] = "CreateObject";
@@ -242,6 +244,7 @@
                         <div class="tab-pane fade" id="nav-offer" role="tabpanel" aria-labelledby="nav-offer-tab">
                             @*<form method="post" asp-action="CreateObject" asp-controller="Object" onsubmit="fillValues()">*@
                             <div class="container">
+                                <br />
                                 <h5 class="mb-3 text-muted">Karakteristike objekta</h5><br />
                                 <input asp-for="AddedCountableOffers" id="countable-offers" type="hidden" />
                                 <input @*asp-for="SelectListCountableOffers" *@ id="selectlist-cntoffers" type="hidden" />
@@ -291,7 +294,7 @@
                                     <div class="col-lg-7 mx-auto">
                                         <div class="bg-white rounded-lg shadow-sm p-5">
                                             <!-- Naplata tabs -->
-                                            <input type="hidden" asp-for="StandardPricingM" value="true" id="spmodel"/>
+                                            <input type="hidden" asp-for="StandardPricingM" value="true" id="spmodel" />
                                             <ul role="tablist" class="nav bg-light nav-pills rounded-pill nav-fill mb-3">
                                                 <li class="nav-item">
                                                     <a data-toggle="pill" onclick="changeToStandardModel()" href="#nav-tab-standardpm" class="nav-link active rounded-pill">
@@ -354,13 +357,12 @@
                                                         </div>
                                                         <div class="col-md-6 form-group">
                                                             <label asp-for="StandardPricingModel.MaxDaysOffer"></label>
-                                                             <input  asp-for="StandardPricingModel.MaxDaysOffer" class="form-control" type="number" min="1">
+                                                            <input asp-for="StandardPricingModel.MaxDaysOffer" class="form-control" type="number" min="1">
                                                         </div>
                                                     </div>
                                                     @*<button type="button" class="subscribe btn btn-primary btn-block rounded-pill shadow-sm"> Confirm  </button>*@
                                                 </div>
                                                 <!-- End -->
-
                                                 <!-- occupancy based model -->
                                                 <div id="nav-tab-occupancyb" class="tab-pane fade">
                                                     <div class="row">
@@ -389,7 +391,7 @@
                                                     </div>
                                                     <button type="button" class="subscribe btn btn-primary btn-block rounded-pill shadow-sm" onclick="formPrices()"> Formiraj cijene  </button>
                                                     <hr />
-                                                    <input type="hidden" asp-for="OccubancBasedPrices" id="occupancybased-prices"/>
+                                                    <input type="hidden" asp-for="OccubancBasedPrices" id="occupancybased-prices" />
                                                     <div id="prices">
                                                     </div>
                                                 </div>
@@ -407,10 +409,85 @@
 
                         </div>
 
-
+                        <!--Fotografije-->
                         <div class="tab-pane fade" id="nav-photos" role="tabpanel" aria-labelledby="nav-photos-tab">
                         </div>
+
+                        <!--Nedostupni periodi-->
                         <div class="tab-pane fade" id="nav-periods" role="tabpanel" aria-labelledby="nav-periods-tab">
+                            <div class="container py-5">
+                                <div class="bg-white rounded-lg shadow-sm p-5">
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input id="datepicker1" class="datepicker" width="276" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input id="datepicker2" class="datepicker" width="276" />
+                                        </div>
+                                    </div>
+                                    <script>
+                                        var $DPicker1 = $('#datepicker1');
+                                        var $DPicker2 = $('#datepicker2');
+                                        $DPicker1.datepicker({
+                                            uiLibrary: 'bootstrap4',
+                                            format: 'yyyy-dd-mm',
+                                            change: function (e) {
+                                                RecreateDatePicker2();
+                                            },
+                                            minDate: new Date()
+                                            
+                                        });
+
+                                        $DPicker2.datepicker({
+                                            uiLibrary: 'bootstrap4',
+                                            format: 'yyyy-dd-mm',
+                                            minDate: new Date(),
+                                            change: function (e) {
+                                                RecreateDatePicker1();
+                                            }
+                                        });
+
+                                        function RecreateDatePicker1() {
+                                            var checkout = $('#datepicker2').val();
+                                            var currentcheckin = $('#datepicker1').val();
+                                            $DPicker1.destroy();
+                                            $DPicker1.datepicker({
+                                                uiLibrary: 'bootstrap4',
+                                                format: 'yyyy-dd-mm',
+                                                value: currentcheckin,
+                                                minDate: new Date(),
+                                                maxDate: checkout,
+                                                change: function (e) {
+                                                    RecreateDatePicker2();
+                                                }
+                                            });
+                                        }
+
+                                        function RecreateDatePicker2() {
+                                            var checkin = $('#datepicker1').val();
+                                            var mindate = new Date();
+                                            if(checkin)
+                                                mindate = checkin;
+
+                                            var currentcheckout = $('#datepicker2').val();
+                                            $DPicker2.destroy();
+                                            $DPicker2.datepicker({
+                                                uiLibrary: 'bootstrap4',
+                                                format: 'yyyy-dd-mm',
+                                                value: currentcheckout,
+                                                minDate: mindate,
+                                                change: function (e) {
+                                                    RecreateDatePicker1();
+                                                }
+                                            });
+                                        }
+
+                                       
+                                    </script>
+
+                                </div>
+                            </div>
                         </div>
                         @*</form>*@
                     </div>
@@ -425,7 +502,6 @@
 
 
 
-
 <script src="~/js/Navbarcolor.js"></script>
 
 <script>
@@ -434,6 +510,7 @@
     }
     function changeToOccupancyBModel() {
         $('#spmodel').val(false);
+        $('#prices').empty();
     }
 
     function formPrices() {
@@ -442,17 +519,16 @@
 
         var minocc = $('#min-occ-ob').val();
         var maxocc = $('#max-occ-ob').val();
-        
+
         if ((!maxocc) || (!minocc) || ((+maxocc) < 1) || ((+minocc) < 1) || ((+minocc) > (+maxocc))) {
             alert("Unesite ispravne podatke za broj posjetilaca");
         }
-        else
-        {
+        else {
             $('#prices').append(
                 '<label><span class="hidden-xs">Broj posjetilaca</span></label>'
             );
             for (var i = 0; i < (maxocc - minocc + 1); i++) {
-                var visitors = (+minocc) + i; 
+                var visitors = (+minocc) + i;
                 var myhtml = '<div class="form-group">'
                     + '<div class="input-group row">'
                     + '<input class="form-control" value="' + visitors + '" disabled>'
@@ -486,7 +562,7 @@
     var payedOffersWithValues = [];
 
     function GetSpecialOffersAttributes() {
-       
+
 
         var sel = document.getElementById("specialoffer-select");
         var text = sel.options[sel.selectedIndex].text;
@@ -639,7 +715,7 @@
         //Check if it works
         if (($('#spmodel').val()) == "false") {
             var occ_b_prices = document.getElementById('prices').getElementsByTagName("input");
-            for (var i = 0; i < occ_b_prices.length; i+=2) {
+            for (var i = 0; i < occ_b_prices.length; i += 2) {
                 var visitors = $(occ_b_prices[i]).attr('value');
                 var pricevalue = $(occ_b_prices[i + 1]).val();
                 occupancabasedprices.push(visitors + ":" + pricevalue);
@@ -749,5 +825,16 @@
 </script>
 
 
+
+@*<script src="~/js/datetimepicker.js"></script>*@
+@*<script src="~/js/customdatetimepicker.js"></script>*@
+@*<script>
+        $(document).ready(function () {
+            $("#datepicker").datepicker();
+            $('.fa-calendar').click(function () {
+                $("#datepicker").focus();
+            });
+        });
+    </script>*@
 <script src="~/js/mapa.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>
