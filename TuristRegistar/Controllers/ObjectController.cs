@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TuristRegistar.Data;
@@ -13,10 +16,13 @@ namespace TuristRegistar.Controllers
     public class ObjectController : Controller
     {
         private readonly ITouristObject _touristObject;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ObjectController(ITouristObject touristObject)
+
+        public ObjectController(ITouristObject touristObject, IHostingEnvironment hostingEnvironment)
         {
             _touristObject = touristObject;
+            _hostingEnvironment = hostingEnvironment;
         }
 
 
@@ -100,6 +106,36 @@ namespace TuristRegistar.Controllers
             var cities = _touristObject.GetCitiesFromCountry(countryId);
             var citiesSelectList = cities.Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
             return Ok(citiesSelectList);
+        }
+
+
+        public async Task<JsonResult> ImageUpload(CreateObjectViewModel model)
+        {
+
+            var file = model.ImageFile;
+
+            if (file != null)
+            {
+
+                var fileName = Path.GetFileName(file.FileName);
+                var extention = Path.GetExtension(file.FileName);
+                var filenamewithoutextension = Path.GetFileNameWithoutExtension(file.FileName);
+
+                //string webRootPath = _hostingEnvironment.WebRootPath;
+                //string contentRootPath = _hostingEnvironment.ContentRootPath;
+
+                //Content(webRootPath + "\n" + contentRootPath);
+                var path  = Path.Combine(_hostingEnvironment.WebRootPath, "UploadedImage" , file.FileName);
+
+                //file.SaveAs(path);
+                using (var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+            }
+
+            return Json(file.FileName);
+
         }
 
     }

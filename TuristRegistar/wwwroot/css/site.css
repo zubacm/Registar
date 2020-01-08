@@ -58,3 +58,10 @@ body {
         width:100% !important;
     }
 }
+
+.no-padding {
+    padding:0;
+}
+.pointer {
+    cursor:pointer;
+}

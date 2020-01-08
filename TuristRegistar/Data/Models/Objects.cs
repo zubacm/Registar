@@ -26,7 +26,7 @@ namespace TuristRegistar.Data.Models
         public ICollection<CntObjAttributesCount> CntObjAttributesCount { get; set; }
         public ICollection<RatingsAndReviews> RatingsAndReviews { get; set; }
         public ICollection<SpecialOffersPrices> SpecialOffers { get; set; }
-        public ICollection<AvailablePeriods> AvailablePeriods { get; set; }//This will become unavailable periods
+        public ICollection<UnavailablePeriods> AvailablePeriods { get; set; }//This will become unavailable periods
         public ICollection<ObjectImages> ObjectImages { get; set; }
         public int ObejectTypeId { get; set; }
         public ObjectTypes ObjectType { get; set; }

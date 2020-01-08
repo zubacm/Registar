@@ -20,7 +20,7 @@ namespace TuristRegistar.Data
         {
         }
 
-        public DbSet<AvailablePeriods> AvailablePeriods { get; set; }
+        public DbSet<UnavailablePeriods> AvailablePeriods { get; set; }
         public DbSet<CountableObjectAttributes> CountableObjectAttributes { get; set; }
         public DbSet<ObjectAttributes> ObjectAttributes { get; set; }
         public DbSet<ObjectImages> ObjectImages { get; set; }

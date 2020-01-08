@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -63,8 +64,18 @@ namespace TuristRegistar.Models
         public OccupancyBasedPricing OccupancyBasedPricing { get; set; }
         public string OccubancBasedPrices { get; set; }
 
+        public string UnavailablePeriodsString { get; set; }
+        public List<UnavailablePeriods> UnavailablePeriods { get; set; }
 
+        public List<IFormFile> ImgFiles { get; set; }
 
+        public string ProductName { get; set; }
+        public string Title { get; set; }
+        //public string Description { get; set; }
+        public Nullable<int> Price { get; set; }
+        public Nullable<int> ImageId { get; set; }
+        //public HttpPostedFileWrapper ImageFile { get; set; }
+        public IFormFile ImageFile { get; set; }
     }
 }
 
