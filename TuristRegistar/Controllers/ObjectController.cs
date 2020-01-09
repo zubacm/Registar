@@ -87,6 +87,12 @@ namespace TuristRegistar.Controllers
         [Route("createobject")] // /createobject
         public IActionResult CreateObject(CreateObjectViewModel model)
         {
+            if ((!ModelState.IsValid) || (!CheckPricing(model)))
+            {
+                TempData["Error-Notification"] = "Ispravno popunite neophodna polja!";
+                return View(model);
+            }
+
             if(!string.IsNullOrWhiteSpace(model.AddedOffers))
                 model.ListOfAddedOffersId = _touristObject.ParseStringToIDsList(model.AddedOffers);
             if (!string.IsNullOrWhiteSpace(model.AddedCountableOffers))
@@ -95,6 +101,13 @@ namespace TuristRegistar.Controllers
             if (!string.IsNullOrWhiteSpace(model.AddedSpecialOffers))
                 model.ListOfAddedSpecialOffersId = (_touristObject.ParseStringToKeyValue(model.AddedSpecialOffers))
                     .Select(item => new SpecialOffers() { Id = item.Key, Price = item.Value }).ToList();
+            if ((!model.StandardPricing) && (!string.IsNullOrWhiteSpace(model.OccubancBasedPrices)))
+                model.OccupancyBasedPricing.Prices = (_touristObject.ParseStringToKeyValue(model.OccubancBasedPrices))
+                    .Select(item => new OccupancyBasedPrices() { Occupancy = item.Key, PricePerNight = item.Value }).ToList();
+            //check if this up and down works
+
+            //if(!string.IsNullOrWhiteSpace(model.UnavailablePeriodsString))
+            //    model.UnavailablePeriods = (_touristObject)
 
             return Redirect("createobject");
         }
@@ -109,7 +122,7 @@ namespace TuristRegistar.Controllers
         }
 
 
-        public async Task<JsonResult> ImageUpload(CreateObjectViewModel model)
+        public async Task<JsonResult> ImageUploadTemp(CreateObjectViewModel model)
         {
 
             var file = model.ImageFile;
@@ -125,7 +138,7 @@ namespace TuristRegistar.Controllers
                 //string contentRootPath = _hostingEnvironment.ContentRootPath;
 
                 //Content(webRootPath + "\n" + contentRootPath);
-                var path  = Path.Combine(_hostingEnvironment.WebRootPath, "UploadedImage" , file.FileName);
+                var path  = Path.Combine(_hostingEnvironment.WebRootPath, "Temp" , file.FileName);
 
                 //file.SaveAs(path);
                 using (var fileStream = new FileStream(path, FileMode.Create))
@@ -138,5 +151,30 @@ namespace TuristRegistar.Controllers
 
         }
 
+        public IActionResult DeleteImageTemp(CreateObjectViewModel model)
+        {
+            var relativelocation = model.DeleteImagePath.Remove(0, 1);
+            var path = Path.Combine(_hostingEnvironment.WebRootPath, relativelocation);
+            if(System.IO.File.Exists(path))
+                 System.IO.File.Delete(path);
+
+            return Ok();
+        }
+
+
+        private bool CheckPricing(CreateObjectViewModel model)
+        {
+            if (model.StandardPricing &&
+                (model.StandardPricingModel.StandardOccupancy == null || model.StandardPricingModel.OffsetPercentage == null
+                || model.StandardPricingModel.StandardOccupancy == null || model.StandardPricingModel.MinOccupancy == null || model.StandardPricingModel.MaxOccupancy == null))
+            {
+                return false;
+            }
+            if ((!model.StandardPricing) && (model.OccupancyBasedPricing.MaxOccupancy == null || model.OccupancyBasedPricing.MinOccupancy == null || model.OccubancBasedPrices == null))
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

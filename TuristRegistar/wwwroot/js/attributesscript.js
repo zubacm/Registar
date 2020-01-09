@@ -63,7 +63,7 @@ function GetAttributes() {
     var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed"  value="'
         + sel.value + '"> <h5 class="my-0 col-md-12">'
         + text
-        + '<a href="#"  class="btn btn-error" onclick="attributeRemove(this);"  style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a></h5></li >';
+        + '<a class="btn btn-error pointer" onclick="attributeRemove(this);"  style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a></h5></li >';
     $("#attributes-container").append(
         myhtml
     );
@@ -124,8 +124,8 @@ function GetCntAttributes() {
         + sel.value + '" value="">'
         + '<span class="my-0 col-md-12"><div class="row">'
         + '<h5 class="col-md-4">' + text + '</h6>'
-        + '<input class="col-md-4 form-control form-control-sm" placeholder="Unesite vrijednost" required type="number" min="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"/>'
-        + '<div class="col-md-4"><a href="#"  class="btn btn-error" onclick="removeCntOffer(this);"  style="float:right;padding:0;line-height:0;">'
+        + '<input class="col-md-4 form-control form-control-sm myinput" placeholder="Unesite vrijednost" required type="number" min="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"/>'
+        + '<div class="col-md-4"><a  class="btn btn-error pointer" onclick="removeCntOffer(this);"  style="float:right;padding:0;line-height:0;">'
         + '<i class="fa fa-times"></i></a></div></div></h5></li>';
     $("#countable-attr-container").append(
         myhtml
@@ -189,9 +189,9 @@ function GetSpecialOffersAttributes() {
         + sel.value + '" value="">'
         + '<span class="my-0 col-md-12"><div class="row">'
         + '<h5 class="col-md-4">' + text + '</h6>'
-        + '<input class="col-md-4 form-control form-control-sm" placeholder="Unesite cijenu" required pattern="[0-9]+([\.][0-9]{1,2})?" />'
+        + '<input class="col-md-4 form-control form-control-sm myinput" placeholder="Unesite cijenu" required pattern="[0-9]+([\.][0-9]{1,2})?" />'
         + '<div class="form-control-sm input-group-append col-md-1"><span class="input-group-text text-muted">' + currency + '</span></div>'
-        + '<div class="col-md-3"><a href="#"  class="btn btn-error" onclick="removeSpecialOffer(this);"  style="float:right;padding:0;line-height:0;">'
+        + '<div class="col-md-3"><a class="btn btn-error pointer" onclick="removeSpecialOffer(this);"  style="float:right;padding:0;line-height:0;">'
         + '<i class="fa fa-times"></i></a></div></div></h5></li>';
     $("#specialoffers-container").append(
         myhtml
@@ -279,10 +279,33 @@ function GetCities() {
 
 function changeToStandardModel() {
     $('#spmodel').val(true);
+    //var standardlist = $('.standardvalidation');
+    //for (var i = 0; i < standardlist.length; i++) {
+    //    //$(standardlist[i]).attr("required", "true");
+    //}
+    //var occupancylist = $('.occupancyvalidation');
+    //for (i = 0; i < occupancylist.length; i++) {
+    //    occupancylist[i].required =  false;
+    //    //$(occupancylist[i]).removeAttr("required");
+    //    //$(occupancylist[i]).attr("required", "false");
+    //}
 }
 function changeToOccupancyBModel() {
     $('#spmodel').val(false);
     $('#prices').empty();
+
+    //var standardlist = $('.standardvalidation');
+    //for (var i = 0; i < standardlist.length; i++) {
+    //    console.log($(standardlist[i]).attr('required'));
+    //    standardlist[i].required = false;
+    //    //$(standardlist[i]).removeAttr("required");
+    //    //$(standardlist[i]).attr("required", "false");
+    //}
+    //var occupancylist = $('.occupancyvalidation');
+    //for (i = 0; i < occupancylist.length; i++) {
+    //    console.log($(occupancylist[i]).attr('required'));
+    //    $(occupancylist[i]).attr("required", "true");
+    //}
 }
 
 function formPrices() {
@@ -304,9 +327,12 @@ function formPrices() {
             var myhtml = '<div class="form-group">'
                 + '<div class="input-group row">'
                 + '<input class="form-control" value="' + visitors + '" disabled>'
-                + '<input type="number" placeholder="Unesite cijenu" name="" class="form-control" required="">'
+                + '<input type="number" placeholder="Unesite cijenu" name="" class="form-control myinput" required="">'
                 + '<div class="input-group-append"><span class="input-group-text text-muted">' + currency + '</span></div></div></div>';
             $('#prices').append(myhtml);
         }
     }
 }
+
+
+

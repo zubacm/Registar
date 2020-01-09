@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\UploadedImage\" />
+    <Folder Include="wwwroot\Temp\" />
   </ItemGroup>
 
 </Project>

@@ -32,10 +32,9 @@ namespace TuristRegistar.Models
         [Display(Name = "Web kontakt")]
         public String WebContact { get; set; }
         [Display(Name = "Površina")]
-        public float Surface { get; set; }
+        public Nullable<float> Surface { get; set; }
        
 
-        public bool StandardPricingM { get; set; }
 
         public IEnumerable<SelectListItem> Countries { get; set; }
         public String SelectedCountry { get; set; }
@@ -59,7 +58,7 @@ namespace TuristRegistar.Models
         [Display(Name = "Maksimalan broj dana boravka")]
         public int MaxDaysOffer { get; set; }
 
-        public bool StandardPrModel { get; set; } 
+        public bool StandardPricing { get; set; } 
         public StandardPricingModel StandardPricingModel { get; set; }
         public OccupancyBasedPricing OccupancyBasedPricing { get; set; }
         public string OccubancBasedPrices { get; set; }
@@ -76,6 +75,7 @@ namespace TuristRegistar.Models
         public Nullable<int> ImageId { get; set; }
         //public HttpPostedFileWrapper ImageFile { get; set; }
         public IFormFile ImageFile { get; set; }
+        public string DeleteImagePath { get; set; }
     }
 }
 

@@ -9,10 +9,12 @@
 <link href="~/css/site.css" rel="stylesheet" />
 <link href="~/css/paying-model-style.css" rel="stylesheet" />
 
+<script src="~/js/toast-show.js"></script>
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script src="~/lib/bootstrap/js/bootstrap.js"></script>
 <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
 <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+<link href="~/css/gallery.css" rel="stylesheet" />
 
 @{
     ViewData["Title"] = "CreateObject";
@@ -24,8 +26,6 @@
 {
     mycurrency = HttpContextAccessor.HttpContext.Request.Cookies["Currency"];
 }
-
-
 <!-- Tabs -->
 <form method="post" asp-action="CreateObject" asp-controller="Object" onsubmit="fillValues()" enctype="multipart/form-data">
     <section id="tabs">
@@ -42,7 +42,8 @@
                         </div>
                     </nav>
                     <div class="tab-content py-3 px-3 px-sm-0" id="nav-tabContent">
-                        @*Basic*@
+
+                        <!--Osnovno-->
                         <div class="tab-pane fade show active" id="nav-basic" role="tabpanel" aria-labelledby="nav-basic-tab">
 
                             <br />
@@ -51,37 +52,35 @@
                                 <div class="col-md-4 order-md-2 mb-4">
                                     <h4 class="d-flex justify-content-between align-items-center mb-3">
                                         <span class="text-muted">Mapa</span>
-                                        @*<span class="badge badge-secondary badge-pill">3</span>*@
                                     </h4>
                                     <div id="map" class="mb-3" style="height:300px"></div>
                                     <hr />
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label asp-for="Lat"></label>
-                                            <input class="form-control" asp-for="Lat" id="latitude-value" pattern="[0-9]+([\.][0-9]{1,2})?" required>
+                                            <input class="form-control myinput" asp-for="Lat" id="latitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
                                             <span asp-validation-for="Lat" class="text-danger"></span>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label asp-for="Lng"></label>
                                             <div class="input-group">
-                                                <input asp-for="Lng" class="form-control" id="longitude-value" pattern="[0-9]+([\.][0-9]{1,2})?" required>
+                                                <input asp-for="Lng" class="form-control myinput" id="longitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
                                                 <span asp-validation-for="Lng" class="text-danger"></span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-8 order-md-1">
-                                    @*<form class="needs-validation" novalidate="">*@
                                     <div class="row">
                                         <div class="col-md-8 mb-3">
                                             <label asp-for="Name"></label>
-                                            <input type="text" class="form-control" placeholder="" asp-for="Name">
+                                            <input id="oj" type="text" class="form-control myinput" placeholder="" asp-for="Name" required>
                                             <span asp-validation-for="Name" class="text-danger"></span>
                                         </div>
                                         <div class="col-md-4 mb-3">
                                             <label asp-for="Surface"></label><span class="text-muted">&nbsp;(Opciono)</span>
                                             <div class="input-group">
-                                                <input type="number" asp-for="Surface" class="form-control" placeholder="">
+                                                <input type="number" asp-for="Surface" class="form-control" pattern="[0-9]+([\.][0-9]*)?" placeholder="">
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text">m²</span>
                                                 </div>
@@ -96,7 +95,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Address" class="form-control" placeholder="Vuka Karadžića 30">
+                                            <input type="text" asp-for="Address" class="form-control" placeholder="Vuka Karadžića 30" required>
                                             <span asp-validation-for="Address" class="text-danger"></span>
 
                                         </div>
@@ -107,7 +106,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                             </div>
-                                            <input type="email" asp-for="EmailContact" class="form-control" placeholder="markomarkovic@primjer.com">
+                                            <input type="email" asp-for="EmailContact" class="form-control mymailvalidation" placeholder="markomarkovic@primjer.com">
                                             <span asp-validation-for="EmailContact" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -138,14 +137,14 @@
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label asp-for="SelectedCountry">Država</label>
+                                            <label asp-for="SelectedCountry">Država</label><span class="text-muted">&nbsp;(Opciono)</span>
                                             <select class="custom-select d-block w-100" asp-for="SelectedCountry" asp-items="@Model.Countries" id="country-select">
                                                 <option disabled selected>Izaberite...</option>
                                             </select>
                                             <span asp-validation-for="Countries" class="text-danger"></span>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label asp-for="SelectedCity">Grad</label>
+                                            <label asp-for="SelectedCity">Grad</label><span class="text-muted">&nbsp;(Opciono)</span>
                                             <select class="custom-select d-block w-100" id="city-select" asp-for="SelectedCity" asp-items="@Model.Cities">
                                                 <option disabled selected>Izaberite...</option>
                                             </select>
@@ -162,62 +161,57 @@
                                     </div>
 
                                     <hr class="mb-4">
-                                    <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
-                                    @*</form>*@
                                 </div>
                             </div>
-
                         </div>
-
-
-
+                        <!--./Osnovno-->
                         <!--Ponude-->
                         <div class="tab-pane fade" id="nav-offer" role="tabpanel" aria-labelledby="nav-offer-tab">
-                            @*<form method="post" asp-action="CreateObject" asp-controller="Object" onsubmit="fillValues()">*@
-                            <div class="container">
-                                <br />
-                                <h5 class="mb-3 text-muted">Karakteristike objekta</h5><br />
-                                <input asp-for="AddedCountableOffers" id="countable-offers" type="hidden" />
-                                <input @*asp-for="SelectListCountableOffers" *@ id="selectlist-cntoffers" type="hidden" />
-                                <ul class="list-group mb-3 m-auto" id="countable-attr-container"></ul>
-                                <br />
-                                <div class="col-md-12 mb-3">
-                                    <select onchange="GetCntAttributes()" class="custom-select d-block w-100 col-md-6 m-auto" @*asp-for="" *@ asp-items="@Model.CountableOffers" id="cnt-attr-select">
-                                        <option disabled selected>Izaberite...</option>
-                                    </select>
+                            <br />
+                            <div class="bg-white rounded-lg shadow-sm p-5">
+                                <div class="container">
+                                    <br />
+                                    <h5 class="mb-3 text-muted">Karakteristike objekta</h5><br />
+                                    <input asp-for="AddedCountableOffers" id="countable-offers" type="hidden" />
+                                    <input id="selectlist-cntoffers" type="hidden" />
+                                    <ul class="list-group mb-3 m-auto" id="countable-attr-container"></ul>
+                                    <br />
+                                    <div class="col-md-12 mb-3">
+                                        <select onchange="GetCntAttributes()" class="custom-select d-block w-100 col-md-6 m-auto" @*asp-for="" *@ asp-items="@Model.CountableOffers" id="cnt-attr-select">
+                                            <option disabled selected>Izaberite...</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <hr />
-                            <div class="container">
-                                <h5 class="mb-3 text-muted">Usluge uključene u cijenu</h5><br />
-                                <input asp-for="AddedOffers" id="added-offers" type="hidden" />
-                                <ul class="list-group mb-3 m-auto" id="attributes-container"></ul>
-                                <br />
-                                <div class="col-md-12 mb-3">
-                                    <select onchange="GetAttributes()" class="custom-select d-block w-100 col-md-6 m-auto" @*asp-for="" *@ asp-items="@Model.Offers" id="attribute-select">
-                                        <option disabled selected>Izaberite...</option>
-                                    </select>
+                                <hr />
+                                <div class="container">
+                                    <h5 class="mb-3 text-muted">Usluge uključene u cijenu</h5><br />
+                                    <input asp-for="AddedOffers" id="added-offers" type="hidden" />
+                                    <ul class="list-group mb-3 m-auto" id="attributes-container"></ul>
+                                    <br />
+                                    <div class="col-md-12 mb-3">
+                                        <select onchange="GetAttributes()" class="custom-select d-block w-100 col-md-6 m-auto" @*asp-for="" *@ asp-items="@Model.Offers" id="attribute-select">
+                                            <option disabled selected>Izaberite...</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <br /><hr />
-                            <div class="container">
-                                <h5 class="mb-3 text-muted">Dodatno naplative ponude</h5><br />
-                                <input asp-for="AddedSpecialOffers" id="special-offersvwithval" type="hidden" />
-                                <input id="selectlist-specialoffers" type="hidden" />
-                                <ul class="list-group mb-3 m-auto" id="specialoffers-container"></ul>
-                                <br />
-                                <div class="col-md-12 mb-3">
-                                    <select onchange="GetSpecialOffersAttributes()" class="custom-select d-block w-100 col-md-6 m-auto" asp-items="@Model.SpecialOffers" id="specialoffer-select">
-                                        <option disabled selected>Izaberite...</option>
-                                    </select>
+                                <br /><hr />
+                                <div class="container">
+                                    <h5 class="mb-3 text-muted">Dodatno naplative ponude</h5><br />
+                                    <input asp-for="AddedSpecialOffers" id="special-offersvwithval" type="hidden" />
+                                    <input id="selectlist-specialoffers" type="hidden" />
+                                    <ul class="list-group mb-3 m-auto" id="specialoffers-container"></ul>
+                                    <br />
+                                    <div class="col-md-12 mb-3">
+                                        <select onchange="GetSpecialOffersAttributes()" class="custom-select d-block w-100 col-md-6 m-auto" asp-items="@Model.SpecialOffers" id="specialoffer-select">
+                                            <option disabled selected>Izaberite...</option>
+                                        </select>
+                                    </div>
                                 </div>
+                                @*<a href="#" onclick="fillValues()">hej</a>*@
                             </div>
-                            @*<a href="#" onclick="fillValues()">hej</a>*@
-                            @*</form>*@
                         </div>
-
-
+                        <!--./Ponude-->
                         <!--Plaćanje-->
                         <div class="tab-pane fade" id="nav-payment" role="tabpanel" aria-labelledby="nav-payment-tab">
                             <div class="container py-5">
@@ -225,11 +219,10 @@
                                     <div class="col-lg-7 mx-auto">
                                         <div class="bg-white rounded-lg shadow-sm p-5">
                                             <!-- Naplata tabs -->
-                                            <input type="hidden" asp-for="StandardPricingM" value="true" id="spmodel" />
+                                            <input type="hidden" asp-for="StandardPricing" value="true" id="spmodel" />
                                             <ul role="tablist" class="nav bg-light nav-pills rounded-pill nav-fill mb-3">
                                                 <li class="nav-item">
                                                     <a data-toggle="pill" onclick="changeToStandardModel()" href="#nav-tab-standardpm" class="nav-link active rounded-pill">
-                                                        @*<i class="fa fa-credit-card"></i>*@
                                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                         &nbsp;&nbsp;&nbsp;Standardni model&nbsp;&nbsp;&nbsp;
                                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -242,19 +235,20 @@
                                                 </li>
                                             </ul>
                                             <!-- End -->
-                                            <!-- form content -->
+                                            <!-- tabs content -->
                                             <div class="tab-content">
                                                 <!--Standard model-->
                                                 <div id="nav-tab-standardpm" class="tab-pane fade show active">
+
                                                     <div class="row">
                                                         <div class="col-md-6 form-group">
                                                             <label asp-for="StandardPricingModel.StandardOccupancy"></label>
-                                                            <input type="number" asp-for="StandardPricingModel.StandardOccupancy" min="0" required class="form-control">
+                                                            <input type="number" asp-for="StandardPricingModel.StandardOccupancy" min="0" class="form-control standardvalidation">
                                                         </div>
                                                         <div class="col-md-6 form-group">
                                                             <label asp-for="StandardPricingModel.StandardPricePerNight"></label>
                                                             <div class="input-group">
-                                                                <input pattern="[0-9]+([\.][0-9]{1,2})?" asp-for="StandardPricingModel.StandardPricePerNight" class="form-control" required>
+                                                                <input pattern="[0-9]+([\.][0-9]{1,2})?" asp-for="StandardPricingModel.StandardPricePerNight" class="form-control standardvalidation">
                                                                 <div class="input-group-append">
                                                                     <span class="input-group-text text-muted">
                                                                         @mycurrency
@@ -265,20 +259,20 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="form-group col-md-4">
-                                                            <label asp-for="StandardPricingModel.MinOccupancy">@*<span class="hidden-xs">Expiration</span>*@</label>
+                                                            <label asp-for="StandardPricingModel.MinOccupancy"></label>
                                                             <div class="input-group">
-                                                                <input type="number" asp-for="StandardPricingModel.MinOccupancy" class="form-control" required>
+                                                                <input type="number" asp-for="StandardPricingModel.MinOccupancy" class="form-control standardvalidation">
                                                             </div>
                                                         </div>
                                                         <div class="form-group col-md-4">
-                                                            <label asp-for="StandardPricingModel.MaxOccupancy">@*<span class="hidden-xs">Expiration</span>*@</label>
+                                                            <label asp-for="StandardPricingModel.MaxOccupancy"></label>
                                                             <div class="input-group">
-                                                                <input type="number" asp-for="StandardPricingModel.MaxOccupancy" class="form-control" required>
+                                                                <input type="number" asp-for="StandardPricingModel.MaxOccupancy" class="form-control standardvalidation">
                                                             </div>
                                                         </div>
                                                         <div class="form-group col-md-4">
                                                             <label asp-for="StandardPricingModel.OffsetPercentage"></label>
-                                                            <input type="text" pattern="[0-9]+([\.][0-9]{1,2})?" required class="form-control" asp-for="StandardPricingModel.OffsetPercentage">
+                                                            <input type="text" pattern="[0-9]+([\.][0-9]{1,2})?" class="form-control standardvalidation" asp-for="StandardPricingModel.OffsetPercentage">
                                                         </div>
                                                     </div>
                                                     <div class="row">
@@ -291,7 +285,6 @@
                                                             <input asp-for="StandardPricingModel.MaxDaysOffer" class="form-control" type="number" min="1">
                                                         </div>
                                                     </div>
-                                                    @*<button type="button" class="subscribe btn btn-primary btn-block rounded-pill shadow-sm"> Confirm  </button>*@
                                                 </div>
                                                 <!-- End -->
                                                 <!-- occupancy based model -->
@@ -310,13 +303,13 @@
                                                         <div class="form-group col-md-6">
                                                             <label asp-for="OccupancyBasedPricing.MinOccupancy"></label>
                                                             <div class="input-group">
-                                                                <input id="min-occ-ob" type="number" asp-for="OccupancyBasedPricing.MinOccupancy" class="form-control" required>
+                                                                <input id="min-occ-ob" type="number" asp-for="OccupancyBasedPricing.MinOccupancy" class="form-control occupancyvalidation">
                                                             </div>
                                                         </div>
                                                         <div class="form-group col-md-6">
                                                             <label asp-for="OccupancyBasedPricing.MaxOccupancy"></label>
                                                             <div class="input-group">
-                                                                <input id="max-occ-ob" type="number" asp-for="OccupancyBasedPricing.MinOccupancy" class="form-control" required>
+                                                                <input id="max-occ-ob" type="number" asp-for="OccupancyBasedPricing.MinOccupancy" class="form-control myinput occupancyvalidation">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -334,42 +327,45 @@
                                     </div>
                                 </div>
                             </div>
-
-
-
                         </div>
-
+                        <!--./Plaćanje-->
                         <!--Fotografije-->
                         <div class="tab-pane fade" id="nav-photos" role="tabpanel" aria-labelledby="nav-photos-tab">
-                            @*<label asp-for="ImgFiles"><br /><br /><span style="cursor:pointer" class="custom-btn fill">Dodaj slike (maksimalno 6)</span></label>
-                                <input type="file" asp-for="ImgFiles" style="opacity:0" accept="image/jpeg, image/png" multiple class="input-group" onchange="readURL(this);" /><br />*@
+                            <div class="container py-5">
+                                <div class="bg-white rounded-lg shadow-sm p-5">
+                                    <div class="col-md-12">
+                                        <input type="file" class="file" accept="image/*" id="imageBrowes" style="display:none" />
 
+                                        <div class="col-md-4">
+                                            <div class="input-group my-3">
+                                                <input type="text" class="form-control" disabled placeholder="Učitaj sliku" id="file">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="browse btn btn-primary">Pretraži...</button>
+                                                </div>
+                                            </div>
+                                            <hr />
 
-                            <div class="col-md-9">
-                                <div class="col-md-4">
-                                    <div class="btn btn-primary">
-                                        <input type="file" id="imageBrowes" />
-                                    </div>
-                                    <hr />
-
-                                    <div id="imgPreview" class="thumbnail" style="display:none">
-                                        <img class="img-responsive" id="targetImg" />
-                                        <div class="caption">
-                                            <a href="#" onclick="ClearPreview()"><i class="fa fa-trash" aria-hidden="true"></i></a>
-                                            <span id="description"></span>
+                                            <div id="imgPreview" style="display:none;margin-top:15px;">
+                                                <div class="card">
+                                                    <img class="img-responsive card-img-top" id="targetImg" style="object-fit:contain" />
+                                                    <div class="caption">
+                                                        <a href="#" onclick="ClearPreview()" class="btn"><i class="fa fa-trash text-danger" aria-hidden="true"></i></a>
+                                                        <span id="description"></span>
+                                                    </div>
+                                                    <a href="#" class="btn btn-primary" onclick="Uploadimage()"><i class="fas fa-upload"></i>&nbsp;Učitaj</a>
+                                                </div>
+                                                <hr />
+                                            </div>
                                         </div>
-                                        <a href="#" class="btn btn-default" onclick="Uploadimage()">Upload</a>
-                                    </div>
 
-                                </div>
-                                <div class="thumbnail col-md-4" style="width: 18rem;" id="uploadedImage">
-                                    </div>
-                                    @*<div class="col-md-2 thumbnail" id="uploadedImage">
-                                    </div>*@
-                                </div>
+                                        <div class="gallery" id="gallery">
+                                        </div>
 
+                                    </div>
+                                </div>
                             </div>
-
+                        </div>
+                        <!--./Fotografije-->
                         <!--Nedostupni periodi-->
                         <div class="tab-pane fade" id="nav-periods" role="tabpanel" aria-labelledby="nav-periods-tab">
                             <div class="container py-5">
@@ -392,17 +388,41 @@
                                 </div>
                             </div>
                         </div>
-                        @*</form>*@
+                        <!--./Nedostupni periodi-->
                     </div>
                 </div>
+            </div>
+            <div class="col-md-8 m-auto">
+                <input id="submitButton" class="btn btn-primary btn-lg btn-block" type="submit" value="Dodaj objekt">
             </div>
         </div>
     </section>
     <!-- ./Tabs -->
-    <input type="submit" />
-
 </form>
 
+
+<script type="text/javascript">
+    $('#submitButton').click(function () {
+        //alert("Molimo vas da ispravno popunite sva obavezna polja.");
+
+        //dont know????
+        $('input:invalid').each(function () {
+            alert('Molimo vas da ispravno popunite sva obavezna polja.');
+            // Find the tab-pane that this element is inside, and get the id
+            var $closest = $(this).closest('.tab-pane');
+            console.log($closest);
+
+            //var id = $closest.attr('id');
+            //console.log($closest);
+            //console.log(id);
+            //// Find the link that corresponds to the pane and have it show
+            //$('.nav a[href="#' + id + '"]').tab('show');
+
+            // Only want to do it once
+            return false;
+        });
+    });
+</script>
 
 
 <script src="~/js/Navbarcolor.js"></script>
@@ -414,86 +434,11 @@
     })
 </script>
 
-
+<script src="~/js/ClienSideInputValidation.js"></script>
+<script src="~/js/gallery.js"></script>
 <script src="~/js/attributesscript.js"></script>
 <script src="~/js/datepickergijgo.js"></script>
 <script src="~/js/mapa.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>
 
 
-<script>
-
-    $(document).ready(function () {
-
-        $("#imageBrowes").change(function () {
-
-            var File = this.files;
-
-            if (File && File[0]) {
-                ReadImage(File[0]);
-            }
-
-        })
-
-    })
-
-
-    var ReadImage = function (file) {
-
-        var reader = new FileReader;
-        var image = new Image;
-
-        reader.readAsDataURL(file);
-        reader.onload = function (_file) {
-
-            image.src = _file.target.result;
-            image.onload = function () {
-
-                var height = this.height;
-                var width = this.width;
-                var type = file.type;
-                var size = ~~(file.size / 1024) + "KB";
-
-                $("#targetImg").attr('src', _file.target.result);
-                $("#description").text("Size:" + size + ", " + height + "X " + width + ", " + type + "");
-                $("#imgPreview").show();
-
-            }
-
-        }
-
-    }
-
-    var ClearPreview = function () {
-        $("#imageBrowes").val('');
-        $("#description").text('');
-        $("#imgPreview").hide();
-
-    }
-
-    var Uploadimage = function () {
-
-        var file = $("#imageBrowes").get(0).files;
-
-        var data = new FormData;
-        data.append("ImageFile", file[0]);
-        data.append("ProductName", "SamsungA8");
-
-        $.ajax({
-
-            type: "Post",
-            url: "/Object/ImageUpload",
-            data: data,
-            contentType: false,
-            processData: false,
-            success: function (response) {
-                ClearPreview();
-                $("#uploadedImage").append('<img src="/UploadedImage/' + response + '" class="img-responsive thumbnail" style="object-fit: contain"/>');
-
-
-            }
-        })
-        //
-    }
-
-</script>

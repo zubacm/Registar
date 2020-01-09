@@ -94,6 +94,7 @@ namespace TuristRegistar.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false/*Input.RememberMe*/, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
+                    TempData["Notification"] = "Uspješno ste se prijavili";
                     return RedirectToAction("Index", "Home");
                 }
                 //if (result.IsLockedOut)
@@ -114,7 +115,7 @@ namespace TuristRegistar.Controllers
         public async Task<ActionResult> Signout()
         {
             await _signInManager.SignOutAsync();
-            TempData["LoginInfo"] = "Uspješno ste se odjavili";
+            TempData["Notification"] = "Uspješno ste se odjavili";
             return RedirectToAction("Index", "Home");
         }
 
@@ -150,7 +151,7 @@ namespace TuristRegistar.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["Notification"] = "Greška prilikom ažuriranja profila.";
+                TempData["Error-Notification"] = "Greška prilikom ažuriranja profila.";
                 return View("Settings");
             }
 
@@ -166,7 +167,7 @@ namespace TuristRegistar.Controllers
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("", "Ne valja.");
-                TempData["Notification"] = "Greška prilikom mijenjanja lozinka.";
+                TempData["Error-Notification"] = "Greška prilikom mijenjanja lozinka.";
                 return View("Settings");
                 //return PartialView(model);
             }
@@ -184,7 +185,7 @@ namespace TuristRegistar.Controllers
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-                TempData["Notification"] = "Molimo vas da navedete ispravnu staru lozinku.";
+                TempData["Error-Notification"] = "Molimo vas da navedete ispravnu staru lozinku.";
                 return View("Settings");
             }
 
@@ -226,7 +227,7 @@ namespace TuristRegistar.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["Notification"] = "Greška prilikom ažuriranja profila.";
+                TempData["Error-Notification"] = "Greška prilikom ažuriranja profila.";
                 return View("Settings");
             }
             Users updateUser = new Users()
