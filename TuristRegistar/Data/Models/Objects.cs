@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,21 +18,25 @@ namespace TuristRegistar.Data.Models
         public String EmailContact { get; set; }
         public String PhoneNumberContact { get; set; }
         public String WebContact { get; set; }
-        public float Surface { get; set; }
+        public Nullable<float> Surface { get; set; }
         public String Description { get; set; }
-        public bool StandardPricingM { get; set; }
+        public bool OccupancyPricing { get; set; }
 
         public ICollection<ObjectHasAttributes> ObjectHasAttributes { get; set; }
         //public ICollection<CountableObjectAttributes> CountableObjectAttributes { get; set; }
         public ICollection<CntObjAttributesCount> CntObjAttributesCount { get; set; }
         public ICollection<RatingsAndReviews> RatingsAndReviews { get; set; }
         public ICollection<SpecialOffersPrices> SpecialOffers { get; set; }
-        public ICollection<UnavailablePeriods> AvailablePeriods { get; set; }//This will become unavailable periods
+        public ICollection<UnavailablePeriods> UnavailablePeriods { get; set; }//This will become unavailable periods
         public ICollection<ObjectImages> ObjectImages { get; set; }
         public int ObejectTypeId { get; set; }
         public ObjectTypes ObjectType { get; set; }
         public int CreatorId { get; set; }
         public Users Creator { get; set; }
+        public String UserId { get; set; }
+        public String IdentUserId { get; set; }//the same role as creator
+        public IdentityUser IdentUser { get; set; }
+
         public int StandardPricingModelId { get; set; }
         public StandardPricingModel StandardPricingModel { get; set; }
         public int OccupancyBasedPricingId { get; set; }

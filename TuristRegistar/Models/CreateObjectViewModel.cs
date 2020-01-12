@@ -11,18 +11,20 @@ namespace TuristRegistar.Models
 {
     public class CreateObjectViewModel
     {
-        //[Required(ErrorMessage = "Obavezno polje")]
+        public int CreatorId { get; set; }
+        public string IdentUserId { get; set; }
+        [Required(ErrorMessage = "Obavezno polje")]
         [Display(Name="Naziv")]
         public String Name { get; set; }
         [Display(Name = "Opis")]
         public String Description { get; set; }
-        //[Required(ErrorMessage = "Obavezno polje")]
+        [Required(ErrorMessage = "Obavezno polje")]
         [Display(Name = "Geografska širina")]
         public Double Lat { get; set; }
-        //[Required(ErrorMessage = "Obavezno polje")]
+        [Required(ErrorMessage = "Obavezno polje")]
         [Display(Name = "Geografska dužina")]
         public Double Lng { get; set; }
-        //[Required(ErrorMessage = "Obavezno polje")]
+        [Required(ErrorMessage = "Obavezno polje")]
         [Display(Name = "Adresa")]
         public String Address { get; set; }
         [Display(Name="Email kontakt")]
@@ -37,28 +39,34 @@ namespace TuristRegistar.Models
 
 
         public IEnumerable<SelectListItem> Countries { get; set; }
+        [Display(Name = "Država")]
         public String SelectedCountry { get; set; }
         public IEnumerable<SelectListItem> Cities { get; set; }
+        [Display(Name = "Grad")]
         public String SelectedCity { get; set; }
+
+        public IEnumerable<SelectListItem> ObjectTypes { get; set; }
+        [Display(Name = "Tip objekta")]
+        public String SelectedObjectType { get; set; }
 
         public IEnumerable<SelectListItem> Offers { get; set; }
         public String AddedOffers { get; set; } 
-        public List<int> ListOfAddedOffersId { get; set; }
+        public List<ObjectHasAttributes> ListOfAddedOffers { get; set; }
 
         public IEnumerable<SelectListItem> CountableOffers { get; set; }
         public String AddedCountableOffers { get; set; }
-        public List<CountableOffers> ListOfAddedCntOffers { get; set; }
+        public List<CntObjAttributesCount> ListOfAddedCntOffers { get; set; }
 
         public IEnumerable<SelectListItem> SpecialOffers { get; set; }
         public String AddedSpecialOffers { get; set; }
-        public List<SpecialOffers> ListOfAddedSpecialOffersId { get; set; }
+        public List<SpecialOffersPrices> ListOfAddedSpecialOffers { get; set; }
 
         [Display(Name = "Mininmalan broj dana boravka")]
         public int MinDaysOffer { get; set; }
         [Display(Name = "Maksimalan broj dana boravka")]
         public int MaxDaysOffer { get; set; }
 
-        public bool StandardPricing { get; set; } 
+        public bool OccupancyPricing { get; set; } 
         public StandardPricingModel StandardPricingModel { get; set; }
         public OccupancyBasedPricing OccupancyBasedPricing { get; set; }
         public string OccubancBasedPrices { get; set; }

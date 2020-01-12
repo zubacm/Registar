@@ -28,6 +28,11 @@ namespace TuristRegistar.Services
                 .FirstOrDefault(c => c.Id == countryId).Cities.ToList();
         }
 
+        public IEnumerable<ObjectTypes> GetObjectTypes()
+        {
+            return _context.ObjectTypes;
+        }
+
 
         //parsing string ex. [1,2,9,3]
         public List<int> ParseStringToIDsList(string text)
@@ -66,6 +71,19 @@ namespace TuristRegistar.Services
             return listKeyValue;
         }
 
+        public List<KeyValuePair<DateTime, DateTime>> ParseDates(string text)
+        {
+            var listKeyValue = new List<KeyValuePair<DateTime, DateTime>>();
+            string[] input = text.Trim('[', ']').Split(',');
+
+            foreach (var item in input)
+            {
+                var pair = item.ToString().Split(':');
+                listKeyValue.Add(new KeyValuePair<DateTime, DateTime>(DateTime.Parse(pair[0]), DateTime.Parse(pair[1])));
+            }
+            return listKeyValue;
+        }
+
 
         public IEnumerable<ObjectAttributes> GetAllObjectAttributes()
         {
@@ -87,6 +105,23 @@ namespace TuristRegistar.Services
         {
             return _context.CountableObjectAttributes.Where(item => !excludedAttributesId.Contains(item.Id))
                .ToList();
+        }
+
+
+        public CountableObjectAttributes GetCountableObjectAttribute(int id)
+        {
+            return _context.CountableObjectAttributes.FirstOrDefault(coa => coa.Id == id);
+        }
+
+        public ObjectAttributes GetObjectAttribute(int id)
+        {
+            return _context.ObjectAttributes.FirstOrDefault(oa => oa.Id == id);
+        }
+
+
+        public void AddObject(Objects myobject)
+        {
+            _context.Add(myobject);
         }
     }
 }

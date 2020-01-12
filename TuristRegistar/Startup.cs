@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -104,6 +105,12 @@ namespace TuristRegistar
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+
+            var cultureInfo = new CultureInfo("en-US");
+            //cultureInfo.NumberFormat.CurrencySymbol = "€";
+
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             app.UseMvc(routes =>
             {

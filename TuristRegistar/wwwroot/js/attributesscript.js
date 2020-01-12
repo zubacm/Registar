@@ -34,8 +34,7 @@ function fillValues() {
         $('#special-offersvwithval').val(payedOffersWithValues);
     }
 
-    //Check if it works
-    if ($('#spmodel').val() === "false") {
+    if ($('#occupancy-model').val() === "true") {
         var occ_b_prices = document.getElementById('prices').getElementsByTagName("input");
         for (i = 0; i < occ_b_prices.length; i += 2) {
             var visitors = $(occ_b_prices[i]).attr('value');
@@ -52,7 +51,6 @@ function fillValues() {
         unavailableperiods.push(checkin + ":" + checkout);
     }
     $('#unavailable-periods').val(unavailableperiods);
-    console.log($('#unavailable-periods').val());
 }
 
 
@@ -63,7 +61,7 @@ function GetAttributes() {
     var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed"  value="'
         + sel.value + '"> <h5 class="my-0 col-md-12">'
         + text
-        + '<a class="btn btn-error pointer" onclick="attributeRemove(this);"  style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a></h5></li >';
+        + '<a class="btn btn-error pointer" onclick="attributeRemove(this);"  style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a></h5></li>';
     $("#attributes-container").append(
         myhtml
     );
@@ -106,7 +104,6 @@ function RefreshOffersSelectList() {
 function attributeRemove(ev) {
 
     var removedvalue = $(ev).parent().parent().attr('value');
-    //console.log(removedvalue);
     const index = offers.indexOf(removedvalue);
     if (index > -1) {
         offers.splice(index, 1);
@@ -144,7 +141,7 @@ function removeCntOffer(ev) {
     if (index > -1) {
         countableOffers.splice(index, 1);
     }
-    $("#selectlist-cntoffers").val(offers);
+    $("#selectlist-cntoffers").val(countableOffers);
     $(myelement).remove();
     RefreshCntOffersSelectList();
 }
@@ -261,7 +258,6 @@ function GetCities() {
                 '<option disabled selected>Izaberite...</option>'
             );
 
-            // console.log(data);//Da vidiš u konzoli
             $.each(data, function (index, model) {
                 citySelectList.append(
                     $('<option>', {
@@ -278,34 +274,11 @@ function GetCities() {
 
 
 function changeToStandardModel() {
-    $('#spmodel').val(true);
-    //var standardlist = $('.standardvalidation');
-    //for (var i = 0; i < standardlist.length; i++) {
-    //    //$(standardlist[i]).attr("required", "true");
-    //}
-    //var occupancylist = $('.occupancyvalidation');
-    //for (i = 0; i < occupancylist.length; i++) {
-    //    occupancylist[i].required =  false;
-    //    //$(occupancylist[i]).removeAttr("required");
-    //    //$(occupancylist[i]).attr("required", "false");
-    //}
+    $('#occupancy-model').val(false);
 }
 function changeToOccupancyBModel() {
-    $('#spmodel').val(false);
+    $('#occupancy-model').val(true);
     $('#prices').empty();
-
-    //var standardlist = $('.standardvalidation');
-    //for (var i = 0; i < standardlist.length; i++) {
-    //    console.log($(standardlist[i]).attr('required'));
-    //    standardlist[i].required = false;
-    //    //$(standardlist[i]).removeAttr("required");
-    //    //$(standardlist[i]).attr("required", "false");
-    //}
-    //var occupancylist = $('.occupancyvalidation');
-    //for (i = 0; i < occupancylist.length; i++) {
-    //    console.log($(occupancylist[i]).attr('required'));
-    //    $(occupancylist[i]).attr("required", "true");
-    //}
 }
 
 function formPrices() {
@@ -334,5 +307,39 @@ function formPrices() {
     }
 }
 
+
+
+$(document).ready(function () {
+    
+});
+
+function ReloadSelectLists() {
+    var mylist = document.getElementById('countable-attr-container').getElementsByTagName("li");
+    for (var i = 0; i < mylist.length; i++) {
+        var idvalue = $(mylist[i]).attr('id-value');
+        //var myvalue = $(mylist[i]).find('input')[0].value;
+        countableOffers.push(idvalue);
+    }
+    $("#selectlist-cntoffers").val(countableOffers);
+    RefreshCntOffersSelectList();
+
+    var specialofferslist = document.getElementById('specialoffers-container').getElementsByTagName("li");
+    for (i = 0; i < specialofferslist.length; i++) {
+        var idvalueso = $(specialofferslist[i]).attr('id-value');
+        //var myvalueso = $(specialofferslist[i]).find('input')[0].value;
+        payedOffers.push(idvalueso);
+    }
+    $("#selectlist-specialoffers").val(payedOffers);
+    RefreshSpecialOffersSelectList();
+
+    var offerslist = document.getElementById('attributes-container').getElementsByTagName('li');
+    for (i = 0; i < offerslist.length; i++) {
+        var idvalueo = $(offerslist[i]).val();
+        offers.push(idvalueo);
+    }
+
+    $("#added-offers").val(offers);
+    RefreshOffersSelectList();
+}
 
 
