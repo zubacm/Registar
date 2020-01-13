@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TuristRegistar.Data;
 using TuristRegistar.Data.Models;
@@ -119,9 +121,111 @@ namespace TuristRegistar.Services
         }
 
 
-        public void AddObject(Objects myobject)
+        public async Task AddObject(Objects myobject, string currency)
         {
-            _context.Add(myobject);
+
+            myobject = await ExchangeCurrencyAsync(myobject, currency, "BAM");
+
+            _context.Objects.Add(myobject);
+            _context.SaveChanges();
         }
+
+        public async Task<Objects> GetObject(int id, string currency)
+        {
+            var obj =  _context.Objects
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.SpecialOffers)
+                .Include(o => o.UnavailablePeriods)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.OccupancyBasedPricing)
+                .Include(o => o.StandardPricingModel)
+                .FirstOrDefault(o => o.Id == id);
+            obj = await ExchangeCurrencyAsync(obj, "BAM", currency);
+
+            return obj;
+
+        }
+
+        public void AddImage(ObjectImages image, int objectid)
+        {
+            _context.Objects.FirstOrDefault(o => o.Id == objectid).ObjectImages.Add(image);
+            _context.SaveChanges();
+        }
+
+        public void DeleteImage(int id)
+        {
+            var img = new ObjectImages() { Id = id};
+            _context.ObjectImages.Remove(img);
+            _context.SaveChanges();
+        }
+
+
+
+        private async Task<Objects> ExchangeCurrencyAsync(Objects myobject, string from, string to)
+        {
+            var exchangerate = await GetExchangeRate(from, to);
+            foreach (var item in myobject.SpecialOffers)
+            {
+                
+                item.Price = (float)exchangerate * item.Price;
+            }
+            if (myobject.OccupancyPricing)
+            {
+                foreach (var item in myobject.OccupancyBasedPricing.Prices)
+                {
+                    item.PricePerNight = (float)exchangerate*item.PricePerNight;
+                }
+            }
+            else
+            {
+                myobject.StandardPricingModel.StandardPricePerNight = (float)exchangerate * myobject.StandardPricingModel.StandardPricePerNight;
+            }
+
+            return myobject;
+        }
+
+
+        public async Task<Decimal> GetExchangeRate(string from, string to)
+        {
+            //Examples:
+            //from = "EUR"
+            //to = "USD"
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    client.BaseAddress = new Uri("https://free.currencyconverterapi.com");
+                    //f49a41b74f3e1f052200
+                    var response = await client.GetAsync($"/api/v6/convert?q={from}_{to}&compact=y&apiKey=f49a41b74f3e1f052200");
+                    //var stringResult = await response.Content.ReadAsStringAsync();
+                    //dynamic data = JObject.Parse(stringResult);
+
+                    //data = {"EUR_USD":{"val":1.140661}}
+                    //I want to return 1.140661
+                    //EUR_USD is dynamic depending on what from/to is
+                    var stringResult = await response.Content.ReadAsStringAsync();
+                    var dictResult = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(stringResult);
+
+                    //key
+                    var mykey = dictResult.ElementAt(0).Key;
+                    var myval = dictResult.ElementAt(0).Value.ElementAt(0).Value;
+                    //value
+                    return Convert.ToDecimal(dictResult.ElementAt(0).Value.ElementAt(0).Value);
+                    //return dictResult[$"{from}_{to}"]["val"];
+                }
+                catch (HttpRequestException httpRequestException)
+                {
+                    Console.WriteLine(httpRequestException.StackTrace);
+                    return 0;
+                    //return new KeyValuePair<string, string> ( "Error", "Error calling API. Please do manual lookup." );
+                    //return "Error calling API. Please do manual lookup.";
+                }
+            }
+        }
+
     }
 }

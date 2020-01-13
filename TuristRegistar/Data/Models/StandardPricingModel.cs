@@ -10,7 +10,7 @@ namespace TuristRegistar.Data.Models
     {
         public int Id { get; set; }
         [Display(Name = "Standardna cijena noćenja")]
-        public Nullable<int> StandardPricePerNight { get; set; }
+        public Nullable<float> StandardPricePerNight { get; set; }
         [Display(Name = "Standardan broj posjetilaca")]
         public Nullable<int> StandardOccupancy { get; set; }
         [Display(Name = "Mininmalan broj posjetilaca")]

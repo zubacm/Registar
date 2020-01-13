@@ -1,4 +1,4 @@
-﻿@model CreateObjectViewModel
+﻿@model EditObjectViewModel
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
@@ -28,6 +28,7 @@
 }
 <!-- Tabs -->
 <form method="post" asp-action="CreateObject" asp-controller="Object" onsubmit="fillValues()" enctype="multipart/form-data">
+   <input type="hidden" asp-for="Id" id="objectid"/>
     <section id="tabs">
         <div class="container">
             <div class="row">
@@ -169,6 +170,7 @@
                                     </div>
 
                                     <hr class="mb-4">
+                                    <!--Ovdje jedan submit-->
                                 </div>
                             </div>
                         </div>
@@ -194,7 +196,6 @@
                                                             <input value="@item.Count" class="col-md-4 form-control form-control-sm myinput" placeholder="Unesite vrijednost" required type="number" min="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57" />
                                                             <div class="col-md-4">
                                                                 <a class="btn btn-error pointer" onclick="removeCntOffer(this);" style="float:right;padding:0;line-height:0;">
-                                                                    '
                                                                     <i class="fa fa-times"></i>
                                                                 </a>
                                                             </div>
@@ -434,6 +435,16 @@
                                         </div>
 
                                         <div class="gallery" id="gallery">
+                                            @if (Model.ImgsSrc != null)
+                                            {
+                                                @foreach (var item in Model.ImgsSrc)
+                                                {
+                                                    <div class="mb-3 pics animation all" onmouseover="showTrash(this)" onmouseout="hideTrash(this)">
+                                                        <img img-id="@item.Id" class="img-fluid" src="@item.Path" alt="Forografija se ne može učitati">
+                                                        <i class="fa fa-trash fa-7x text-dark trach-icon" onclick="deleteImg(this)"></i>
+                                                    </div>
+                                                }
+                                            }
                                         </div>
 
                                     </div>
@@ -488,6 +499,7 @@
 </form>
 
 
+<!--I ovo govno ne moze ovako možda uopšte ne treba-->
 <script type="text/javascript">
     $('#submitButton').click(function () {
         //alert("Molimo vas da ispravno popunite sva obavezna polja.");
@@ -521,9 +533,9 @@
     })
 </script>
 
+<script src="~/js/editgallery.js"></script>
 <script src="~/js/attributesscript.js"></script>
 <script src="~/js/ClienSideInputValidation.js"></script>
-<script src="~/js/gallery.js"></script>
 <script src="~/js/datepickergijgo.js"></script>
 <script src="~/js/mapa.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>

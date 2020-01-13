@@ -68,6 +68,29 @@ namespace TuristRegistar.Controllers
 
             return model;
         }
+        private EditObjectViewModel FillSelectLists(EditObjectViewModel model)
+        {
+            IEnumerable<Countries> countries = _touristObject.GetCountries();
+            model.Countries = countries.Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+            if (!String.IsNullOrWhiteSpace(model.SelectedCountry))
+            {
+                IEnumerable<Cities> cities = _touristObject.GetCitiesFromCountry(Convert.ToInt32(model.SelectedCountry));
+                model.Cities = cities.Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+            }
+            IEnumerable<ObjectTypes> objecttypes = _touristObject.GetObjectTypes();
+            model.ObjectTypes = objecttypes.Select(ot => new SelectListItem() { Text = ot.Name, Value = ot.Id.ToString() }).ToList();
+
+            //attributes are for attributes and specialoffers
+            IEnumerable<ObjectAttributes> attributes = _touristObject.GetAllObjectAttributes();
+            model.Offers = attributes.Select(a => new SelectListItem() { Text = a.Name, Value = a.Id.ToString() }).ToList();
+            model.SpecialOffers = model.Offers;
+
+            IEnumerable<CountableObjectAttributes> cntOffers = _touristObject.GetAllCountableObjectAttributes();
+            model.CountableOffers = cntOffers.Select(co => new SelectListItem() { Text = co.Name, Value = co.Id.ToString() }).ToList();
+
+            return model;
+        }
+
 
         public IActionResult GetObjectAttributes(string excludedAttributesId)
         {
@@ -106,7 +129,7 @@ namespace TuristRegistar.Controllers
         //[Authorize]
         [HttpPost]
         [Route("createobject")] // /createobject
-        public IActionResult CreateObject(CreateObjectViewModel model)
+        public async Task<IActionResult> CreateObject(CreateObjectViewModel model)
         {
 
             if(!string.IsNullOrWhiteSpace(model.AddedOffers))
@@ -145,9 +168,9 @@ namespace TuristRegistar.Controllers
                 ObjectHasAttributes = model.ListOfAddedOffers == null ? new List<ObjectHasAttributes>() : model.ListOfAddedOffers.Select(item => new ObjectHasAttributes() { AttributeId = item.AttributeId }).ToList(),
                 CntObjAttributesCount = model.ListOfAddedCntOffers == null ? new List<CntObjAttributesCount>() : model.ListOfAddedCntOffers,
                 SpecialOffers = model.ListOfAddedSpecialOffers == null ? new List<SpecialOffersPrices>() : model.ListOfAddedSpecialOffers,
-                CountryId = Convert.ToInt32(model.SelectedCountry),
-                CityId = Convert.ToInt32(model.SelectedCity),
-                ObejectTypeId = Convert.ToInt32(model.SelectedObjectType),
+                CountryId = Convert.ToInt32(model.SelectedCountry) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCountry),
+                CityId = Convert.ToInt32(model.SelectedCity) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCity),
+                ObejectTypeId = Convert.ToInt32(model.SelectedObjectType) == 0 ? null : (int?)Convert.ToInt32(model.SelectedObjectType),
                 Lat = model.Lat,
                 Lng = model.Lng,
                 UnavailablePeriods = model.UnavailablePeriods == null ? new List<UnavailablePeriods>() : model.UnavailablePeriods,
@@ -156,12 +179,53 @@ namespace TuristRegistar.Controllers
                 OccupancyBasedPricing = model.OccupancyPricing ? model.OccupancyBasedPricing : null,
                 ////CreatorId = null,
                 IdentUserId = _userManager.GetUserId(this.User),
-                ObjectImages = CopyFiles(Path.Combine(_hostingEnvironment.WebRootPath, "Temp"), Path.Combine(_hostingEnvironment.WebRootPath, _userManager.GetUserId(this.User))),
+                ObjectImages = CopyFiles(Path.Combine(_hostingEnvironment.WebRootPath, "Temp"), Path.Combine(_hostingEnvironment.WebRootPath, "UploadedImages")),
             };
             if (model.Surface != null)
                 newobject.Surface = (float)model.Surface;
 
+            var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
+            await _touristObject.AddObject(newobject, currency);
+
+            TempData["Notification"] = "Uspješno ste dodali objekt";
             return Redirect("createobject");
+        }
+
+        //[Authorize]
+        [Route("editobject")] // /createobject
+        public async Task<IActionResult> EditObject(int id)
+        {
+            var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
+            var myobject = await _touristObject.GetObject(id, currency);
+
+            var model = new EditObjectViewModel()
+            {
+                Id = myobject.Id,
+                Name = myobject.Name,
+                Lat = myobject.Lat,
+                Lng = myobject.Lng,
+                Address = myobject.Address,
+                EmailContact = myobject.EmailContact,
+                PhoneNumberContact = myobject.PhoneNumberContact,
+                WebContact = myobject.WebContact,
+                Description = myobject.Description,
+                UnavailablePeriods = myobject.UnavailablePeriods.ToList(),
+                ListOfAddedOffers = myobject.ObjectHasAttributes.ToList(),
+                ListOfAddedCntOffers = myobject.CntObjAttributesCount.ToList(),
+                ListOfAddedSpecialOffers = myobject.SpecialOffers.ToList(),
+                Surface = myobject.Surface,
+                OccupancyPricing = myobject.OccupancyPricing,
+                OccupancyBasedPricing = myobject.OccupancyBasedPricing,
+                StandardPricingModel = myobject.StandardPricingModel,
+                IdentUserId = myobject.IdentUserId,
+                SelectedCity = myobject.CityId == null ? null : myobject.CityId.ToString(),
+                SelectedCountry = myobject.CountryId == null ? null : myobject.CountryId.ToString(),
+                SelectedObjectType = myobject.ObejectTypeId == null ? null : myobject.ObejectTypeId.ToString(),
+                ImgsSrc = myobject.ObjectImages.ToList(),
+            };
+            model = FillSelectLists(model);
+
+            return View(model);
         }
 
 
@@ -186,10 +250,6 @@ namespace TuristRegistar.Controllers
                 var extention = Path.GetExtension(file.FileName);
                 var filenamewithoutextension = Path.GetFileNameWithoutExtension(file.FileName);
 
-                //string webRootPath = _hostingEnvironment.WebRootPath;
-                //string contentRootPath = _hostingEnvironment.ContentRootPath;
-
-                //Content(webRootPath + "\n" + contentRootPath);
                 var path  = Path.Combine(_hostingEnvironment.WebRootPath, "Temp" , file.FileName);
 
                 //file.SaveAs(path);
@@ -201,6 +261,57 @@ namespace TuristRegistar.Controllers
 
             return Json(file.FileName);
 
+        }
+
+        public async Task<JsonResult> AddNewImage(EditObjectViewModel model)
+        {
+
+            var file = model.ImageFile;
+            var filename = file.Name;
+
+            if (file != null)
+            {
+                try
+                {
+                    if (System.IO.File.Exists(Path.Combine(_hostingEnvironment.WebRootPath, "UploadedImages", file.Name)))
+                    {
+                        var extension = Path.GetExtension(file.Name);
+                        //unique file name
+                        filename = string.Format(@"{0}." + extension, Guid.NewGuid());
+
+                    }
+                    var path = Path.Combine(_hostingEnvironment.WebRootPath, "UploadedImages", filename);
+                    using (var fileStream = new FileStream(path, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+                    var img = new ObjectImages()
+                    {
+                        Path = "/UploadedImages/" + filename,
+                       
+                    };
+
+                    _touristObject.AddImage(img, model.Id);
+                }
+                catch (Exception)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error while copying");
+                }
+            }
+
+            return Json(filename);
+
+        }
+
+        public IActionResult DeleteImage(EditObjectViewModel model)
+        {
+            _touristObject.DeleteImage(model.DeleteImageId);
+            var relativelocation = model.DeleteImagePath.Remove(0, 1);
+            var path = Path.Combine(_hostingEnvironment.WebRootPath, relativelocation);
+            if (System.IO.File.Exists(path))
+                System.IO.File.Delete(path);
+
+            return Ok();
         }
 
         public IActionResult DeleteImageTemp(CreateObjectViewModel model)
@@ -259,21 +370,40 @@ namespace TuristRegistar.Controllers
             return model;
         }
 
+
         public List<ObjectImages> CopyFiles(string sourcePath, string destinationPath)
         {
             var imgs = new List<ObjectImages>();
-            string[] files = System.IO.Directory.GetFiles(sourcePath);
-
-            foreach (string file in files)
+            
+            //System.IO.Directory.CreateDirectory(destinationPath);
+            try
             {
-                System.IO.File.Copy(sourcePath, destinationPath);
-                var img = new ObjectImages()
+                foreach (var file in new DirectoryInfo(sourcePath).GetFiles())
                 {
-                    //try it!
-                    Path = Path.Combine(destinationPath, file)
-                };
-                imgs.Add(img);
+                    var filename = file.Name;
+                    if (System.IO.File.Exists(Path.Combine(destinationPath, file.Name)))
+                    {
+                        var extension = Path.GetExtension(file.Name);
+                        //unique file name
+                        filename = string.Format(@"{0}." + extension, Guid.NewGuid());
+
+                    }
+                    file.CopyTo(Path.Combine(destinationPath, filename));
+                    var img = new ObjectImages()
+                    {
+                        Path = "/UploadedImages/" + filename
+                    };
+                    imgs.Add(img);
+                }
             }
+            catch (Exception)
+            {
+                System.Diagnostics.Debug.WriteLine("Error while copying");
+            }
+
+
+            DeleteAllTempImages();
+
 
             return imgs;
         }
@@ -282,8 +412,17 @@ namespace TuristRegistar.Controllers
         public void DeleteAllTempImages()
         {
             var path = Path.Combine(_hostingEnvironment.WebRootPath, "Temp");
-            if (System.IO.File.Exists(path))
-                System.IO.File.Delete(path);
+            try
+            {
+                foreach (var file in new DirectoryInfo(path).GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+            catch (Exception)
+            {
+                System.Diagnostics.Debug.WriteLine("Error while deleteing");
+            }
         }
 
     }

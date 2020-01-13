@@ -58,11 +58,12 @@ namespace TuristRegistar.Controllers
             option.Expires = DateTime.Now.AddDays(1);
             Response.Cookies.Append("Currency", currency, option);
             
-            //Request.Cookies["Currency"];
+             //Request.Cookies["Currency"];
             //return RedirectToPage();
         }
 
-        public async Task<KeyValuePair<string,string>> GetExchangeRate(string from, string to)
+        //public async Task<KeyValuePair<string,string>> GetExchangeRate(string from, string to)
+        public async Task<Decimal> GetExchangeRate(string from, string to)
         {
             //Examples:
             //from = "EUR"
@@ -87,13 +88,14 @@ namespace TuristRegistar.Controllers
                     var mykey = dictResult.ElementAt(0).Key;
                     var myval = dictResult.ElementAt(0).Value.ElementAt(0).Value;
                     //value
-                    return dictResult.ElementAt(0).Value.ElementAt(0);
+                    return Convert.ToDecimal(dictResult.ElementAt(0).Value.ElementAt(0).Value);
                     //return dictResult[$"{from}_{to}"]["val"];
                 }
                 catch (HttpRequestException httpRequestException)
                 {
                     Console.WriteLine(httpRequestException.StackTrace);
-                    return new KeyValuePair<string, string> ( "Error", "Error calling API. Please do manual lookup." );
+                    return 0;
+                    //return new KeyValuePair<string, string> ( "Error", "Error calling API. Please do manual lookup." );
                     //return "Error calling API. Please do manual lookup.";
                 }
             }

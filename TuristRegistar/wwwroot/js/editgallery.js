@@ -69,15 +69,16 @@ var ClearPreview = function () {
 var Uploadimage = function () {
 
     var file = $("#imageBrowes").get(0).files;
-
+    var objId = $('#objectid').val();
     var data = new FormData;
     data.append("ImageFile", file[0]);
     data.append("ProductName", "SamsungA8");
+    data.append("Id", objId);
 
     $.ajax({
 
         type: "Post",
-        url: "/Object/ImageUploadTemp",
+        url: "/Object/AddNewImage",
         data: data,
         contentType: false,
         processData: false,
@@ -106,11 +107,13 @@ function hideTrash(e) {
 function deleteImg(e) {
     var container = $(e).parent();
     var filepath = $(e).parent().find('img').attr('src');
+    var fileid = $(e).parent().find('img').attr('img-id');
     var data = new FormData;
     data.append("DeleteImagePath", filepath);
+    data.append("DeleteImageId", fileid);
     $.ajax({
         type: 'POST',
-        url: "/Object/DeleteImageTemp",
+        url: "/Object/DeleteImage",
         contentType: "application/json",
         data: data,
         //contentType: false,

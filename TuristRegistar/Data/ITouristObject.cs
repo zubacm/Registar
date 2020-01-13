@@ -21,6 +21,9 @@ namespace TuristRegistar.Data
         IEnumerable<CountableObjectAttributes> GetCountableObjectAttributes(List<int> excludedAttributesId);
         CountableObjectAttributes GetCountableObjectAttribute(int id);
         ObjectAttributes GetObjectAttribute(int id);
-        void AddObject(Objects myobject);
+        Task AddObject(Objects myobject, string currency);
+        Task<Objects> GetObject(int id, string currency);
+        void AddImage(ObjectImages image, int objectid);
+        void DeleteImage(int id);
     }
 }

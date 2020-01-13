@@ -29,22 +29,21 @@ namespace TuristRegistar.Data.Models
         public ICollection<SpecialOffersPrices> SpecialOffers { get; set; }
         public ICollection<UnavailablePeriods> UnavailablePeriods { get; set; }//This will become unavailable periods
         public ICollection<ObjectImages> ObjectImages { get; set; }
-        public int ObejectTypeId { get; set; }
+        public Nullable<int> ObejectTypeId { get; set; }
         public ObjectTypes ObjectType { get; set; }
-        public int CreatorId { get; set; }
+        public Nullable<int> CreatorId { get; set; }
         public Users Creator { get; set; }
-        public String UserId { get; set; }
         public String IdentUserId { get; set; }//the same role as creator
         public IdentityUser IdentUser { get; set; }
 
-        public int StandardPricingModelId { get; set; }
+        public Nullable<int> StandardPricingModelId { get; set; }
         public StandardPricingModel StandardPricingModel { get; set; }
-        public int OccupancyBasedPricingId { get; set; }
+        public Nullable<int> OccupancyBasedPricingId { get; set; }
         public OccupancyBasedPricing OccupancyBasedPricing { get; set; }
 
-        public int CountryId { get; set; }
+        public Nullable<int> CountryId { get; set; }
         public Countries Country { get; set; }
-        public int CityId { get; set; }
+        public Nullable<int> CityId { get; set; }
         public Cities City { get; set; }
     }
 }
