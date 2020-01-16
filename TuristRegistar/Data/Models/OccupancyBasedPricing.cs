@@ -21,5 +21,7 @@ namespace TuristRegistar.Data.Models
 
         public ICollection<OccupancyBasedPrices> Prices { get; set; }
 
+        public Objects Objects { get; set; }
+
     }
 }

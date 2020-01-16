@@ -64,12 +64,39 @@ function RecreateDatePicker2() {
 function AddPeriod() {
     var checkin = $('#datepicker1').val();
     var checkout = $('#datepicker2').val();
-    var myhtml = '<li checkin="' + checkin + '" checkout="' + checkout + '" class="list-group-item row no-gutters  d-flex justify-content-between lh-condensed" >'
-        + '<div class="list-group-item row "><i class="fas fa-sign-out-alt fa-2x"></i>&nbsp;&nbsp;<h4>' + checkin + '</h4></div>'
-        + '<div class="list-group-item row"><i class="fas fa-sign-out-alt fa-2x fa-flip-horizontal"></i>&nbsp;&nbsp;<h4>' + checkout + '</h4></div>'
-        + '<div><a onclick="removePeriod(this)" class="btn pointer"><i class="fa fa-times"></i></a></div>'
-        + '</li>';
-    $('#periods').append(myhtml);
+    //var myhtml = '<li checkin="' + checkin + '" checkout="' + checkout + '" class="list-group-item row no-gutters  d-flex justify-content-between lh-condensed" >'
+    //    + '<div class="list-group-item row "><i class="fas fa-sign-out-alt fa-2x"></i>&nbsp;&nbsp;<h4>' + checkin + '</h4></div>'
+    //    + '<div class="list-group-item row"><i class="fas fa-sign-out-alt fa-2x fa-flip-horizontal"></i>&nbsp;&nbsp;<h4>' + checkout + '</h4></div>'
+    //    + '<div><a onclick="removePeriod(this)" class="btn pointer"><i class="fa fa-times"></i></a></div>'
+    //    + '</li>';
+    //$('#periods').append(myhtml);
+
+    var objId = $('#objectid').val();
+
+    var data = new FormData;
+    data.append("UnavailablePeriodsString", checkin + ":" + checkout);
+    data.append("Id", objId);
+
+    $.ajax({
+        type: "Post",
+        url: "/Object/AddPeriod",
+        data: data,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            var myhtml = '<li checkin="' + checkin + '" checkout="' + checkout + '" class="list-group-item row no-gutters  d-flex justify-content-between lh-condensed" >'
+                + '<div class="list-group-item row "><i class="fas fa-sign-out-alt fa-2x"></i>&nbsp;&nbsp;<h4>' + checkin + '</h4></div>'
+                + '<div class="list-group-item row"><i class="fas fa-sign-out-alt fa-2x fa-flip-horizontal"></i>&nbsp;&nbsp;<h4>' + checkout + '</h4></div>'
+                + '<div><a onclick="removePeriod(this)" period-id="' + response+'" class="btn pointer"><i class="fa fa-times"></i></a></div>'
+                + '</li>';
+            $('#periods').append(myhtml);
+        },
+        error: function () {
+            alert('Greška prilikom dodavanja podataka.');
+        }
+    });
+
+
 
     $('#period-btn').prop('disabled', true);
     $DPicker1.destroy();
@@ -96,7 +123,25 @@ function AddPeriod() {
 }
 
 function removePeriod(ev) {
-    $(ev).parent().parent().remove();
+    var periodid = $(ev).attr('period-id');
+
+    var data = new FormData;
+    data.append("DeletePeriodId", periodid);
+
+    $.ajax({
+
+        type: "Post",
+        url: "/Object/DeletePeriod",
+        data: data,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            $(ev).parent().parent().remove();
+        },
+        error: function () {
+            alert('Greška prilikom brisanja podataka.');
+        }
+    });
 }
 
 

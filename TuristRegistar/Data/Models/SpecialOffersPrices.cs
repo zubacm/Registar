@@ -15,6 +15,6 @@ namespace TuristRegistar.Data.Models
         public int ObjectId { get; set; }
         public Objects Object { get; set; }
 
-        public float Price { get; set; }
+        public Decimal Price { get; set; }
     }
 }

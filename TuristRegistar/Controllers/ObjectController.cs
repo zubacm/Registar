@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json.Linq;
 using TuristRegistar.Data;
 using TuristRegistar.Data.Models;
 using TuristRegistar.Models;
@@ -267,17 +269,17 @@ namespace TuristRegistar.Controllers
         {
 
             var file = model.ImageFile;
-            var filename = file.Name;
+            var filename = file.FileName;
 
             if (file != null)
             {
                 try
                 {
-                    if (System.IO.File.Exists(Path.Combine(_hostingEnvironment.WebRootPath, "UploadedImages", file.Name)))
+                    if (System.IO.File.Exists(Path.Combine(_hostingEnvironment.WebRootPath, "UploadedImages", filename)))
                     {
-                        var extension = Path.GetExtension(file.Name);
+                        var extension = Path.GetExtension(filename);
                         //unique file name
-                        filename = string.Format(@"{0}." + extension, Guid.NewGuid());
+                        filename = string.Format(@"{0}" + extension, Guid.NewGuid());
 
                     }
                     var path = Path.Combine(_hostingEnvironment.WebRootPath, "UploadedImages", filename);
@@ -291,7 +293,12 @@ namespace TuristRegistar.Controllers
                        
                     };
 
-                    _touristObject.AddImage(img, model.Id);
+                    var imgid = _touristObject.AddImage(img, model.Id);
+                    var response = @"{imgname:'" + filename + "',imgid:" + imgid+"}";
+                    JObject json = JObject.Parse(response);
+                    var oks = Json(json);
+
+                    return Json(json);
                 }
                 catch (Exception)
                 {
@@ -299,8 +306,8 @@ namespace TuristRegistar.Controllers
                 }
             }
 
-            return Json(filename);
 
+            return Json("Not found");
         }
 
         public IActionResult DeleteImage(EditObjectViewModel model)
@@ -331,6 +338,21 @@ namespace TuristRegistar.Controllers
             if ((!model.OccupancyPricing) &&
                 ((model.StandardPricingModel.StandardOccupancy == null || model.StandardPricingModel.OffsetPercentage == null
                 || model.StandardPricingModel.MinOccupancy == null || model.StandardPricingModel.MaxOccupancy == null) 
+                || model.StandardPricingModel.StandardOccupancy < model.StandardPricingModel.MinOccupancy || model.StandardPricingModel.StandardOccupancy > model.StandardPricingModel.MaxOccupancy))
+            {
+                return false;
+            }
+            if (model.OccupancyPricing && (model.OccupancyBasedPricing.MaxOccupancy == null || model.OccupancyBasedPricing.MinOccupancy == null || model.OccubancBasedPrices == null))
+            {
+                return false;
+            }
+            return true;
+        }
+        private bool CheckPricing(EditObjectViewModel model)
+        {
+            if ((!model.OccupancyPricing) &&
+                ((model.StandardPricingModel.StandardOccupancy == null || model.StandardPricingModel.OffsetPercentage == null
+                || model.StandardPricingModel.MinOccupancy == null || model.StandardPricingModel.MaxOccupancy == null)
                 || model.StandardPricingModel.StandardOccupancy < model.StandardPricingModel.MinOccupancy || model.StandardPricingModel.StandardOccupancy > model.StandardPricingModel.MaxOccupancy))
             {
                 return false;
@@ -423,6 +445,131 @@ namespace TuristRegistar.Controllers
             {
                 System.Diagnostics.Debug.WriteLine("Error while deleteing");
             }
+        }
+
+        public IActionResult DeletePeriod(EditObjectViewModel model)
+        {
+            _touristObject.DeletePeriod(model.DeletePeriodId);
+
+            return Ok();
+        }
+
+        public IActionResult AddPeriod(EditObjectViewModel model)
+        {
+            if (!string.IsNullOrWhiteSpace(model.UnavailablePeriodsString))
+                model.UnavailablePeriods = (_touristObject.ParseDates(model.UnavailablePeriodsString))
+                    .Select(item => new UnavailablePeriods() { From = item.Key, To = item.Value }).ToList();
+            var id = _touristObject.AddPeriod(model.UnavailablePeriods[0], model.Id);
+
+            return Json(id);
+        }
+
+
+        [HttpPost]
+        public IActionResult EditOccupancyBased(EditObjectViewModel model)
+        {
+            model.OccupancyPricing = true;
+            if ( (!string.IsNullOrWhiteSpace(model.OccubancBasedPrices)))
+                model.OccupancyBasedPricing.Prices = (_touristObject.ParseStringToKeyValue(model.OccubancBasedPrices))
+                    .Select(item => new OccupancyBasedPrices() { Occupancy = item.Key, PricePerNight = item.Value }).ToList();
+
+            if (!CheckPricing(model))
+            {
+                TempData["Error-Notification"] = "Ispravno popunite neophodna polja!";
+                //redirect to edit umjesto ovog
+                return View(model);
+            }
+            //var occupancyBasedPricing = model.OccupancyBasedPricing;
+            //ili možda null
+            if (model.OccupancyBasedPricing.Id != 0)
+            {
+                _touristObject.NewOccupancyBasedPricing(model.OccupancyBasedPricing, model.Id);
+            }
+            else
+            {
+                _touristObject.DeleteStandardModel(model.Id);
+                _touristObject.AddOccupancyBasedModel(model.OccupancyBasedPricing, model.Id);
+                //add occupancy
+            }
+            ViewData["Notification"] = "Uspješno sačuvane izmjene";
+            return null;
+            //return RedirectToAction("Index", "Object");
+        }
+
+        public IActionResult EditStandardModel(EditObjectViewModel model)
+        {
+            model.OccupancyPricing = false;
+
+            if (!CheckPricing(model))
+            {
+                TempData["Error-Notification"] = "Ispravno popunite neophodna polja!";
+                //redirect to edit umjesto ovog
+                return View(model);
+            }
+
+            if (model.StandardPricingModel.Id == 0)
+            {
+                _touristObject.DeleteOccupancyBasedModel(model.Id);
+                _touristObject.AddStandardModel(model.StandardPricingModel, model.Id);
+            }
+            else
+            {
+                _touristObject.EditStandardModel(model.StandardPricingModel);
+            }
+
+            //ove nalove
+            return null;
+        }
+
+        public IActionResult DeleteObjectHasAttribute(EditObjectViewModel model)
+        {
+            _touristObject.DeleteObjectHasAttributes(model.Id, model.DeleteAttributeId);
+            return Ok();
+        }
+
+        public IActionResult AddObjectHasAttribute(EditObjectViewModel model)
+        {
+            var objHasAttribute = new ObjectHasAttributes()
+            {
+                ObjectId = model.Id,
+                AttributeId = model.AddAttributeId,
+            };
+            _touristObject.AddObjectHasAttribute(objHasAttribute);
+            return Ok();
+        }
+
+        public IActionResult AddCntAttribute(EditObjectViewModel model)
+        {
+            var cntObjAttribute = new CntObjAttributesCount()
+            {
+                ObjectId = model.Id,
+                CountableObjAttrId = model.AddCntAttributeId,
+                Count = model.AddCntAttributeValue,
+            };
+            _touristObject.AddCntAttributeCount(cntObjAttribute);
+            return Ok();
+        }
+        public IActionResult DeleteCntAttribute(EditObjectViewModel model)
+        {
+            _touristObject.DeleteCntAttributeCount(model.Id, model.DeleteCntAttributeId);
+            return Ok();
+        }
+
+        public IActionResult AddSpecialOffer(EditObjectViewModel model)
+        {
+            var specialoffer = new SpecialOffersPrices()
+            {
+                ObjectId = model.Id,
+                SpecialOfferId = model.AddSpecialOfferId,
+                Price = model.AddSpecialOfferValue,
+            };
+            _touristObject.AddSpecialOffer(specialoffer);
+            return Ok();
+        }
+        public IActionResult DeleteSpecialOffer(EditObjectViewModel model)
+        {
+            _touristObject.DeleteSpecialOffer(model.Id, model.DeleteSpecialOfferId);
+            return Ok();
         }
 
     }

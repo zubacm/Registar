@@ -186,7 +186,7 @@ function GetSpecialOffersAttributes() {
         + sel.value + '" value="">'
         + '<span class="my-0 col-md-12"><div class="row">'
         + '<h5 class="col-md-4">' + text + '</h6>'
-        + '<input class="col-md-4 form-control form-control-sm myinput" placeholder="Unesite cijenu" required pattern="[0-9]+([\.][0-9]{1,2})?" />'
+        + '<input class="col-md-4 form-control form-control-sm myinput" placeholder="Unesite cijenu" required type="number" step="0.000001" />'
         + '<div class="form-control-sm input-group-append col-md-1"><span class="input-group-text text-muted">' + currency + '</span></div>'
         + '<div class="col-md-3"><a class="btn btn-error pointer" onclick="removeSpecialOffer(this);"  style="float:right;padding:0;line-height:0;">'
         + '<i class="fa fa-times"></i></a></div></div></h5></li>';
@@ -206,7 +206,7 @@ function removeSpecialOffer(ev) {
     if (index > -1) {
         payedOffers.splice(index, 1);
     }
-    $("#selectlist-cntoffers").val(payedOffers);
+    $("#selectlist-specialoffers").val(payedOffers);
     $(myelement).remove();
     RefreshSpecialOffersSelectList();
 }
@@ -280,6 +280,9 @@ function changeToOccupancyBModel() {
     $('#occupancy-model').val(true);
     $('#prices').empty();
 }
+function emptyPrices() {
+    $('#prices').empty();
+}
 
 function formPrices() {
     $('#prices').empty();
@@ -300,7 +303,7 @@ function formPrices() {
             var myhtml = '<div class="form-group">'
                 + '<div class="input-group row">'
                 + '<input class="form-control" value="' + visitors + '" disabled>'
-                + '<input type="number" placeholder="Unesite cijenu" name="" class="form-control myinput" required="">'
+                + '<input type="number" step="0.000001" placeholder="Unesite cijenu" name="" class="form-control myinput" required="">'
                 + '<div class="input-group-append"><span class="input-group-text text-muted">' + currency + '</span></div></div></div>';
             $('#prices').append(myhtml);
         }
@@ -310,7 +313,7 @@ function formPrices() {
 
 
 $(document).ready(function () {
-    
+    ReloadSelectLists();
 });
 
 function ReloadSelectLists() {

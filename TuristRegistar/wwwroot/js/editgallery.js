@@ -80,12 +80,16 @@ var Uploadimage = function () {
         type: "Post",
         url: "/Object/AddNewImage",
         data: data,
+        contents: JSON,
         contentType: false,
+        //contentType: "application/json",
+
         processData: false,
         success: function (response) {
+            var res = JSON.parse(response);
             ClearPreview();
             var myhtml = '<div class="mb-3 pics animation all" onmouseover="showTrash(this)" onmouseout="hideTrash(this)">'
-                + '<img class="img-fluid" src="/Temp/' + response + '" alt="Forografija se ne može učitati">'
+                + '<img class="img-fluid" img-id="'+res.imgid+'" src="/UploadedImages/' + res.imgname + '" alt="Forografija se ne može učitati">'
                 + '<i class="fa fa-trash fa-7x text-dark trach-icon" onclick="deleteImg(this)"></i></div>';
             $('#gallery').append(myhtml);
             //$("#uploadedImage").append('<img src="/Temp/' + response + '" class="img-responsive thumbnail" style="object-fit: contain"/>');
@@ -111,12 +115,13 @@ function deleteImg(e) {
     var data = new FormData;
     data.append("DeleteImagePath", filepath);
     data.append("DeleteImageId", fileid);
+
     $.ajax({
         type: 'POST',
         url: "/Object/DeleteImage",
-        contentType: "application/json",
+        //contentType: "application/json",
         data: data,
-        //contentType: false,
+        contentType: false,
         processData: false,
         success: function (data) {
             container.remove();

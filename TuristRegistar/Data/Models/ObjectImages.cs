@@ -10,5 +10,7 @@ namespace TuristRegistar.Data.Models
         public int Id { get; set; }
         public String Path { get; set; }
         public bool IsCover { get; set; }
+
+        public Objects Objects { get; set; }
     }
 }

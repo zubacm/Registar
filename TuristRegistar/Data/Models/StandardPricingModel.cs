@@ -10,7 +10,7 @@ namespace TuristRegistar.Data.Models
     {
         public int Id { get; set; }
         [Display(Name = "Standardna cijena noćenja")]
-        public Nullable<float> StandardPricePerNight { get; set; }
+        public Nullable<Decimal> StandardPricePerNight { get; set; }
         [Display(Name = "Standardan broj posjetilaca")]
         public Nullable<int> StandardOccupancy { get; set; }
         [Display(Name = "Mininmalan broj posjetilaca")]
@@ -18,11 +18,13 @@ namespace TuristRegistar.Data.Models
         [Display(Name = "Maksimalan broj posjetilaca")]
         public Nullable<int> MaxOccupancy { get; set; }
         [Display(Name = "Postotak ofseta po osobi")]
-        public Nullable<float> OffsetPercentage {get; set;}
+        public Nullable<Decimal> OffsetPercentage {get; set;}
 
         [Display(Name = "Mininmalan broj dana boravka")]
         public Nullable<int> MinDaysOffer { get; set; }
         [Display(Name = "Maksimalan broj dana boravka")]
         public Nullable<int> MaxDaysOffer { get; set; }
+
+        public Objects Objects { get; set; }
     }
 }

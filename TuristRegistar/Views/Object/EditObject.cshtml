@@ -27,7 +27,7 @@
     mycurrency = HttpContextAccessor.HttpContext.Request.Cookies["Currency"];
 }
 <!-- Tabs -->
-<form method="post" asp-action="CreateObject" asp-controller="Object" onsubmit="fillValues()" enctype="multipart/form-data">
+@*<form method="post" asp-action="CreateObject" asp-controller="Object" onsubmit="fillValues()" enctype="multipart/form-data">*@
    <input type="hidden" asp-for="Id" id="objectid"/>
     <section id="tabs">
         <div class="container">
@@ -182,7 +182,7 @@
                                 <div class="container">
                                     <br />
                                     <h5 class="mb-3 text-muted">Karakteristike objekta</h5><br />
-                                    <input asp-for="AddedCountableOffers" id="countable-offers" type="hidden" />
+                                    @*<input asp-for="AddedCountableOffers" id="countable-offers" type="hidden" />*@
                                     <input id="selectlist-cntoffers" type="hidden" />
                                     <ul class="list-group mb-3 m-auto" id="countable-attr-container">
                                         @if (Model.ListOfAddedCntOffers != null)
@@ -193,7 +193,7 @@
                                                     <span class="my-0 col-md-12">
                                                         <div class="row">
                                                             <h5 class="col-md-4">@item.CountableObjAttr.Name</h5>
-                                                            <input value="@item.Count" class="col-md-4 form-control form-control-sm myinput" placeholder="Unesite vrijednost" required type="number" min="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57" />
+                                                            <span class="col-md-4">@item.Count</span>
                                                             <div class="col-md-4">
                                                                 <a class="btn btn-error pointer" onclick="removeCntOffer(this);" style="float:right;padding:0;line-height:0;">
                                                                     <i class="fa fa-times"></i>
@@ -205,6 +205,9 @@
                                             }
                                         }
                                     </ul>
+                                    <ul class="list-group mb-3 m-auto" id="add-cnt-offer">
+                                       
+                                    </ul>
                                     <br />
                                     <div class="col-md-12 mb-3">
                                         <select onchange="GetCntAttributes()" class="custom-select d-block w-100 col-md-6 m-auto" @*asp-for="" *@ asp-items="@Model.CountableOffers" id="cnt-attr-select">
@@ -215,7 +218,7 @@
                                 <hr />
                                 <div class="container">
                                     <h5 class="mb-3 text-muted">Usluge uključene u cijenu</h5><br />
-                                    <input asp-for="AddedOffers" id="added-offers" type="hidden" />
+                                    <input id="added-offers" type="hidden" />
                                     <ul class="list-group mb-3 m-auto" id="attributes-container">
                                         @if (Model.ListOfAddedOffers != null)
                                         {
@@ -224,7 +227,7 @@
                                                 <li class="list-group-item d-flex justify-content-between lh-condensed" value="@item.AttributeId">
                                                     <h5 class="my-0 col-md-12">
                                                         @item.Attribute.Name
-                                                        <a class="btn btn-error pointer" onclick="attributeRemove(this);" style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a>
+                                                        <a atr-id="@item.AttributeId" class="btn btn-error pointer" onclick="attributeRemove(this);" style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a>
                                                     </h5>
                                                 </li>
                                             }
@@ -239,39 +242,42 @@
                                 </div>
 
                                 <br /><hr />
-                                <div class="container">
-                                    <h5 class="mb-3 text-muted">Dodatno naplative ponude</h5><br />
-                                    <input asp-for="AddedSpecialOffers" id="special-offersvwithval" type="hidden" />
-                                    <input id="selectlist-specialoffers" type="hidden" />
-                                    <ul class="list-group mb-3 m-auto" id="specialoffers-container">
-                                        @if (Model.ListOfAddedSpecialOffers != null)
-                                        {
-                                            @foreach (var item in Model.ListOfAddedSpecialOffers)
-                                            {
-                                                <li class="list-group-item d-flex justify-content-between lh-condensed" id-value="@item.SpecialOfferId" value="">
-                                                    <span class="my-0 col-md-12">
-                                                        <div class="row">
-                                                            <h5 class="col-md-4">@item.SpecialOffer.Name</h5>
-                                                            <input class="col-md-4 form-control form-control-sm myinput" value="@item.Price" placeholder="Unesite cijenu" required pattern="[0-9]+([\.][0-9]{1,2})?" />
-                                                            <div class="form-control-sm input-group-append col-md-1"><span class="input-group-text text-muted">@mycurrency</span></div>
-                                                            <div class="col-md-3">
-                                                                <a class="btn btn-error pointer" onclick="removeSpecialOffer(this);" style="float:right;padding:0;line-height:0;">
-                                                                    <i class="fa fa-times"></i>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </span>
-                                                </li>
-                                            }
-                                        }
-                                    </ul>
-                                    <br />
-                                    <div class="col-md-12 mb-3">
-                                        <select onchange="GetSpecialOffersAttributes()" class="custom-select d-block w-100 col-md-6 m-auto" asp-items="@Model.SpecialOffers" id="specialoffer-select">
-                                            <option disabled selected>Izaberite...</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                      <div class="container">
+                                          <h5 class="mb-3 text-muted">Dodatno naplative ponude</h5><br />
+                                          @*<input asp-for="AddedSpecialOffers" id="special-offersvwithval" type="hidden" />*@
+                                          <input id="selectlist-specialoffers" type="hidden" />
+                                          <ul class="list-group mb-3 m-auto" id="specialoffers-container">
+                                              @if (Model.ListOfAddedSpecialOffers != null)
+                                              {
+                                                  @foreach (var item in Model.ListOfAddedSpecialOffers)
+                                                  {
+                                                      <li class="list-group-item d-flex justify-content-between lh-condensed" id-value="@item.SpecialOfferId" value="">
+                                                          <span class="my-0 col-md-12">
+                                                              <div class="row">
+                                                                  <h5 class="col-md-4">@item.SpecialOffer.Name</h5>
+                                                                  <span class="col-md-4">@item.Price</span>
+                                                                  <div class="form-control-sm input-group-append col-md-1"><span class="input-group-text text-muted">@mycurrency</span></div>
+                                                                  <div class="col-md-3">
+                                                                      <a class="btn btn-error pointer" onclick="removeSpecialOffer(this);" style="float:right;padding:0;line-height:0;">
+                                                                          <i class="fa fa-times"></i>
+                                                                      </a>
+                                                                  </div>
+                                                              </div>
+                                                          </span>
+                                                      </li>
+                                                  }
+                                              }
+                                          </ul>
+                                          <ul class="list-group mb-3 m-auto" id="add-special-offer">
+
+                                          </ul>
+                                          <br />
+                                          <div class="col-md-12 mb-3">
+                                              <select onchange="GetSpecialOffersAttributes()" class="custom-select d-block w-100 col-md-6 m-auto" asp-items="@Model.SpecialOffers" id="specialoffer-select">
+                                                  <option disabled selected>Izaberite...</option>
+                                              </select>
+                                          </div>
+                                      </div>
                                 @*<a href="#" onclick="fillValues()">hej</a>*@
                             </div>
                         </div>
@@ -316,86 +322,116 @@
                                             <div class="tab-content">
                                                 <!--Standard model-->
                                                 <div id="nav-tab-standardpm" class="tab-pane fade @showstandard @standardclass">
-                                                    <div class="row">
-                                                        <div class="col-md-6 form-group">
-                                                            <label asp-for="StandardPricingModel.StandardOccupancy"></label>
-                                                            <input type="number" asp-for="StandardPricingModel.StandardOccupancy" min="0" class="form-control standardvalidation">
+                                                        <form method="post" asp-action="EditStandardModel" asp-controller="Object">
+                                                            <input type="hidden" asp-for="Id" />
+                                                            <input type="hidden" asp-for="StandardPricingModel.Id" />
+                                                            <div class="row">
+                                                                <div class="col-md-6 form-group">
+                                                                    <label asp-for="StandardPricingModel.StandardOccupancy"></label>
+                                                                    <input type="number" asp-for="StandardPricingModel.StandardOccupancy" min="0" class="form-control standardvalidation">
+                                                                </div>
+                                                                <div class="col-md-6 form-group">
+                                                                    <label asp-for="StandardPricingModel.StandardPricePerNight"></label>
+                                                                    <div class="input-group">
+                                                                        <input type="number" step="0.000001" asp-for="StandardPricingModel.StandardPricePerNight" class="form-control standardvalidation">
+                                                                        <div class="input-group-append">
+                                                                            <span class="input-group-text text-muted">
+                                                                                @mycurrency
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="form-group col-md-4">
+                                                                    <label asp-for="StandardPricingModel.MinOccupancy"></label>
+                                                                    <div class="input-group">
+                                                                        <input type="number" asp-for="StandardPricingModel.MinOccupancy" class="form-control standardvalidation">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group col-md-4">
+                                                                    <label asp-for="StandardPricingModel.MaxOccupancy"></label>
+                                                                    <div class="input-group">
+                                                                        <input type="number" asp-for="StandardPricingModel.MaxOccupancy" class="form-control standardvalidation">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group col-md-4">
+                                                                    <label asp-for="StandardPricingModel.OffsetPercentage"></label>
+                                                                    <input type="number" step="0.0000000001" min="0" max="100" class="form-control standardvalidation" asp-for="StandardPricingModel.OffsetPercentage">
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6 form-group">
+                                                                    <label asp-for="StandardPricingModel.MinDaysOffer">Minimalan broj dana boravka<span class="text-muted">&nbsp;(Opciono)</span></label>
+                                                                    <input type="number" asp-for="StandardPricingModel.MinDaysOffer" min="1" class="form-control">
+                                                                </div>
+                                                                <div class="col-md-6 form-group">
+                                                                    <label asp-for="StandardPricingModel.MaxDaysOffer">Maksimalan broj dana boravka<span class="text-muted">&nbsp;(Opciono)</span></label>
+                                                                    <input asp-for="StandardPricingModel.MaxDaysOffer" class="form-control" type="number" min="1">
+                                                                </div>
+                                                            </div>
+                                                            <hr />
+                                                            <div class="col-md-8 m-auto">
+                                                                <input id="submitButton" class="btn btn-primary btn-lg btn-block" type="submit" value="Sačuvaj">
+                                                            </div>
+                                                        </form>
+                                                </div>
+                                                    <!-- End -->
+                                                    <!-- occupancy based model -->               
+                                                <div id="nav-tab-occupancyb" class="tab-pane fade @showoccupancy @occupancyclass">
+                                                    <form method="post" asp-action="EditOccupancyBased" asp-controller="Object" onsubmit="fillPrices()">
+                                                        <input type="hidden" asp-for="Id" />
+                                                        <input type="hidden" asp-for="OccupancyBasedPricing.Id" />
+                                                        <div class="row">
+                                                            <div class="col-md-6 form-group">
+                                                                <label asp-for="OccupancyBasedPricing.MinDaysOffer">Minimalan broj dana boravka<span class="text-muted">&nbsp;(Opciono)</span></label>
+                                                                <input type="number" asp-for="OccupancyBasedPricing.MinDaysOffer" min="1" class="form-control">
+                                                            </div>
+                                                            <div class="col-md-6 form-group">
+                                                                <label asp-for="OccupancyBasedPricing.MaxDaysOffer">Maksimalan broj dana boravka<span class="text-muted">&nbsp;(Opciono)</span></label>
+                                                                <input asp-for="OccupancyBasedPricing.MaxDaysOffer" class="form-control" type="number" min="1">
+                                                            </div>
                                                         </div>
-                                                        <div class="col-md-6 form-group">
-                                                            <label asp-for="StandardPricingModel.StandardPricePerNight"></label>
-                                                            <div class="input-group">
-                                                                <input pattern="[0-9]+([\.][0-9]{1,2})?" asp-for="StandardPricingModel.StandardPricePerNight" class="form-control standardvalidation">
-                                                                <div class="input-group-append">
-                                                                    <span class="input-group-text text-muted">
-                                                                        @mycurrency
-                                                                    </span>
+                                                        <div class="row">
+                                                            <div class="form-group col-md-6">
+                                                                <label asp-for="OccupancyBasedPricing.MinOccupancy"></label>
+                                                                <div class="input-group">
+                                                                    <input id="min-occ-ob" type="number" asp-for="OccupancyBasedPricing.MinOccupancy" oninput="emptyPrices()" class="form-control occupancyvalidation">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-md-6">
+                                                                <label asp-for="OccupancyBasedPricing.MaxOccupancy"></label>
+                                                                <div class="input-group">
+                                                                    <input id="max-occ-ob" type="number" asp-for="OccupancyBasedPricing.MaxOccupancy" oninput="emptyPrices()" class="form-control myinput occupancyvalidation">
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group col-md-4">
-                                                            <label asp-for="StandardPricingModel.MinOccupancy"></label>
-                                                            <div class="input-group">
-                                                                <input type="number" asp-for="StandardPricingModel.MinOccupancy" class="form-control standardvalidation">
-                                                            </div>
+                                                        <button type="button" class="subscribe btn btn-primary btn-block rounded-pill shadow-sm" onclick="formPrices()"> Formiraj cijene  </button>
+                                                        <hr />
+                                                        <input type="hidden" asp-for="OccubancBasedPrices" id="occupancybased-prices" />
+                                                        <div id="prices">
+                                                            @if (Model.OccupancyBasedPricing != null)
+                                                            {
+                                                                <label><span class="hidden-xs">Broj posjetilaca</span></label>
+                                                                @foreach (var item in Model.OccupancyBasedPricing.Prices)
+                                                                {
+                                                                    <div class="form-group">
+                                                                        <div class="input-group row">
+                                                                            <input class="form-control" value="@item.Occupancy" disabled>
+                                                                            <input type="number" step="0.000001" value="@item.PricePerNight" placeholder="Unesite cijenu" name="" class="form-control myinput" required="">
+                                                                            <div class="input-group-append"><span class="input-group-text text-muted">@mycurrency</span></div>
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            }
                                                         </div>
-                                                        <div class="form-group col-md-4">
-                                                            <label asp-for="StandardPricingModel.MaxOccupancy"></label>
-                                                            <div class="input-group">
-                                                                <input type="number" asp-for="StandardPricingModel.MaxOccupancy" class="form-control standardvalidation">
-                                                            </div>
+                                                        <hr />
+                                                        <div class="col-md-8 m-auto">
+                                                            <input id="submitButton" class="btn btn-primary btn-lg btn-block" type="submit" value="Sačuvaj">
                                                         </div>
-                                                        <div class="form-group col-md-4">
-                                                            <label asp-for="StandardPricingModel.OffsetPercentage"></label>
-                                                            <input type="number" step="0.0000000001" min="0" max="100" class="form-control standardvalidation" asp-for="StandardPricingModel.OffsetPercentage">
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-6 form-group">
-                                                            <label asp-for="StandardPricingModel.MinDaysOffer">Minimalan broj dana boravka<span class="text-muted">&nbsp;(Opciono)</span></label>
-                                                            <input type="number" asp-for="StandardPricingModel.MinDaysOffer" min="1" class="form-control">
-                                                        </div>
-                                                        <div class="col-md-6 form-group">
-                                                            <label asp-for="StandardPricingModel.MaxDaysOffer">Maksimalan broj dana boravka<span class="text-muted">&nbsp;(Opciono)</span></label>
-                                                            <input asp-for="StandardPricingModel.MaxDaysOffer" class="form-control" type="number" min="1">
-                                                        </div>
-                                                    </div>
+                                                    </form>
                                                 </div>
-                                                <!-- End -->
-                                                <!-- occupancy based model -->
-                                                <div id="nav-tab-occupancyb" class="tab-pane fade @showoccupancy @occupancyclass">
-                                                    <div class="row">
-                                                        <div class="col-md-6 form-group">
-                                                            <label asp-for="OccupancyBasedPricing.MinDaysOffer">Minimalan broj dana boravka<span class="text-muted">&nbsp;(Opciono)</span></label>
-                                                            <input type="number" asp-for="OccupancyBasedPricing.MinDaysOffer" min="1" class="form-control">
-                                                        </div>
-                                                        <div class="col-md-6 form-group">
-                                                            <label asp-for="OccupancyBasedPricing.MaxDaysOffer">Maksimalan broj dana boravka<span class="text-muted">&nbsp;(Opciono)</span></label>
-                                                            <input asp-for="OccupancyBasedPricing.MaxDaysOffer" class="form-control" type="number" min="1">
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <label asp-for="OccupancyBasedPricing.MinOccupancy"></label>
-                                                            <div class="input-group">
-                                                                <input id="min-occ-ob" type="number" asp-for="OccupancyBasedPricing.MinOccupancy" class="form-control occupancyvalidation">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label asp-for="OccupancyBasedPricing.MaxOccupancy"></label>
-                                                            <div class="input-group">
-                                                                <input id="max-occ-ob" type="number" asp-for="OccupancyBasedPricing.MaxOccupancy" class="form-control myinput occupancyvalidation">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="subscribe btn btn-primary btn-block rounded-pill shadow-sm" onclick="formPrices()"> Formiraj cijene  </button>
-                                                    <hr />
-                                                    <input type="hidden" asp-for="OccubancBasedPrices" id="occupancybased-prices" />
-                                                    <div id="prices">
-                                                    </div>
-                                                </div>
-                                                <!-- End -->
+                                                    <!-- End -->
                                             </div>
                                             <!-- End -->
 
@@ -456,7 +492,7 @@
                         <div class="tab-pane fade" id="nav-periods" role="tabpanel" aria-labelledby="nav-periods-tab">
                             <div class="container py-5">
                                 <div class="bg-white rounded-lg shadow-sm p-5">
-                                    <input type="hidden" id="unavailable-periods" asp-for="UnavailablePeriodsString" />
+                                    @*<input type="hidden" id="unavailable-periods" asp-for="UnavailablePeriodsString" />*@
                                     <div>
                                         <ul id="periods" class="list-group mb-3 m-auto col-md-7">
                                             @if (Model.UnavailablePeriods != null)
@@ -466,7 +502,7 @@
                                                     <li checkin="@item.From.Year-@item.From.Month-@item.From.Day" checkout="@item.To.Year-@item.To.Month-@item.To.Day" class="list-group-item row no-gutters  d-flex justify-content-between lh-condensed">
                                                         <div class="list-group-item row "><i class="fas fa-sign-out-alt fa-2x"></i>&nbsp;&nbsp;<h4>@item.From.Year-@item.From.Month-@item.From.Day</h4></div>
                                                         <div class="list-group-item row"><i class="fas fa-sign-out-alt fa-2x fa-flip-horizontal"></i>&nbsp;&nbsp;<h4>@item.To.Year-@item.To.Month-@item.To.Day</h4></div>
-                                                        <div><a onclick="removePeriod(this)" class="btn pointer"><i class="fa fa-times"></i></a></div>
+                                                        <div><a onclick="removePeriod(this)" period-id="@item.Id" class="btn pointer"><i class="fa fa-times"></i></a></div>
                                                     </li>
                                                 }
                                             }
@@ -496,7 +532,7 @@
         </div>
     </section>
     <!-- ./Tabs -->
-</form>
+@*</form>*@
 
 
 <!--I ovo govno ne moze ovako možda uopšte ne treba-->
@@ -534,9 +570,9 @@
 </script>
 
 <script src="~/js/editgallery.js"></script>
-<script src="~/js/attributesscript.js"></script>
+<script src="~/js/editattributesscript.js"></script>
 <script src="~/js/ClienSideInputValidation.js"></script>
-<script src="~/js/datepickergijgo.js"></script>
+<script src="~/js/editdatepicker.js"></script>
 <script src="~/js/mapa.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>
 

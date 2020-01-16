@@ -193,8 +193,7 @@
                                                             <h5 class="col-md-4">@item.CountableObjAttr.Name</h5>
                                                             <input value="@item.Count" class="col-md-4 form-control form-control-sm myinput" placeholder="Unesite vrijednost" required type="number" min="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57" />
                                                             <div class="col-md-4">
-                                                                <a class="btn btn-error pointer" onclick="removeCntOffer(this);" style="float:right;padding:0;line-height:0;">
-                                                                    '
+                                                                <a class="btn btn-error pointer" onclick="removeCntOffer(this);" style="float:right;padding:0;line-height:0;">                                                                   
                                                                     <i class="fa fa-times"></i>
                                                                 </a>
                                                             </div>
@@ -251,7 +250,7 @@
                                                     <span class="my-0 col-md-12">
                                                         <div class="row">
                                                             <h5 class="col-md-4">@item.SpecialOffer.Name</h5>
-                                                            <input class="col-md-4 form-control form-control-sm myinput" value="@item.Price" placeholder="Unesite cijenu" required pattern="[0-9]+([\.][0-9]{1,2})?" />
+                                                            <input class="col-md-4 form-control form-control-sm myinput" value="@item.Price" placeholder="Unesite cijenu" required type="number" step="0.000001" />
                                                             <div class="form-control-sm input-group-append col-md-1"><span class="input-group-text text-muted">@mycurrency</span></div>
                                                             <div class="col-md-3">
                                                                 <a class="btn btn-error pointer" onclick="removeSpecialOffer(this);" style="float:right;padding:0;line-height:0;">
@@ -323,7 +322,7 @@
                                                         <div class="col-md-6 form-group">
                                                             <label asp-for="StandardPricingModel.StandardPricePerNight"></label>
                                                             <div class="input-group">
-                                                                <input pattern="[0-9]+([\.][0-9]{1,2})?" asp-for="StandardPricingModel.StandardPricePerNight" class="form-control standardvalidation">
+                                                                <input type="number" step="0.000001" asp-for="StandardPricingModel.StandardPricePerNight" class="form-control standardvalidation">
                                                                 <div class="input-group-append">
                                                                     <span class="input-group-text text-muted">
                                                                         @mycurrency
@@ -378,13 +377,13 @@
                                                         <div class="form-group col-md-6">
                                                             <label asp-for="OccupancyBasedPricing.MinOccupancy"></label>
                                                             <div class="input-group">
-                                                                <input id="min-occ-ob" type="number" asp-for="OccupancyBasedPricing.MinOccupancy" class="form-control occupancyvalidation">
+                                                                <input id="min-occ-ob" type="number" asp-for="OccupancyBasedPricing.MinOccupancy" oninput="emptyPrices()" class="form-control occupancyvalidation">
                                                             </div>
                                                         </div>
                                                         <div class="form-group col-md-6">
                                                             <label asp-for="OccupancyBasedPricing.MaxOccupancy"></label>
                                                             <div class="input-group">
-                                                                <input id="max-occ-ob" type="number" asp-for="OccupancyBasedPricing.MaxOccupancy" class="form-control myinput occupancyvalidation">
+                                                                <input id="max-occ-ob" type="number" asp-for="OccupancyBasedPricing.MaxOccupancy" oninput="emptyPrices()" class="form-control myinput occupancyvalidation">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -392,6 +391,21 @@
                                                     <hr />
                                                     <input type="hidden" asp-for="OccubancBasedPrices" id="occupancybased-prices" />
                                                     <div id="prices">
+                                                        <!--see if this works++++-->
+                                                        @if (Model.OccupancyBasedPricing != null)
+                                                        {
+                                                            <label><span class="hidden-xs">Broj posjetilaca</span></label>
+                                                            @foreach (var item in Model.OccupancyBasedPricing.Prices)
+                                                            {
+                                                                <div class="form-group">
+                                                                    <div class="input-group row">
+                                                                        <input class="form-control" value="@item.Occupancy" disabled>
+                                                                        <input type="number" step="0.000001" value="@item.PricePerNight" placeholder="Unesite cijenu" name="" class="form-control myinput" required="">
+                                                                        <div class="input-group-append"><span class="input-group-text text-muted">@mycurrency</span></div>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        }
                                                     </div>
                                                 </div>
                                                 <!-- End -->

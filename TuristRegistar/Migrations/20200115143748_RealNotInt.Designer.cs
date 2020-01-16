@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TuristRegistar.Data;
 
 namespace TuristRegistar.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200115143748_RealNotInt")]
+    partial class RealNotInt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -410,7 +412,7 @@ namespace TuristRegistar.Migrations
 
                     b.Property<int>("Occupancy");
 
-                    b.Property<decimal>("PricePerNight");
+                    b.Property<float>("PricePerNight");
 
                     b.HasKey("Id");
 
@@ -469,7 +471,7 @@ namespace TuristRegistar.Migrations
 
                     b.Property<int>("ObjectId");
 
-                    b.Property<decimal>("Price");
+                    b.Property<float>("Price");
 
                     b.HasKey("SpecialOfferId", "ObjectId");
 
@@ -492,11 +494,11 @@ namespace TuristRegistar.Migrations
 
                     b.Property<int?>("MinOccupancy");
 
-                    b.Property<decimal?>("OffsetPercentage");
+                    b.Property<float?>("OffsetPercentage");
 
                     b.Property<int?>("StandardOccupancy");
 
-                    b.Property<decimal?>("StandardPricePerNight");
+                    b.Property<float?>("StandardPricePerNight");
 
                     b.HasKey("Id");
 

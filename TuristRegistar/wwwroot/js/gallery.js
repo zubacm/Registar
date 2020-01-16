@@ -111,9 +111,9 @@ function deleteImg(e) {
     $.ajax({
         type: 'POST',
         url: "/Object/DeleteImageTemp",
-        contentType: "application/json",
+        //contentType: "application/json",
         data: data,
-        //contentType: false,
+        contentType: false,
         processData: false,
         success: function (data) {
             container.remove();
