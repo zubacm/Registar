@@ -51,20 +51,20 @@ namespace TuristRegistar.Models
         public String SelectedObjectType { get; set; }
 
         public IEnumerable<SelectListItem> Offers { get; set; }
-        public String AddedOffers { get; set; }
+        //public String AddedOffers { get; set; }
         public List<ObjectHasAttributes> ListOfAddedOffers { get; set; }
         public int DeleteAttributeId { get; set; }
         public int AddAttributeId { get; set; }
 
         public IEnumerable<SelectListItem> CountableOffers { get; set; }
-        public String AddedCountableOffers { get; set; }
+        //public String AddedCountableOffers { get; set; }
         public List<CntObjAttributesCount> ListOfAddedCntOffers { get; set; }
         public int AddCntAttributeId { get; set; }
         public int AddCntAttributeValue { get; set; }
         public int DeleteCntAttributeId { get; set; }
 
         public IEnumerable<SelectListItem> SpecialOffers { get; set; }
-        public String AddedSpecialOffers { get; set; }
+        //public String AddedSpecialOffers { get; set; }
         public List<SpecialOffersPrices> ListOfAddedSpecialOffers { get; set; }
         public int AddSpecialOfferId { get; set; }
         public Decimal AddSpecialOfferValue { get; set; }

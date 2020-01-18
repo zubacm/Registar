@@ -1,0 +1,214 @@
+﻿@model ObjectsViewModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
+@*<link href="~/css/regst.css" rel="stylesheet" />*@
+<link href="~/css/site.css" rel="stylesheet" />
+
+<script src="~/js/toast-show.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+<script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+<link href="~/css/gallery.css" rel="stylesheet" />
+
+@{
+    ViewData["Title"] = "ObjectList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{ var mycurrency = "BAM";}
+@if (HttpContextAccessor.HttpContext.Request.Cookies["Currency"] != null)
+{
+    mycurrency = HttpContextAccessor.HttpContext.Request.Cookies["Currency"];
+}
+<br /><br />
+<div class="container">
+    <div class="row">
+        <br />
+        <!--Search and filters-->
+        <div class="col-md-3">
+            <!--Search-->
+            <div class=" card">
+                <div class="card-header font-weight-bolder">
+                    Pretraga
+                </div>
+                <div class="card-body">
+                    <div class="card-group">
+                        <div class="m-auto">
+                            <input class="form-control" asp-for="Search.SearchString" placeholder="Naziv/Lokacija" />
+                            <span asp-validation-for="Search.SearchString" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="card-group container">
+                        <div class="">
+                            <label asp-for="Search.CheckIn"></label>
+                            <input id="datepicker1" class="datepicker" width="" />
+                            <span asp-validation-for="Search.CheckIn" class="text-danger"></span>
+                        </div>
+                        <br />
+                        <div class="">
+                            <label asp-for="Search.CheckOut"></label>
+                            <input id="datepicker2" class="datepicker" width="" />
+                            <span asp-validation-for="Search.CheckOut" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="card-group m-auto">
+                        <div class="col-sm-12" style="text-align:center;margin-bottom:5px"><label class="m-auto" asp-for="Search.Occupancy"></label></div>
+                        <div class="m-auto input-group col-sm-9">
+                            <input asp-for="Search.Occupancy" class="form-control" type="number" min="1" max="30" value="" />
+                            <div class="input-group-append">
+                                <span class="input-group-text text-muted">
+                                    @*<i class="fas fa-user-friends"></i>*@
+                                    <i class="fas fa-users"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="card-group m-auto">
+                        <div class="col-sm-12" style="text-align:center;margin-bottom:5px"><label class="m-auto" asp-for="Search.PriceBelow"></label></div>
+                        <div class="m-auto input-group col-sm-9">
+                            <input asp-for="Search.PriceBelow" class="form-control" type="number" min="1" value="" />
+                            <div class="input-group-append">
+                                <span class="input-group-text text-muted">
+                                    @mycurrency
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="card-group m-auto">
+                        <div class="col-sm-12" style="text-align:center;margin-bottom:5px"><label class="m-auto" asp-for="Search.RatingAbove"></label></div>
+                        <div class="m-auto input-group col-sm-9">
+                            <input asp-for="Search.RatingAbove" class="form-control" type="number" min="1" value="" />
+                            <div class="input-group-append">
+                                <span class="input-group-text text-muted">
+                                    <i class="fas fa-star"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="card-group">
+                        <button class="pointer btn btn-primary col-sm-12">Pretraži</button>
+                    </div>
+                </div>
+            </div>
+            <!--./Search-->
+
+            <br />
+            <!--Type-->
+            <div class="card">
+                <div class="card-header font-weight-bolder">
+                    Tip objekta
+                </div>
+                <div class="card-body">
+                    <div class="card-group">
+                        @if (Model.Search != null && Model.Search.ObjectTypes != null)
+                        {
+                            @foreach (var item in Model.Search.ObjectTypes)
+                            {
+                                <div class="card-group col-sm-12" style="margin-top:10px;">
+                                    <div class="custom-control custom-checkbox">
+                                        @{ var attrid = "type" + item.Id.ToString();}
+                                        <div class="col-sm-12">
+                                            <input asp-for="@item.Selected" type="checkbox" class="custom-control-input" id="@attrid" onchange="alert('jojo');">
+                                            <label class="custom-control-label" asp-for="@item.Id" for="@attrid">@item.Name</label>
+                                        </div>
+                                        <input type="hidden" asp-for="@item.Id" />
+                                        <input type="hidden" asp-for="@item.Name" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <!--./Type-->
+            <br />
+            <!--Attributes-->
+            <div class="card">
+                <div class="card-header font-weight-bolder">
+                    Karakteristike
+                </div>
+                <div class="card-body">
+                    <div class="card-group">
+                        @if (Model.Search != null && Model.Search.ObjectAttributes != null)
+                        {
+                            @foreach (var item in Model.Search.ObjectAttributes)
+                            {
+                                <div class="card-group col-sm-12" style="margin-top:10px;">
+                                    <div class="custom-control custom-checkbox">
+                                        @{ var attrid = "attr" + item.Id.ToString();}
+                                        <div class="col-sm-12">
+                                            <input asp-for="@item.Selected" type="checkbox" class="custom-control-input" id="@attrid" onchange="alert('jojo');">
+                                            <label class="custom-control-label" asp-for="@item.Id" for="@attrid">@item.Name</label>
+                                        </div>
+                                        <input type="hidden" asp-for="@item.Id" />
+                                        <input type="hidden" asp-for="@item.Name" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <!--./Attributes-->
+
+        </div>
+        <!--./Search and filters-->
+        <!--Objects-->
+        <div class="col-md-9">
+            <div class="container">
+                @if (Model.ObjectsList != null)
+                {
+                    @foreach (var item in Model.ObjectsList)
+                    {
+
+                    }
+                }
+            </div>
+        </div>
+        <!--./Objects-->
+    </div>
+</div>
+
+
+<script src="~/js/Navbarcolor.js"></script>
+<script src="~/js/gallery.js"></script>
+<script src="~/js/datepickergijgo.js"></script>
+<script src="~/js/mapa.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>
+
+@*Ovo mora ovdje jer pristupa modelu...*@
+<script>
+    function resetPager() {
+                document.getElementById("CurrPage").value = 0;
+    }
+    function goToNext() {
+        document.getElementById("CurrPage").value = @Model.Pager.CurrentPage+1;
+        document.getElementById("formIndex").submit();
+    }
+    function goToPrevious() {
+        document.getElementById("CurrPage").value = @Model.Pager.CurrentPage-1;
+        document.getElementById("formIndex").submit();
+    }
+    function goToFirst() {
+        document.getElementById("CurrPage").value = 1;
+        document.getElementById("formIndex").submit();
+    }
+    function goToLast() {
+        document.getElementById("CurrPage").value = @Model.Pager.TotalPages;
+        document.getElementById("formIndex").submit();
+    }
+    function goToPage(pagee) {
+        document.getElementById("CurrPage").value = pagee;
+        document.getElementById("formIndex").submit();
+    }
+</script>

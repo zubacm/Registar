@@ -39,5 +39,6 @@ namespace TuristRegistar.Data
         void DeleteCntAttributeCount(int objectid, int cntattributeid);
         void AddSpecialOffer(SpecialOffersPrices specialoffer);
         void DeleteSpecialOffer(int objectid, int attributeid);
+        void EditObjectBasic(Objects myobject);
     }
 }

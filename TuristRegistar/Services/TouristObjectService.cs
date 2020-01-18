@@ -337,5 +337,25 @@ namespace TuristRegistar.Services
             _context.SpecialOffersPrices.Remove(specialoffer);
             _context.SaveChanges();
         }
+
+        public void EditObjectBasic(Objects myobject)
+        {
+            var obj = _context.Objects.FirstOrDefault(o => o.Id == myobject.Id);
+            obj.Name = myobject.Name;
+            obj.Lat = myobject.Lat;
+            obj.Lng = myobject.Lng;
+            obj.Address = myobject.Address;
+            obj.EmailContact = myobject.EmailContact;
+            obj.PhoneNumberContact = myobject.PhoneNumberContact;
+            obj.WebContact = myobject.WebContact;
+            obj.Description = myobject.Description;
+            obj.Surface = myobject.Surface;
+            obj.CountryId = myobject.CountryId;
+            obj.CityId = myobject.CityId;
+            obj.ObejectTypeId = myobject.ObejectTypeId;
+
+            _context.Objects.Attach(obj);
+            _context.SaveChanges();
+        }
     }
 }

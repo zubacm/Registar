@@ -6,19 +6,47 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using TuristRegistar.Data;
 using TuristRegistar.Models;
 
 namespace TuristRegistar.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ITouristObject _touristObject;
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public HomeController(ITouristObject touristObject,  UserManager<IdentityUser> userManager)
+        {
+            _touristObject = touristObject;
+            _userManager = userManager;
+        }
+
         public IActionResult Index()
         {
             return View();
         }
+
+        [Route("objectlist")] // /objectlist
+        public IActionResult ObjectList()
+        {
+            ObjectsViewModel model = new ObjectsViewModel();
+            model.Search = new Search()
+            {
+                ObjectAttributes = _touristObject.GetAllObjectAttributes()
+                                .Select(atr => new ObjectAttributesModel() { Id = atr.Id, Name = atr.Name, Selected = false }).ToList(),
+                ObjectTypes = _touristObject.GetObjectTypes()
+                            .Select(type => new ObjectTypeModel() { Id = type.Id, Name = type.Name, Selected = false }).ToList(),
+            };
+
+            return View(model);
+        }
+
+
 
         public IActionResult About()
         {
@@ -57,10 +85,8 @@ namespace TuristRegistar.Controllers
             var option = new CookieOptions();
             option.Expires = DateTime.Now.AddDays(1);
             Response.Cookies.Append("Currency", currency, option);
-            
-             //Request.Cookies["Currency"];
-            //return RedirectToPage();
         }
+
 
         //public async Task<KeyValuePair<string,string>> GetExchangeRate(string from, string to)
         public async Task<Decimal> GetExchangeRate(string from, string to)

@@ -16,42 +16,42 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(";").shift();
 }
 
-function fillValues() {
-    var mylist = document.getElementById('countable-attr-container').getElementsByTagName("li");
-    for (var i = 0; i < mylist.length; i++) {
-        var idvalue = $(mylist[i]).attr('id-value');
-        var myvalue = $(mylist[i]).find('input')[0].value;
-        cntOffersAndValues.push(idvalue + ":" + myvalue);
-        $('#countable-offers').val(cntOffersAndValues);
-    }
+//function fillValues() {
+//    var mylist = document.getElementById('countable-attr-container').getElementsByTagName("li");
+//    for (var i = 0; i < mylist.length; i++) {
+//        var idvalue = $(mylist[i]).attr('id-value');
+//        var myvalue = $(mylist[i]).find('input')[0].value;
+//        cntOffersAndValues.push(idvalue + ":" + myvalue);
+//        $('#countable-offers').val(cntOffersAndValues);
+//    }
 
 
-    var specialofferslist = document.getElementById('specialoffers-container').getElementsByTagName("li");
-    for (i = 0; i < specialofferslist.length; i++) {
-        var idvalueso = $(specialofferslist[i]).attr('id-value');
-        var myvalueso = $(specialofferslist[i]).find('input')[0].value;
-        payedOffersWithValues.push(idvalueso + ":" + myvalueso);
-        $('#special-offersvwithval').val(payedOffersWithValues);
-    }
+//    var specialofferslist = document.getElementById('specialoffers-container').getElementsByTagName("li");
+//    for (i = 0; i < specialofferslist.length; i++) {
+//        var idvalueso = $(specialofferslist[i]).attr('id-value');
+//        var myvalueso = $(specialofferslist[i]).find('input')[0].value;
+//        payedOffersWithValues.push(idvalueso + ":" + myvalueso);
+//        $('#special-offersvwithval').val(payedOffersWithValues);
+//    }
 
-    if ($('#occupancy-model').val() === "true") {
-        var occ_b_prices = document.getElementById('prices').getElementsByTagName("input");
-        for (i = 0; i < occ_b_prices.length; i += 2) {
-            var visitors = $(occ_b_prices[i]).attr('value');
-            var pricevalue = $(occ_b_prices[i + 1]).val();
-            occupancabasedprices.push(visitors + ":" + pricevalue);
-        }
-        $('#occupancybased-prices').val(occupancabasedprices);
-    }
+//    if ($('#occupancy-model').val() === "true") {
+//        var occ_b_prices = document.getElementById('prices').getElementsByTagName("input");
+//        for (i = 0; i < occ_b_prices.length; i += 2) {
+//            var visitors = $(occ_b_prices[i]).attr('value');
+//            var pricevalue = $(occ_b_prices[i + 1]).val();
+//            occupancabasedprices.push(visitors + ":" + pricevalue);
+//        }
+//        $('#occupancybased-prices').val(occupancabasedprices);
+//    }
 
-    var periodslist = document.getElementById('periods').getElementsByTagName("li");
-    for (i = 0; i < periodslist.length; i++) {
-        var checkin = $(periodslist[i]).attr('checkin');
-        var checkout = $(periodslist[i]).attr('checkout');
-        unavailableperiods.push(checkin + ":" + checkout);
-    }
-    $('#unavailable-periods').val(unavailableperiods);
-}
+//    var periodslist = document.getElementById('periods').getElementsByTagName("li");
+//    for (i = 0; i < periodslist.length; i++) {
+//        var checkin = $(periodslist[i]).attr('checkin');
+//        var checkout = $(periodslist[i]).attr('checkout');
+//        unavailableperiods.push(checkin + ":" + checkout);
+//    }
+//    $('#unavailable-periods').val(unavailableperiods);
+//}
 
 
 
@@ -165,13 +165,6 @@ function GetCntAttributes() {
 
     var sel = document.getElementById("cnt-attr-select");
     var text = sel.options[sel.selectedIndex].text;
-    //var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed" id-value="'
-    //    + sel.value + '" value="">'
-    //    + '<span class="my-0 col-md-12"><div class="row">'
-    //    + '<h5 class="col-md-4">' + text + '</h6>'
-    //    + '<input class="col-md-4 form-control form-control-sm myinput" placeholder="Unesite vrijednost" required type="number" min="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"/>'
-    //    + '<div class="col-md-4"><a  class="btn btn-error pointer" onclick="removeCntOffer(this);"  style="float:right;padding:0;line-height:0;">'
-    //    + '<i class="fa fa-times"></i></a></div></div></h5></li>';
     var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed" id-value="'
         + sel.value + '" text-value="' + text + '">'
         + '<span class="my-0 col-md-12"><div class="row">'
@@ -179,17 +172,9 @@ function GetCntAttributes() {
         + '<input class="col-md-4 form-control form-control-sm myinput" placeholder="Unesite vrijednost" required type="number" min="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"/>'
         + '<div class="col-md-4"><a  class="btn btn-primary pointer" onclick="addCntOffer(this);"  style="color:white;float:right;line-height:0;">'
         + 'Dodaj&nbsp<i class="fa fa-plus"></i></a></div></div></h5></li>';
-    //$("#countable-attr-container").append(
-    //    myhtml
-    //);
     $("#add-cnt-offer").append(
         myhtml
     );
-
-    //ne ovdje nego na submit
-    //countableOffers.push(sel.value);
-    //$("#selectlist-cntoffers").val(countableOffers);
-    //RefreshCntOffersSelectList();
 }
 function addCntOffer(ev) {
     var element = $(ev).parent().parent().parent().parent();
@@ -217,7 +202,7 @@ function addCntOffer(ev) {
                     + idvalue + '" value="">'
                     + '<span class="my-0 col-md-12"><div class="row">'
                     + '<h5 class="col-md-4">' + textvalue + '</h6>'
-                    + '<span class="col-md-4">' + myvalue + '</span>'
+                    + '<input class="col-md-4 col-md-4 form-control form-control-sm" value ="'+myvalue+'" disabled />'
                             + '<div class="col-md-4"><a  class="btn btn-error pointer" onclick="removeCntOffer(this);"  style="float:right;padding:0;line-height:0;">'
                             + '<i class="fa fa-times"></i></a></div></div></h5></li>';
 
@@ -285,7 +270,6 @@ function RefreshCntOffersSelectList() {
                 '<option disabled selected>Izaberite...</option>'
             );
 
-            //console.log(data);//Da vidiš u konzoli
             $.each(data, function (index, model) {
                 offersSelectList.append(
                     $('<option>', {
@@ -307,17 +291,6 @@ function GetSpecialOffersAttributes() {
 
     var sel = document.getElementById("specialoffer-select");
     var text = sel.options[sel.selectedIndex].text;
-    //var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed" id-value="'
-    //    + sel.value + '" value="">'
-    //    + '<span class="my-0 col-md-12"><div class="row">'
-    //    + '<h5 class="col-md-4">' + text + '</h6>'
-    //    + '<input class="col-md-4 form-control form-control-sm myinput" placeholder="Unesite cijenu" required pattern="[0-9]+([\.][0-9]{1,2})?" />'
-    //    + '<div class="form-control-sm input-group-append col-md-1"><span class="input-group-text text-muted">' + currency + '</span></div>'
-    //    + '<div class="col-md-3"><a class="btn btn-error pointer" onclick="removeSpecialOffer(this);"  style="float:right;padding:0;line-height:0;">'
-    //    + '<i class="fa fa-times"></i></a></div></div></h5></li>';
-    //$("#specialoffers-container").append(
-    //    myhtml
-    //);
     var myhtml = '<li class="list-group-item d-flex justify-content-between lh-condensed" id-value="'
         + sel.value + '" text-value="' + text + '">'
         + '<span class="my-0 col-md-12"><div class="row">'
@@ -330,10 +303,6 @@ function GetSpecialOffersAttributes() {
     $("#add-special-offer").append(
         myhtml
     );
-
-    //payedOffers.push(sel.value);
-    //$("#selectlist-specialoffers").val(payedOffers);
-    //RefreshSpecialOffersSelectList();
 }
 function addSpecialOffer(ev) {
     var element = $(ev).parent().parent().parent().parent();
@@ -361,7 +330,7 @@ function addSpecialOffer(ev) {
                     + idvalue + '" value="">'
                     + '<span class="my-0 col-md-12"><div class="row">'
                     + '<h5 class="col-md-4">' + textvalue + '</h6>'
-                    + '<span class="col-md-4">' + myvalue + '</span>'
+                    + '<input class="col-md-4 col-md-4 form-control form-control-sm" value ="' + myvalue + '" disabled />'
                     + '<div class="col-md-4"><a  class="btn btn-error pointer" onclick="removeSpecialOffer(this);"  style="float:right;padding:0;line-height:0;">'
                     + '<i class="fa fa-times"></i></a></div></div></h5></li>';
 

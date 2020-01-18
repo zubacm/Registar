@@ -31,7 +31,7 @@ namespace TuristRegistar.Controllers
             _userManager = userManager;
         }
 
-
+       
         public IActionResult Index()
         {
             return View();
@@ -571,6 +571,31 @@ namespace TuristRegistar.Controllers
             _touristObject.DeleteSpecialOffer(model.Id, model.DeleteSpecialOfferId);
             return Ok();
         }
+
+        public IActionResult EditObjectBasic(EditObjectViewModel model)
+        {
+            Objects myobject = new Objects()
+            {
+                Id = model.Id,
+                Name = model.Name,
+                Lat = model.Lat,
+                Lng = model.Lng,
+                Address = model.Address,
+                EmailContact = model.EmailContact,
+                PhoneNumberContact = model.PhoneNumberContact,
+                WebContact = model.WebContact,
+                Description = model.Description,
+                Surface = model.Surface,
+                CountryId = Convert.ToInt32(model.SelectedCountry) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCountry),
+                CityId = Convert.ToInt32(model.SelectedCity) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCity),
+                ObejectTypeId = Convert.ToInt32(model.SelectedObjectType) == 0 ? null : (int?)Convert.ToInt32(model.SelectedObjectType),
+            };
+            _touristObject.EditObjectBasic(myobject);
+            ViewData["Notification"] = "Uspješno sačuvane izmjene";
+            return RedirectToAction("EditObject", "Object", new { id = model.Id });
+        }
+
+        //još delete
 
     }
 }
