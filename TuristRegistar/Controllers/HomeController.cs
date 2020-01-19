@@ -42,7 +42,24 @@ namespace TuristRegistar.Controllers
                 ObjectTypes = _touristObject.GetObjectTypes()
                             .Select(type => new ObjectTypeModel() { Id = type.Id, Name = type.Name, Selected = false }).ToList(),
             };
-
+            var test = _touristObject.GetAllObjects();
+            model.ObjectsList = _touristObject.GetAllObjects()
+                               .Select(ob => new ObjectItemModel()
+                               {
+                                   Id = ob.Id,
+                                   Name = ob.Name,
+                                   Location = ob.City != null ? ob.Address + ", " + ob.City.Name : ob.Address,
+                                   ImgSrc = ob.ObjectImages.Count > 0 ? ob.ObjectImages.ElementAt(0).Path : "",
+                                   Lat = ob.Lat,
+                                   Lng = ob.Lng,
+                                   Description = ob.Description,
+                                   WebContact = ob.WebContact,
+                                   EmailContact = ob.EmailContact,
+                                   PhoneNumberContact = ob.PhoneNumberContact,
+                                   Type = ob.ObjectType == null ? "/pink.png" : ob.ObjectType.Name,
+                                   NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
+                                   Rating = _touristObject.GetAvarageRating(ob.Id),
+                                   }).ToList();
             return View(model);
         }
 

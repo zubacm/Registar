@@ -78,7 +78,12 @@ namespace TuristRegistar.Data
             //   new { Id = 3, Name = "Doručak" },
             //   new { Id = 4, Name = "Mini-bar" }
             //   );
-
+            //modelBuilder.Entity<ObjectTypes>().HasData(
+            //   new { Id = 1, Name = "Apartman" },
+            //   new { Id = 2, Name = "Hotelska soba" },
+            //   new { Id = 3, Name = "Kuća" },
+            //   new { Id = 4, Name = "Vikendica" }
+            //   );
 
             #endregion
         }

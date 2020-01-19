@@ -357,5 +357,36 @@ namespace TuristRegistar.Services
             _context.Objects.Attach(obj);
             _context.SaveChanges();
         }
+
+        public IEnumerable<Objects> GetAllObjects()
+        {
+            return _context.Objects
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                //.Include(o => o.SpecialOffers)
+                //.Include(o => o.UnavailablePeriods)
+                .Include(o => o.ObjectImages)
+                //.Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
+                //.Include(o => o.StandardPricingModel);
+                ;
+        }
+
+        public int GetNumberOfRatings(int objectId)
+        {
+            return _context.RatingsAndReviews.Where(r => r.ObjectId == objectId).Count();
+        }
+        //check this shit
+        public Decimal GetAvarageRating(int objectId)
+        {
+            //return _context.RatingsAndReviews.Where(r => r.ObjectId == objectId).Sum(ob => ob.Rating);
+            return GetNumberOfRatings(objectId) > 0 ?
+                (Decimal)_context.RatingsAndReviews.Where(r => r.ObjectId == objectId).Average(ob => ob.Rating)
+                : 0;
+        }
+
     }
 }

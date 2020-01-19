@@ -40,5 +40,8 @@ namespace TuristRegistar.Data
         void AddSpecialOffer(SpecialOffersPrices specialoffer);
         void DeleteSpecialOffer(int objectid, int attributeid);
         void EditObjectBasic(Objects myobject);
+        IEnumerable<Objects> GetAllObjects();
+        int GetNumberOfRatings(int objectId);
+        Decimal GetAvarageRating(int objectId);
     }
 }
