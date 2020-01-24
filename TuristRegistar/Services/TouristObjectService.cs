@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using TuristRegistar.Data;
 using TuristRegistar.Data.Models;
+using TuristRegistar.Models;
 
 namespace TuristRegistar.Services
 {
@@ -86,6 +87,14 @@ namespace TuristRegistar.Services
             return listKeyValue;
         }
 
+        public DateTime ParseDate(string text)
+        {
+            var listKeyValue = new List<KeyValuePair<DateTime, DateTime>>();
+            string[] input = text.Trim('[', ']').Split(',');
+
+            return DateTime.Parse(input[0]);
+            
+        }
 
         public IEnumerable<ObjectAttributes> GetAllObjectAttributes()
         {
@@ -132,7 +141,7 @@ namespace TuristRegistar.Services
 
         public async Task<Objects> GetObject(int id, string currency)
         {
-            var obj =  _context.Objects
+            var obj = _context.Objects
                 .Include(o => o.Country)
                 .Include(o => o.City)
                 .Include(o => o.ObjectType)
@@ -140,6 +149,7 @@ namespace TuristRegistar.Services
                 .Include(o => o.CntObjAttributesCount)
                 .Include(o => o.SpecialOffers)
                 .Include(o => o.UnavailablePeriods)
+                //.Where(c => c.UnavailablePeriods.Any(up => 12 < 5 )
                 .Include(o => o.ObjectImages)
                 .Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
                 .Include(o => o.StandardPricingModel)
@@ -352,7 +362,7 @@ namespace TuristRegistar.Services
             obj.Surface = myobject.Surface;
             obj.CountryId = myobject.CountryId;
             obj.CityId = myobject.CityId;
-            obj.ObejectTypeId = myobject.ObejectTypeId;
+            obj.ObjectTypeId = myobject.ObjectTypeId;
 
             _context.Objects.Attach(obj);
             _context.SaveChanges();
@@ -375,18 +385,402 @@ namespace TuristRegistar.Services
                 ;
         }
 
+        public IEnumerable<Objects> GetObjects(int pagenumber, int pagesize)
+        {
+            return _context.Objects
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                //.Include(o => o.SpecialOffers)
+                //.Include(o => o.UnavailablePeriods)
+                .Include(o => o.ObjectImages)
+                //.Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
+                //.Include(o => o.StandardPricingModel)
+                .Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
+        }
+
+        public async Task<IEnumerable<Objects>> GetFilteredObjects(int pagenumber, int pagesize, Search search, string currency)
+        {
+            var myobjects = GetCheckedRatingAndSearch(search);
+
+            if (search.Occupancy != 0 && search.PriceBelow != 0 && search.CheckIn != DateTime.MinValue && search.CheckOut != DateTime.MinValue)
+            {
+                var priceBelowBAM = (await GetExchangeRate(currency, "BAM")) * search.PriceBelow;
+                int numberOfDays = (search.CheckOut - search.CheckIn).Days;
+
+                myobjects = myobjects.Where(ob => CheckCheckInAndOut(search.CheckIn, search.CheckOut, ob.UnavailablePeriods.ToList()))
+                    .Where(ob => (ob.OccupancyBasedPricingId != null && GetOccupancyBasedPricing(ob.Id).MinOccupancy <= search.Occupancy && GetOccupancyBasedPricing(ob.Id).MaxOccupancy >= search.Occupancy && GetPriceForOccupancyModel(ob.Id, search.Occupancy)*numberOfDays <= priceBelowBAM)
+                || (ob.StandardPricingModelId != null && GetStandardPricingModel(ob.Id).MinOccupancy <= search.Occupancy && GetStandardPricingModel(ob.Id).MaxOccupancy >= search.Occupancy && GetPriceForStandardModel(ob.Id,search.Occupancy)*numberOfDays <= priceBelowBAM));
+            }
+            else if (search.Occupancy != 0 && search.CheckIn != DateTime.MinValue && search.CheckOut != DateTime.MinValue)
+            {
+                myobjects = myobjects.Where(ob => CheckCheckInAndOut(search.CheckIn, search.CheckOut, ob.UnavailablePeriods.ToList()))
+                    .Where(ob => (ob.OccupancyBasedPricingId != null && GetOccupancyBasedPricing(ob.Id).MinOccupancy <= search.Occupancy && GetOccupancyBasedPricing(ob.Id).MaxOccupancy >= search.Occupancy)
+                || (ob.StandardPricingModelId != null && GetStandardPricingModel(ob.Id).MinOccupancy <= search.Occupancy && GetStandardPricingModel(ob.Id).MaxOccupancy >= search.Occupancy));
+            }
+            else if (search.CheckIn != DateTime.MinValue && search.CheckOut != DateTime.MinValue)
+            {
+                myobjects = myobjects.Where(ob => CheckCheckInAndOut(search.CheckIn, search.CheckOut, ob.UnavailablePeriods.ToList()));
+            }
+            else if (search.Occupancy != 0)
+            {
+                myobjects = myobjects.Where(ob => (ob.OccupancyBasedPricingId != null && GetOccupancyBasedPricing(ob.Id).MinOccupancy <= search.Occupancy && GetOccupancyBasedPricing(ob.Id).MaxOccupancy >= search.Occupancy)
+                || (ob.StandardPricingModelId != null && GetStandardPricingModel(ob.Id).MinOccupancy <= search.Occupancy && GetStandardPricingModel(ob.Id).MaxOccupancy >= search.Occupancy));
+            }
+
+            return myobjects.Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
+        }
+
+        private bool CheckCheckInAndOut(DateTime checkIn, DateTime checkOut, List<UnavailablePeriods> unavailablePeriods)
+        {
+            foreach (var period in unavailablePeriods)
+            {
+                if ((DateTime.Compare(period.From, checkIn) <= 0 && DateTime.Compare(period.To, checkIn) >= 0) || (DateTime.Compare(period.To, checkOut) >= 0 && DateTime.Compare(period.From, checkOut) <= 0) )
+                    return false;
+            }
+            return true;
+        }
+        private StandardPricingModel GetStandardPricingModel(int objectId)
+        {
+            return _context.StandardPricingModels.FirstOrDefault(spm => spm.Objects.Id == objectId);
+        }
+        private OccupancyBasedPricing GetOccupancyBasedPricing(int objectId)
+        {
+            return _context.OccupancyBasedPricings.FirstOrDefault(obp => obp.Objects.Id == objectId);
+        }
+        
+        private Decimal GetPriceForStandardModel(int objectId, int occupancy)
+        {
+            var standardPM = GetStandardPricingModel(objectId);
+            var occupancyOffset = occupancy - standardPM.StandardOccupancy;
+            return (Decimal)standardPM.StandardPricePerNight + (Decimal)(occupancyOffset * standardPM.StandardPricePerNight * (standardPM.OffsetPercentage / 100));
+        }
+        
+        private Decimal GetPriceForOccupancyModel(int objectId, int occupancy)
+        {
+            var occupancyPM = _context.OccupancyBasedPricings.Include(opm => opm.Prices).FirstOrDefault(obp => obp.Objects.Id == objectId);
+            return occupancyPM.Prices.FirstOrDefault(pr => pr.Occupancy == occupancy).PricePerNight;            
+        }
+        private IEnumerable<Objects> GetCheckedRatingAndSearch(Search search)
+        {
+            //maybe remove city and country from include because i have fulladdress
+            var checkedTypes = search.ObjectTypes.Where(ot => ot.Selected == true).Select(ot => ot.Id).ToList();
+            var checkedAttributes = search.ObjectAttributes.Where(oa => oa.Selected == true).Select(oa => oa.Id).ToList();
+            if (checkedTypes.Count > 0 && checkedAttributes.Count > 0 && search.RatingAbove != 0 && (!string.IsNullOrWhiteSpace(search.SearchString)))
+            {
+                return _context.Objects
+                .Where(o => checkedTypes.Contains((int)o.ObjectTypeId))
+                .Where(o => !checkedAttributes.Except(o.ObjectHasAttributes.Select(item => item.AttributeId)).Any())
+                .Where(o => (o.RatingsAndReviews.Count > 0 ? o.RatingsAndReviews.Select(item => item.Rating).Average() >= search.RatingAbove : false))
+                .Where(ob => ob.Name.ToLower().Contains(search.SearchString.ToLower()) || ob.FullAddress.ToLower().Contains(search.SearchString.ToLower()))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedTypes.Count > 0 && checkedAttributes.Count > 0 && search.RatingAbove != 0)
+            {
+                return _context.Objects
+                .Where(o => checkedTypes.Contains((int)o.ObjectTypeId))
+                .Where(o => !checkedAttributes.Except(o.ObjectHasAttributes.Select(item => item.AttributeId)).Any())
+                .Where(o => (o.RatingsAndReviews.Count > 0 ? o.RatingsAndReviews.Select(item => item.Rating).Average() >= search.RatingAbove : false))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedTypes.Count > 0 && checkedAttributes.Count > 0 && (!string.IsNullOrWhiteSpace(search.SearchString)))
+            {
+                return _context.Objects
+                .Where(o => checkedTypes.Contains((int)o.ObjectTypeId))
+                .Where(o => !checkedAttributes.Except(o.ObjectHasAttributes.Select(item => item.AttributeId)).Any())
+                .Where(ob => ob.Name.ToLower().Contains(search.SearchString.ToLower()) || ob.FullAddress.ToLower().Contains(search.SearchString.ToLower()))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedTypes.Count > 0 && search.RatingAbove != 0 && (!string.IsNullOrWhiteSpace(search.SearchString)))
+            {
+                return _context.Objects
+                .Where(o => checkedTypes.Contains((int)o.ObjectTypeId))
+                .Where(o => (o.RatingsAndReviews.Count > 0 ? o.RatingsAndReviews.Select(item => item.Rating).Average() >= search.RatingAbove : false))
+                .Where(ob => ob.Name.ToLower().Contains(search.SearchString.ToLower()) || ob.FullAddress.ToLower().Contains(search.SearchString.ToLower()))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedAttributes.Count > 0 && search.RatingAbove != 0 && (!string.IsNullOrWhiteSpace(search.SearchString)))
+            {
+                return _context.Objects
+                .Where(o => !checkedAttributes.Except(o.ObjectHasAttributes.Select(item => item.AttributeId)).Any())
+                .Where(o => (o.RatingsAndReviews.Count > 0 ? o.RatingsAndReviews.Select(item => item.Rating).Average() >= search.RatingAbove : false))
+                .Where(ob => ob.Name.ToLower().Contains(search.SearchString.ToLower()) || ob.FullAddress.ToLower().Contains(search.SearchString.ToLower()))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedTypes.Count > 0 && search.RatingAbove != 0)
+            {
+                return _context.Objects
+                .Where(o => checkedTypes.Contains((int)o.ObjectTypeId))
+                .Where(o => (o.RatingsAndReviews.Count > 0 ? o.RatingsAndReviews.Select(item => item.Rating).Average() >= search.RatingAbove : false))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedTypes.Count > 0 && (!string.IsNullOrWhiteSpace(search.SearchString)))
+            {
+                return _context.Objects
+                .Where(o => checkedTypes.Contains((int)o.ObjectTypeId))
+                .Where(ob => ob.Name.ToLower().Contains(search.SearchString.ToLower()) || ob.FullAddress.ToLower().Contains(search.SearchString.ToLower()))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedAttributes.Count > 0 && search.RatingAbove != 0)
+            {
+                return _context.Objects
+                .Where(o => !checkedAttributes.Except(o.ObjectHasAttributes.Select(item => item.AttributeId)).Any())
+                .Where(o => (o.RatingsAndReviews.Count > 0 ? o.RatingsAndReviews.Select(item => item.Rating).Average() >= search.RatingAbove : false))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedAttributes.Count > 0 && (!string.IsNullOrWhiteSpace(search.SearchString)))
+            {
+                return _context.Objects
+                .Where(o => !checkedAttributes.Except(o.ObjectHasAttributes.Select(item => item.AttributeId)).Any())
+                .Where(ob => ob.Name.ToLower().Contains(search.SearchString.ToLower()) || ob.FullAddress.ToLower().Contains(search.SearchString.ToLower()))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (search.RatingAbove != 0 && (!string.IsNullOrWhiteSpace(search.SearchString)))
+            {
+                return _context.Objects
+                .Where(o => (o.RatingsAndReviews.Count > 0 ? o.RatingsAndReviews.Select(item => item.Rating).Average() >= search.RatingAbove : false))
+                .Where(ob => ob.Name.ToLower().Contains(search.SearchString.ToLower()) || ob.FullAddress.ToLower().Contains(search.SearchString.ToLower()))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedTypes.Count > 0 && checkedAttributes.Count > 0)
+            {
+                return _context.Objects
+                .Where(o => checkedTypes.Contains((int)o.ObjectTypeId))
+                .Where(o => !checkedAttributes.Except(o.ObjectHasAttributes.Select(item => item.AttributeId)).Any())
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedTypes.Count > 0)
+            {
+                return _context.Objects
+                .Where(o => checkedTypes.Contains((int)o.ObjectTypeId))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (checkedAttributes.Count > 0)
+            {
+                return _context.Objects
+                .Where(o => !checkedAttributes.Except(o.ObjectHasAttributes.Select(item => item.AttributeId)).Any())
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (search.RatingAbove != 0)
+            {
+                return _context.Objects
+                .Where(o => (o.RatingsAndReviews.Count > 0 ? o.RatingsAndReviews.Select(item => item.Rating).Average() >= search.RatingAbove : false))
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                .Include(o => o.ObjectImages)
+                .Include(o => o.UnavailablePeriods)
+                .ToList();
+            }
+            else if (!string.IsNullOrWhiteSpace(search.SearchString))
+            {
+                return _context.Objects//check the city, country is missing
+                    .Where(ob => ob.Name.ToLower().Contains(search.SearchString.ToLower()) || ob.FullAddress.ToLower().Contains(search.SearchString.ToLower()))
+                    .Include(o => o.Country)
+                    .Include(o => o.City)
+                    .Include(o => o.ObjectType)
+                    .Include(o => o.ObjectHasAttributes)
+                    .Include(o => o.CntObjAttributesCount)
+                    .Include(o => o.RatingsAndReviews)
+                    .Include(o => o.ObjectImages)
+                    .Include(o => o.UnavailablePeriods)
+                    .ToList();
+            }
+            return _context.Objects
+            .Include(o => o.Country)
+            .Include(o => o.City)
+            .Include(o => o.ObjectType)
+            .Include(o => o.ObjectHasAttributes)
+            .Include(o => o.CntObjAttributesCount)
+            .Include(o => o.RatingsAndReviews)
+            .Include(o => o.ObjectImages)
+            .Include(o => o.UnavailablePeriods)
+            .ToList();
+
+        }
+
+
+
+        public async Task<int> CountFilteredObjects(Search search, string currency)
+        {
+            var myobjects = GetCheckedRatingAndSearch(search);
+
+            if (search.Occupancy != 0 && search.PriceBelow != 0 && search.CheckIn != DateTime.MinValue && search.CheckOut != DateTime.MinValue)
+            {
+                var priceBelowBAM = (await GetExchangeRate(currency, "BAM")) * search.PriceBelow;
+                int numberOfDays = (search.CheckOut - search.CheckIn).Days;
+
+                return myobjects.Where(ob => CheckCheckInAndOut(search.CheckIn, search.CheckOut, ob.UnavailablePeriods.ToList()))
+                    .Where(ob => (ob.OccupancyBasedPricingId != null && GetOccupancyBasedPricing(ob.Id).MinOccupancy <= search.Occupancy && GetOccupancyBasedPricing(ob.Id).MaxOccupancy >= search.Occupancy && GetPriceForOccupancyModel(ob.Id, search.Occupancy) * numberOfDays <= priceBelowBAM)
+                || (ob.StandardPricingModelId != null && GetStandardPricingModel(ob.Id).MinOccupancy <= search.Occupancy && GetStandardPricingModel(ob.Id).MaxOccupancy >= search.Occupancy && GetPriceForStandardModel(ob.Id, search.Occupancy) * numberOfDays <= priceBelowBAM))
+                .Count();
+            }
+            else if (search.Occupancy != 0 && search.CheckIn != DateTime.MinValue && search.CheckOut != DateTime.MinValue)
+            {
+                return myobjects.Where(ob => CheckCheckInAndOut(search.CheckIn, search.CheckOut, ob.UnavailablePeriods.ToList()))
+                    .Where(ob => (ob.OccupancyBasedPricingId != null && GetOccupancyBasedPricing(ob.Id).MinOccupancy <= search.Occupancy && GetOccupancyBasedPricing(ob.Id).MaxOccupancy >= search.Occupancy)
+                || (ob.StandardPricingModelId != null && GetStandardPricingModel(ob.Id).MinOccupancy <= search.Occupancy && GetStandardPricingModel(ob.Id).MaxOccupancy >= search.Occupancy))
+                .Count();
+            }
+            else if (search.CheckIn != DateTime.MinValue && search.CheckOut != DateTime.MinValue)
+            {
+                myobjects = myobjects.Where(ob => CheckCheckInAndOut(search.CheckIn, search.CheckOut, ob.UnavailablePeriods.ToList()));
+            }
+            else if (search.Occupancy != 0)
+            {
+                return myobjects.Where(ob => (ob.OccupancyBasedPricingId != null && GetOccupancyBasedPricing(ob.Id).MinOccupancy <= search.Occupancy && GetOccupancyBasedPricing(ob.Id).MaxOccupancy >= search.Occupancy)
+                || (ob.StandardPricingModelId != null && GetStandardPricingModel(ob.Id).MinOccupancy <= search.Occupancy && GetStandardPricingModel(ob.Id).MaxOccupancy >= search.Occupancy))
+                .Count();
+            }
+
+            return myobjects.Count();
+        }
+
+
+        public int CountObjects()
+        {
+            return _context.Objects.Count();
+        }
+
         public int GetNumberOfRatings(int objectId)
         {
             return _context.RatingsAndReviews.Where(r => r.ObjectId == objectId).Count();
         }
-        //check this shit
         public Decimal GetAvarageRating(int objectId)
         {
-            //return _context.RatingsAndReviews.Where(r => r.ObjectId == objectId).Sum(ob => ob.Rating);
             return GetNumberOfRatings(objectId) > 0 ?
                 (Decimal)_context.RatingsAndReviews.Where(r => r.ObjectId == objectId).Average(ob => ob.Rating)
                 : 0;
         }
 
+        //Expecting 1,2,34,32 ---- not used i think
+        public List<int> ParseComaSeparatedStringToIntList(string text)
+        {
+            string[] input = text.Split(',');
+            int i = 0;
+            return input.Where(s => int.TryParse(s, out i))
+                             .Select(s => i)
+                             .ToList();
+        }
+
+
+        public String GetCityName(int cityId)
+        {
+            return _context.Cities.FirstOrDefault(c => c.Id == cityId).Name;
+        }
+        public String GetCoutnryName(int countryId)
+        {
+            return _context.Counries.FirstOrDefault(c => c.Id == countryId).Name;
+        }
     }
 }

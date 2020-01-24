@@ -9,25 +9,29 @@
 @if (showBanner)
 {
     <nav id="cookieConsent" class="navbar navbar-default navbar-fixed-top" role="alert">
-        <div class="container">
+        <div class="container bg-dark rounded" style="padding:10px">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#cookieConsent .navbar-collapse">
                     <span class="sr-only">Toggle cookie consent banner</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
+                    <i class="fa fa-bars" aria-hidden="true"></i>
                 </button>
                 <span class="navbar-brand"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></span>
             </div>
             <div class="collapse navbar-collapse">
-                <p class="navbar-text">
-                    Use this space to summarize your privacy and cookie use policy.
-                </p>
-                <div class="navbar-right">
+            <div class="">
+                <h6 class="navbar-text text-white">
+                    <i class="fa fa-info-circle fa-2x" aria-hidden="true"></i>
+                    &nbsp; Ova stranica koristi kolačiće.
+                </h6>
+                <div class="">
                     <a asp-controller="Home" asp-action="Privacy" class="btn btn-info navbar-btn">Learn More</a>
-                    <button type="button" class="btn btn-default navbar-btn" data-cookie-string="@cookieString">Accept</button>
+                    <button type="button" class="btn btn-warning navbar-btn" data-cookie-string="@cookieString">Prihvati</button>
                 </div>
-            </div>
+                </div>
+</div>
         </div>
     </nav>
     <script>

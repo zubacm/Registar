@@ -21,6 +21,7 @@ namespace TuristRegistar.Data.Models
         public Nullable<float> Surface { get; set; }
         public String Description { get; set; }
         public bool OccupancyPricing { get; set; }
+        public String FullAddress { get; set; }
 
         public ICollection<ObjectHasAttributes> ObjectHasAttributes { get; set; }
         //public ICollection<CountableObjectAttributes> CountableObjectAttributes { get; set; }
@@ -29,7 +30,7 @@ namespace TuristRegistar.Data.Models
         public ICollection<SpecialOffersPrices> SpecialOffers { get; set; }
         public ICollection<UnavailablePeriods> UnavailablePeriods { get; set; }//This will become unavailable periods
         public ICollection<ObjectImages> ObjectImages { get; set; }
-        public Nullable<int> ObejectTypeId { get; set; }
+        public Nullable<int> ObjectTypeId { get; set; }
         public ObjectTypes ObjectType { get; set; }
         public Nullable<int> CreatorId { get; set; }
         public Users Creator { get; set; }

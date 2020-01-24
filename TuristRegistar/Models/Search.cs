@@ -16,6 +16,12 @@ namespace TuristRegistar.Models
         [Display(Name = "Odlazak")]
         public DateTime CheckOut { get; set; }
 
+        [Display(Name = "Dolazak")]
+        public String CheckInString { get; set; }
+
+        [Display(Name = "Odlazak")]
+        public String CheckOutString { get; set; }
+
         [Display(Name = "Broj osoba")]
         [Range(1, 30, ErrorMessage = "Broj osoba mora biti u opsegu od 1 do 30.")]
         public int Occupancy { get; set; }

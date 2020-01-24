@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TuristRegistar.Data.Models;
+using TuristRegistar.Models;
+using TuristRegistar.Services;
 
 namespace TuristRegistar.Data
 {
@@ -15,6 +17,7 @@ namespace TuristRegistar.Data
         List<KeyValuePair<int, int>> ParseStringToKeyValueList(string text);
         List<KeyValuePair<int, Decimal>> ParseStringToKeyValue(string text);
         List<KeyValuePair<DateTime, DateTime>> ParseDates(string text);
+        DateTime ParseDate(string text);
         IEnumerable<ObjectAttributes> GetAllObjectAttributes();
         IEnumerable<ObjectAttributes> GetObjectAttributes(List<int> excludedAttributesId);
         IEnumerable<CountableObjectAttributes> GetAllCountableObjectAttributes();
@@ -41,7 +44,14 @@ namespace TuristRegistar.Data
         void DeleteSpecialOffer(int objectid, int attributeid);
         void EditObjectBasic(Objects myobject);
         IEnumerable<Objects> GetAllObjects();
+        IEnumerable<Objects> GetObjects(int pagenumber, int pagesize);
         int GetNumberOfRatings(int objectId);
         Decimal GetAvarageRating(int objectId);
+        int CountObjects();
+        Task<int> CountFilteredObjects(Search search, string currency);
+        List<int> ParseComaSeparatedStringToIntList(string text);
+        String GetCityName(int cityId);
+        String GetCoutnryName(int countryId);
+        Task<IEnumerable<Objects>> GetFilteredObjects(int pagenumber, int pagesize, Search search, string currency);
     }
 }

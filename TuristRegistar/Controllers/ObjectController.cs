@@ -172,13 +172,15 @@ namespace TuristRegistar.Controllers
                 SpecialOffers = model.ListOfAddedSpecialOffers == null ? new List<SpecialOffersPrices>() : model.ListOfAddedSpecialOffers,
                 CountryId = Convert.ToInt32(model.SelectedCountry) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCountry),
                 CityId = Convert.ToInt32(model.SelectedCity) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCity),
-                ObejectTypeId = Convert.ToInt32(model.SelectedObjectType) == 0 ? null : (int?)Convert.ToInt32(model.SelectedObjectType),
+                ObjectTypeId = Convert.ToInt32(model.SelectedObjectType) == 0 ? null : (int?)Convert.ToInt32(model.SelectedObjectType),
                 Lat = model.Lat,
                 Lng = model.Lng,
                 UnavailablePeriods = model.UnavailablePeriods == null ? new List<UnavailablePeriods>() : model.UnavailablePeriods,
                 OccupancyPricing = model.OccupancyPricing,
                 StandardPricingModel = (!model.OccupancyPricing) ? model.StandardPricingModel : null,
                 OccupancyBasedPricing = model.OccupancyPricing ? model.OccupancyBasedPricing : null,
+                FullAddress = model.Address + (Convert.ToInt32(model.SelectedCity) == 0 ? "" : _touristObject.GetCityName(Convert.ToInt32(model.SelectedCity)))
+                + (Convert.ToInt32(model.SelectedCity) == 0 ? "" : _touristObject.GetCoutnryName(Convert.ToInt32(model.SelectedCountry))),
                 ////CreatorId = null,
                 IdentUserId = _userManager.GetUserId(this.User),
                 ObjectImages = CopyFiles(Path.Combine(_hostingEnvironment.WebRootPath, "Temp"), Path.Combine(_hostingEnvironment.WebRootPath, "UploadedImages")),
@@ -194,7 +196,7 @@ namespace TuristRegistar.Controllers
         }
 
         //[Authorize]
-        [Route("editobject")] // /createobject
+        [Route("editobject")] // /editobject
         public async Task<IActionResult> EditObject(int id)
         {
             var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
@@ -211,7 +213,7 @@ namespace TuristRegistar.Controllers
                 PhoneNumberContact = myobject.PhoneNumberContact,
                 WebContact = myobject.WebContact,
                 Description = myobject.Description,
-                UnavailablePeriods = myobject.UnavailablePeriods.ToList(),
+                UnavailablePeriods = myobject.UnavailablePeriods.Where(up => DateTime.Compare(DateTime.Now, up.To) <= 0).ToList(),
                 ListOfAddedOffers = myobject.ObjectHasAttributes.ToList(),
                 ListOfAddedCntOffers = myobject.CntObjAttributesCount.ToList(),
                 ListOfAddedSpecialOffers = myobject.SpecialOffers.ToList(),
@@ -222,7 +224,7 @@ namespace TuristRegistar.Controllers
                 IdentUserId = myobject.IdentUserId,
                 SelectedCity = myobject.CityId == null ? null : myobject.CityId.ToString(),
                 SelectedCountry = myobject.CountryId == null ? null : myobject.CountryId.ToString(),
-                SelectedObjectType = myobject.ObejectTypeId == null ? null : myobject.ObejectTypeId.ToString(),
+                SelectedObjectType = myobject.ObjectTypeId == null ? null : myobject.ObjectTypeId.ToString(),
                 ImgsSrc = myobject.ObjectImages.ToList(),
             };
             model = FillSelectLists(model);
@@ -588,7 +590,9 @@ namespace TuristRegistar.Controllers
                 Surface = model.Surface,
                 CountryId = Convert.ToInt32(model.SelectedCountry) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCountry),
                 CityId = Convert.ToInt32(model.SelectedCity) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCity),
-                ObejectTypeId = Convert.ToInt32(model.SelectedObjectType) == 0 ? null : (int?)Convert.ToInt32(model.SelectedObjectType),
+                ObjectTypeId = Convert.ToInt32(model.SelectedObjectType) == 0 ? null : (int?)Convert.ToInt32(model.SelectedObjectType),
+                FullAddress = model.Address + (Convert.ToInt32(model.SelectedCity) == 0 ? "" : _touristObject.GetCityName(Convert.ToInt32(model.SelectedCity)))
+                + (Convert.ToInt32(model.SelectedCity) == 0 ? "" : _touristObject.GetCoutnryName(Convert.ToInt32(model.SelectedCountry))),
             };
             _touristObject.EditObjectBasic(myobject);
             ViewData["Notification"] = "Uspješno sačuvane izmjene";
