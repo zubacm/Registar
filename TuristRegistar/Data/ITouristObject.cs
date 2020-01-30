@@ -31,11 +31,11 @@ namespace TuristRegistar.Data
         int AddPeriod(UnavailablePeriods period, int objectid);
         void DeletePeriod(int id);
         void DeleteStandardModel(int objectid);
-        void AddOccupancyBasedModel(OccupancyBasedPricing occupancybp, int objectid);
-        void NewOccupancyBasedPricing(OccupancyBasedPricing occupanybp, int objectid);
+        Task AddOccupancyBasedModel(OccupancyBasedPricing occupancybp, int objectid, string currency);
+        Task NewOccupancyBasedPricing(OccupancyBasedPricing occupanybp, int objectid, string currency);
         void DeleteOccupancyBasedModel(int objectid);
-        void AddStandardModel(StandardPricingModel standardmodel, int objectid);
-        void EditStandardModel(StandardPricingModel standardmodel);
+        Task AddStandardModel(StandardPricingModel standardmodel, int objectid, string currency);
+        Task EditStandardModel(StandardPricingModel standardmodel, string currency);
         void DeleteObjectHasAttributes(int objectid, int attributeid);
         void AddObjectHasAttribute(ObjectHasAttributes objHasAttribute);
         void AddCntAttributeCount(CntObjAttributesCount cntAttrCount);
@@ -53,5 +53,7 @@ namespace TuristRegistar.Data
         String GetCityName(int cityId);
         String GetCoutnryName(int countryId);
         Task<IEnumerable<Objects>> GetFilteredObjects(int pagenumber, int pagesize, Search search, string currency);
+        Task<decimal> GetPriceForStandardModel(int occupancy, string currency, DateTime checkIn, DateTime checkOut, StandardPricingModel standardModel);
+        Task<decimal> GetPriceForOccupancyBasedModel(int occupancy, string currency, DateTime checkIn, DateTime checkOut, OccupancyBasedPricing occupancyModel);
     }
 }

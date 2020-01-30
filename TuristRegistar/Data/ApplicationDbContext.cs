@@ -20,6 +20,7 @@ namespace TuristRegistar.Data
         {
         }
 
+        //change later the name
         public DbSet<UnavailablePeriods> AvailablePeriods { get; set; }
         public DbSet<CountableObjectAttributes> CountableObjectAttributes { get; set; }
         public DbSet<ObjectAttributes> ObjectAttributes { get; set; }
@@ -38,6 +39,7 @@ namespace TuristRegistar.Data
         public DbSet<CntObjAttributesCount> CntObjAttributesCount { get; set; }
         public DbSet<Currencies> Currencies { get; set; }
         public DbSet<ObjectHasAttributes> ObjectHasAttributes { get; set; }
+        public DbSet<Bookmarks> Bookmarks { get; set; }
 
 
 
@@ -53,6 +55,8 @@ namespace TuristRegistar.Data
                 .HasKey(c => new { c.SpecialOfferId, c.ObjectId });
             modelBuilder.Entity<ObjectHasAttributes>()
                 .HasKey(o => new { o.ObjectId, o.AttributeId });
+            modelBuilder.Entity<Bookmarks>()
+                .HasKey(o => new { o.ObjectId, o.UserId });
 
             #region "Seed data"
 

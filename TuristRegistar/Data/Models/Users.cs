@@ -26,6 +26,6 @@ namespace TuristRegistar.Data.Models
         public String IdentUserId { get; set; }
         public IdentityUser IdentUser { get; set; }
 
-        public ICollection<Objects> BookmarkedObjects { get; set; }
+        public ICollection<Bookmarks> ObjectHasAttributes { get; set; }
     }
 }

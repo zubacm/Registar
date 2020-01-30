@@ -483,14 +483,16 @@ namespace TuristRegistar.Controllers
             }
             //var occupancyBasedPricing = model.OccupancyBasedPricing;
             //ili možda null
+            var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
+
             if (model.OccupancyBasedPricing.Id != 0)
-            {
-                _touristObject.NewOccupancyBasedPricing(model.OccupancyBasedPricing, model.Id);
+            {//i ovdje currency
+                _touristObject.NewOccupancyBasedPricing(model.OccupancyBasedPricing, model.Id, currency);
             }
             else
             {
-                _touristObject.DeleteStandardModel(model.Id);
-                _touristObject.AddOccupancyBasedModel(model.OccupancyBasedPricing, model.Id);
+                _touristObject.DeleteStandardModel(model.Id);//ovdje treba currency converting
+                _touristObject.AddOccupancyBasedModel(model.OccupancyBasedPricing, model.Id, currency);
                 //add occupancy
             }
             ViewData["Notification"] = "Uspješno sačuvane izmjene";
@@ -509,14 +511,16 @@ namespace TuristRegistar.Controllers
                 return View(model);
             }
 
+            var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
+            //test test when done
             if (model.StandardPricingModel.Id == 0)
             {
-                _touristObject.DeleteOccupancyBasedModel(model.Id);
-                _touristObject.AddStandardModel(model.StandardPricingModel, model.Id);
+                _touristObject.DeleteOccupancyBasedModel(model.Id);//isto currency
+                _touristObject.AddStandardModel(model.StandardPricingModel, model.Id, currency);
             }
             else
             {
-                _touristObject.EditStandardModel(model.StandardPricingModel);
+                _touristObject.EditStandardModel(model.StandardPricingModel, currency);
             }
 
             //ove nalove
@@ -597,6 +601,48 @@ namespace TuristRegistar.Controllers
             _touristObject.EditObjectBasic(myobject);
             ViewData["Notification"] = "Uspješno sačuvane izmjene";
             return RedirectToAction("EditObject", "Object", new { id = model.Id });
+        }
+
+        public async Task<IActionResult> ObjectDetails(int id, int occupancy, DateTime checkin, DateTime checkout)
+        {
+            var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
+            var myobject = await _touristObject.GetObject(id, currency);
+            var model = new ObjectDetailsViewModel()
+            {
+                Id = myobject.Id,
+                Name = myobject.Name,
+                Lat = myobject.Lat,
+                Lng = myobject.Lng,
+                Address = myobject.Address,
+                EmailContact = myobject.EmailContact,
+                PhoneNumberContact = myobject.PhoneNumberContact,
+                WebContact = myobject.WebContact,
+                Description = myobject.Description,
+                Offers = myobject.ObjectHasAttributes.ToList(),
+                CntOffers = myobject.CntObjAttributesCount.ToList(),
+                SpecialOffers = myobject.SpecialOffers.ToList(),
+                Surface = myobject.Surface,
+                OccupancyPricing = myobject.OccupancyPricing,
+                OccupancyBasedPricing = myobject.OccupancyBasedPricing,
+                StandardPricingModel = myobject.StandardPricingModel,
+                IdentUserId = myobject.IdentUserId,
+                City = myobject.CityId == null ? null : myobject.CityId.ToString(),
+                Country = myobject.CountryId == null ? null : myobject.CountryId.ToString(),
+                ObjectType = myobject.ObjectType == null ? null : myobject.ObjectType.Name,
+                ImgsSrc = myobject.ObjectImages.ToList(),
+                CheckIn = checkin,
+                CheckOut = checkout,
+                Occupancy = occupancy,
+            };
+            if (model.Occupancy != 0 && model.CheckIn != DateTime.MinValue && model.CheckOut != DateTime.MinValue)
+            {
+                if (model.StandardPricingModel != null)
+                    model.Price = await _touristObject.GetPriceForStandardModel(model.Occupancy, currency, model.CheckIn, model.CheckOut, model.StandardPricingModel);
+                else if (model.OccupancyBasedPricing != null)
+                    model.Price = await _touristObject.GetPriceForOccupancyBasedModel(model.Occupancy, currency, model.CheckIn, model.CheckOut, model.OccupancyBasedPricing);
+            }
+
+            return View(model);
         }
 
         //još delete

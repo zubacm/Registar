@@ -24,5 +24,9 @@ namespace TuristRegistar.Models
         public String EmailContact { get; set; }
         public String PhoneNumberContact { get; set; }
         public String WebContact { get; set; }
+
+        public int Occupancy { get; set; }
+        public String CheckIn { get; set; }
+        public String CheckOut { get; set; }
     }
 }
