@@ -1,0 +1,55 @@
+﻿@model ObjectDetailsViewModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+
+@{ var mycurrency = "BAM";}
+@if (HttpContextAccessor.HttpContext.Request.Cookies["Currency"] != null)
+{
+    mycurrency = HttpContextAccessor.HttpContext.Request.Cookies["Currency"];
+}
+
+
+<div class="row">
+    <div class="col-md-4">
+        <label asp-for="CheckIn" class="text-muted">Dolazak</label>
+        <input id="datepicker1" class="datepicker" width="276" asp-for="CheckInString" onkeydown="return false" />
+    </div>
+    <div class="col-md-4 float-right">
+        <label asp-for="CheckOut" class="text-muted"></label>
+        <input id="datepicker2" class="datepicker" width="276" asp-for="CheckOutString" onkeydown="return false" />
+    </div>
+    <div class="col-md-3 float-right">
+        &nbsp;&nbsp;&nbsp;<label asp-for="Occupancy" class="text-muted"></label>
+        <div class="m-auto input-group col-sm-12">
+            @if (Model.Occupancy == 0)
+            {
+                <input asp-for="Occupancy" id="occupancy" class="form-control" type="number" min="@Model.MinOccupancy" max="@Model.MaxOccupancy" value="" onkeydown="return false" />
+            }
+            else
+            {
+                <input asp-for="Occupancy" id="occupancy" class="form-control" type="number" min="@Model.MinOccupancy" max="@Model.MaxOccupancy" onkeydown="return false" />
+            }
+            <div class="input-group-append">
+                <span class="input-group-text text-muted">
+                    <i class="fas fa-users"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1 col-sm-12"><br /><a class="btn btn-primary text-white pointer" onclick="searchPrice()" style="margin-top:0.5rem;"><i class="fas fa-search"></i></a></div>
+</div>
+<br />
+<div class="col-sm-12">
+    @if (Model.Occupancy == 0)
+    {
+        <h5 class="text-success">Cijena:  - @mycurrency</h5>
+    }
+    else
+    {
+        <h5 class="text-success">Cijena:  @Model.Price @mycurrency</h5>
+    }
+</div>
+<hr />
+@*<script src="~/js/editdatepicker.js"></script>*@

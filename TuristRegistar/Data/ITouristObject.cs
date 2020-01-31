@@ -55,5 +55,7 @@ namespace TuristRegistar.Data
         Task<IEnumerable<Objects>> GetFilteredObjects(int pagenumber, int pagesize, Search search, string currency);
         Task<decimal> GetPriceForStandardModel(int occupancy, string currency, DateTime checkIn, DateTime checkOut, StandardPricingModel standardModel);
         Task<decimal> GetPriceForOccupancyBasedModel(int occupancy, string currency, DateTime checkIn, DateTime checkOut, OccupancyBasedPricing occupancyModel);
+        bool checkNumberOfStayDays(DateTime checkIn, DateTime checkOut, int? minDays = 0, int? maxDays = 0);
+        bool CheckCheckInAndOut(DateTime checkIn, DateTime checkOut, List<UnavailablePeriods> unavailablePeriods);
     }
 }

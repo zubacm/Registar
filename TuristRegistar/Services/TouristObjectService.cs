@@ -145,9 +145,10 @@ namespace TuristRegistar.Services
                 .Include(o => o.Country)
                 .Include(o => o.City)
                 .Include(o => o.ObjectType)
-                .Include(o => o.ObjectHasAttributes)
-                .Include(o => o.CntObjAttributesCount)
-                .Include(o => o.SpecialOffers)
+                .Include(o => o.ObjectHasAttributes).ThenInclude(o => o.Attribute)
+                .Include(o => o.CntObjAttributesCount).ThenInclude(o => o.CountableObjAttr)
+                //.ThenInclude(cntAttr => cntAttr.)
+                .Include(o => o.SpecialOffers).ThenInclude(o => o.SpecialOffer)
                 .Include(o => o.UnavailablePeriods)
                 //.Where(c => c.UnavailablePeriods.Any(up => 12 < 5 )
                 .Include(o => o.ObjectImages)
@@ -155,6 +156,7 @@ namespace TuristRegistar.Services
                 .Include(o => o.StandardPricingModel)
                 .FirstOrDefault(o => o.Id == id);
             obj = await ExchangeCurrencyAsync(obj, "BAM", currency);
+
 
             return obj;
 
@@ -460,7 +462,7 @@ namespace TuristRegistar.Services
             return myobjects.Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
         }
 
-        private bool checkNumberOfStayDays(DateTime checkIn, DateTime checkOut, int? minDays = 0, int? maxDays = 0)
+        public bool checkNumberOfStayDays(DateTime checkIn, DateTime checkOut, int? minDays = 0, int? maxDays = 0)
         {
             int numberOfDays = (checkOut - checkIn).Days;
             if (minDays > 0 && numberOfDays < minDays)
@@ -471,7 +473,7 @@ namespace TuristRegistar.Services
             return true;
 
         }
-        private bool CheckCheckInAndOut(DateTime checkIn, DateTime checkOut, List<UnavailablePeriods> unavailablePeriods)
+        public bool CheckCheckInAndOut(DateTime checkIn, DateTime checkOut, List<UnavailablePeriods> unavailablePeriods)
         {
             foreach (var period in unavailablePeriods)
             {

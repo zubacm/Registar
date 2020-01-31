@@ -1,5 +1,7 @@
 ﻿@model ObjectDetailsViewModel
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using Newtonsoft.Json;
+
 
 <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
@@ -29,93 +31,76 @@
 
 <!--Osnovno-->
 @*<div class="tab-pane fade show active" id="nav-basic" role="tabpanel" aria-labelledby="nav-basic-tab">*@
-    <form method="post" asp-action="EditObjectBasic" asp-controller="Object">
-        <input type="hidden" asp-for="Id" />
-        <br />
-        <div class="row bg-white rounded-lg shadow-sm p-5">
-            @*mapa*@
-            <div class="col-md-4 order-md-2 mb-4">
-                    <h4 class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Mapa</span>
-                    </h4>
-                <div id="map" class="mb-3" style="height:300px"></div>
-                <hr />
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Lat"></label>
-                        <input class="form-control myinput" asp-for="Lat" id="latitude-value" disabled>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Lng"></label>
-                        <div class="input-group">
-                            <input asp-for="Lng" class="form-control myinput" id="longitude-value" disabled>
-                        </div>
+<form id="formDetails">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="OccupancyPricing" />
+    <br />
+    <div class="row bg-white rounded-lg shadow-sm p-5">
+        @*mapa*@
+        <div class="col-md-4 order-md-2 mb-4">
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted">Mapa</span>
+            </h4>
+            <div id="map" class="mb-3" style="height:300px"></div>
+            <hr />
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Lat"></label>
+                    <input class="form-control myinput" asp-for="Lat" id="latitude-value" disabled>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Lng"></label>
+                    <div class="input-group">
+                        <input asp-for="Lng" class="form-control myinput" id="longitude-value" disabled>
                     </div>
                 </div>
             </div>
-            <div class="col-md-8 order-md-1">
+        </div>
+        <div class="col-md-8 order-md-1">
+            <div class="mb-3">
+                <div class="row">
+                    <h2>@Model.Name</h2>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.ObjectType))
+                {
+                    <span class="btn-sm bg-danger text-white" style="margin-top:8px!important;">
+                        @Model.ObjectType
+                    </span>
+                }
+                @*<label asp-for="Name"></label>
+                    <input id="oj" type="text" class="form-control" asp-for="Name" disabled>*@
+            </div>
+            <hr />
+            @if (!string.IsNullOrWhiteSpace(Model.Description))
+            {
                 <div class="mb-3">
-                    <div class="row">
-                        <h2>@Model.Name</h2>
-                    </div>
-                    @if (!string.IsNullOrWhiteSpace(Model.ObjectType))
-                    {
-                        <span class="btn-sm bg-danger text-white" style="margin-top:8px!important;">
-                            @Model.ObjectType
-                        </span>
-                    }
-                    @*<label asp-for="Name"></label>
-            <input id="oj" type="text" class="form-control" asp-for="Name" disabled>*@
+                    <span>@Model.Description</span>
                 </div>
                 <hr />
-                @if (!string.IsNullOrWhiteSpace(Model.Description))
-                {
-                    <div class="mb-3">
-                        <span>@Model.Description</span>
-                    </div>
-                    <hr />
-                }
+            }
 
-                <div class="row">
-                    @*<div class="col-md-6 mb-3">
-                <label asp-for="Surface"></label><span class="text-muted">&nbsp;(Opciono)</span>
-                <div class="input-group">
-                    <input type="number" step="0.0000001" min="0" asp-for="Surface" class="form-control" placeholder="">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">m²</span>
-                    </div>
-                    <span asp-validation-for="Surface" class="text-danger"></span>
-                </div>
-            </div>*@
-                    @*<div class="col-md-6 mb-3">
-                <label asp-for="SelectedObjectType"></label><span class="text-muted">&nbsp;(Opciono)</span>
-                <select class="custom-select d-block w-100" asp-for="SelectedObjectType" asp-items="@Model.ObjectTypes">
-                    <option disabled selected>Izaberite...</option>
-                </select>
-                <span asp-validation-for="SelectedObjectType" class="text-danger"></span>
-            </div>*@
-                </div>
-                <div class="row">
+            <div id="obj-container">
+                <partial name="_PricePartial" for="@Model" />
+            </div>
+            @*<div class="row">
                     <div class="col-md-4">
-                        <label>Dolazak</label>
-                        <input id="datepicker1" class="datepicker" width="276" />
+                        <label asp-for="CheckIn" class="text-muted">Dolazak</label>
+                        <input id="datepicker1" class="datepicker" width="276" asp-for="CheckInString" onkeydown="return false" />
                     </div>
                     <div class="col-md-4 float-right">
-                        @*<label asp-for=""></label>*@
-                        <label>Odlazak</label>
-                        <input id="datepicker2" class="datepicker" width="276" />
+                        <label asp-for="CheckOut" class="text-muted"></label>
+                        <input id="datepicker2" class="datepicker" width="276" asp-for="CheckOutString" onkeydown="return false" />
                     </div>
-                    <div class="col-md-4 float-right">
-                        @*<label class="m-auto" asp-for="Occupancy">Broj posjetilaca</label>*@
-                        <label>Broj posjetilaca</label>
+                    <div class="col-md-3 float-right">
+                        &nbsp;&nbsp;<label asp-for="Occupancy" class="text-muted"></label>
                         <div class="m-auto input-group col-sm-12">
                             @if (Model.Occupancy == 0)
                             {
-                                <input asp-for="Occupancy" id="occupancy" class="form-control" type="number" min="1" max="30" value=""/>
+                                <input asp-for="Occupancy" id="occupancy" class="form-control" type="number" min="1" max="30" value="" onkeydown="return false" />
                             }
                             else
                             {
-                                <input asp-for="Occupancy" id="occupancy" class="form-control" type="number" min="1" max="30" />
+                                <input asp-for="Occupancy" id="occupancy" class="form-control" type="number" min="1" max="30" onkeydown="return false" />
                             }
                             <div class="input-group-append">
                                 <span class="input-group-text text-muted">
@@ -124,7 +109,7 @@
                             </div>
                         </div>
                     </div>
-
+                    <div class="col-md-1 col-sm-12"><br /><a class="btn btn-primary text-white pointer" style="margin-top:0.5rem;"><i class="fas fa-search"></i></a></div>
                 </div>
                 <br />
                 <div class="col-sm-12">
@@ -137,86 +122,96 @@
                         <h5 class="text-success">Cijena:  @Model.Price @mycurrency</h5>
                     }
                 </div>
-                @*<div class="row">
-            <div class="m-auto input-group col-sm-2">
-                <input asp-for="Occupancy" id="occupancy" class="form-control" type="number" min="1" max="30" value="" />
-                <div class="input-group-append">
-                    <span class="input-group-text text-muted">
-                        <i class="fas fa-users"></i>
-                    </span>
-                </div>
-            </div>
-        </div>*@
-                <hr />
-                <div class="mb-3">
-                    <label asp-for="Location"></label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                        </div>
-                        <input type="text" asp-for="Address" class="form-control" disabled>
+                <hr />*@
+            <div class="mb-3">
+                <label asp-for="Location"></label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                     </div>
-
+                    <input type="text" asp-for="Address" class="form-control" disabled>
                 </div>
-                <div class="mb-3">
-                    <label asp-for="EmailContact"></label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                        </div>
-                        <input type="email" asp-for="EmailContact" class="form-control" disabled>
+
+            </div>
+            <div class="mb-3">
+                <label asp-for="EmailContact"></label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                     </div>
+                    <input type="email" asp-for="EmailContact" class="form-control" disabled>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label asp-for="PhoneNumberContact"></label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                        </div>
-                        <input type="text" asp-for="PhoneNumberContact" class="form-control" disabled>
+            <div class="mb-3">
+                <label asp-for="PhoneNumberContact"></label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
                     </div>
+                    <input type="text" asp-for="PhoneNumberContact" class="form-control" disabled>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label asp-for="WebContact"></label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa fa-globe"></i></span>
-                        </div>
-                        <input type="text" asp-for="WebContact" class="form-control" disabled>
+            <div class="mb-3">
+                <label asp-for="WebContact"></label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-globe"></i></span>
                     </div>
+                    <input type="text" asp-for="WebContact" class="form-control" disabled>
                 </div>
-
-
-
-                @*<div class="row">
-            <div class="col-md-6 mb-3">
-                <label asp-for="SelectedCountry"></label><span class="text-muted">&nbsp;(Opciono)</span>
-                <select class="custom-select d-block w-100" asp-for="SelectedCountry" asp-items="@Model.Countries" id="country-select">
-                    <option disabled selected>Izaberite...</option>
-                </select>
-                <span asp-validation-for="SelectedCountry" class="text-danger"></span>
             </div>
-            <div class="col-md-6 mb-3">
-                <label asp-for="SelectedCity"></label><span class="text-muted">&nbsp;(Opciono)</span>
-                <select class="custom-select d-block w-100" id="city-select" asp-for="SelectedCity" asp-items="@Model.Cities">
-                    <option disabled selected>Izaberite...</option>
-                </select>
-                <span asp-validation-for="SelectedCity" class="text-danger"></span>
+            <hr />
+            <div class="row">
+                @if (Model.Offers.Count > 0)
+                {
+                    <div class="col-md-6 table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <caption>Ponude uključene u cijenu</caption>
+                            @foreach (var item in Model.Offers)
+                            {
+                                <tr>
+                                    <td>@item.Attribute.Name</td>
+                                    <td class="text-center"><strong><i class="fas fa-check text-success"></i></strong></td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                }
+                @if (Model.CntOffers.Count > 0)
+                {
+                    <div class="col-md-6 table-responsive">
+                        <table class="table table-bordered table-striped">
+                            @foreach (var item in Model.CntOffers)
+                            {
+                                <tr>
+                                    <td>@item.CountableObjAttr.Name</td>
+                                    <td class="text-center"><strong>@item.Count</strong></td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                }
             </div>
-        </div>*@
-
-                @*<div class="mb-3">
-            <label asp-for="Description"></label><span class="text-muted">&nbsp;(Opciono)</span>
-            <div class="input-group">
-                <textarea asp-for="Description" class="form-control" disabled></textarea>
-            </div>
-        </div>*@
-
-            </div>
+            @if (Model.SpecialOffers.Count > 0)
+            {
+                <div class="col-md-6 table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <caption>Ponude koje se dodatno naplaćuju</caption>
+                        @foreach (var item in Model.SpecialOffers)
+                        {
+                            <tr>
+                                <td>@item.SpecialOffer.Name</td>
+                                <td class="text-center"><strong>@item.Price @mycurrency</strong></td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            }
         </div>
-    </form>
+    </div>
+</form>
 @*</div>*@
 <!--./Osnovno-->
 
@@ -231,10 +226,129 @@
         $('[data-toggle="tooltip"]').tooltip()
     })
 </script>
+<script>
+    $(document).ready(function () {
+        RecreateDatePicker1();
+        RecreateDatePicker2();
+    });
+
+</script>
+<script>
+    function searchPrice() {
+        //if ($('#datepicker2').val() === '' && $('#datepicker1').val() === '')
+        //    alert('Unesite datume za dolzak i odlazak!');
+        //else if ($('#datepicker2').val() === '' && $('#datepicker1').val() !== '')
+        //    alert('Unesite datum za odlazak!');
+        //else if ($('#datepicker2').val() !== '' && $('#datepicker1').val() === '')
+        //    alert('Unesite datum za dolazak!');
+        //else if ($('#occupancy').val() === '')
+        //    alert('Unesite broj osoba!');
+        //else if ($('#occupancy').val() !== '' && +($('#occupancy').val()) <= 0)
+        //    alert('Unesite ispravan broj osoba!');
+        //else
+        findPrice();
+    }
+
+    function findPrice() {
+        $.ajax({
+            type: 'GET',
+            url: "/Object/FindPrice",
+            data: $('#formDetails').serialize(),
+            dataType: 'html',
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                $('#obj-container').html(response);
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+</script>
+
+<script>
+    var unavailableperiodsJSON = '@Html.Raw(JsonConvert.SerializeObject(Model.UnavailablePeriodsModel.ToArray()))';
+    var unavailableperiods = JSON.parse(unavailableperiodsJSON);
+
+    var $DPicker1 = $('#datepicker1');
+    var $DPicker2 = $('#datepicker2');
+    console.log(unavailableperiods);
+
+    $DPicker1.datepicker({
+        uiLibrary: 'bootstrap4',
+        format: 'yyyy-mm-dd',
+        disableDates: unavailableperiods,
+        change: function (e) {
+            RecreateDatePicker2();
+        },
+        minDate: new Date()
+
+    });
+
+    $DPicker2.datepicker({
+        uiLibrary: 'bootstrap4',
+        format: 'yyyy-mm-dd',
+        minDate: new Date(new Date() + (24 * 60 * 60 * 1000)),
+        disableDates: unavailableperiods,
+        change: function (e) {
+            RecreateDatePicker1();
+        }
+    });
+
+    function RecreateDatePicker1() {
+        var unavailableperiodsJSON = '@Html.Raw(JsonConvert.SerializeObject(Model.UnavailablePeriodsModel.ToArray()))';
+    var unavailableperiods = JSON.parse(unavailableperiodsJSON);
+        console.log(unavailableperiods);
+        var checkout = $('#datepicker2').val();
+        var maxDate = new Date(new Date(checkout) - (24 * 60 * 60 * 1000));
+        var currentcheckin = $('#datepicker1').val();
+        //if (checkout && currentcheckin)
+        //    $('#period-btn').prop('disabled', false);
+
+        $DPicker1.destroy();
+        $DPicker1.datepicker({
+            uiLibrary: 'bootstrap4',
+            format: 'yyyy-mm-dd',
+            value: currentcheckin,
+            minDate: new Date(),
+            maxDate: maxDate,
+            disableDates: unavailableperiods,
+            change: function (e) {
+                RecreateDatePicker2();
+            }
+        });
+    }
+
+    function RecreateDatePicker2() {
+        var unavailableperiodsJSON = '@Html.Raw(JsonConvert.SerializeObject(Model.UnavailablePeriodsModel.ToArray()))';
+        var unavailableperiods = JSON.parse(unavailableperiodsJSON);
+
+        var checkin = $('#datepicker1').val();
+        var mindate = new Date();
+        if (checkin)
+            mindate = new Date(new Date(checkin) + (24 * 60 * 60 * 1000));
+
+        var currentcheckout = $('#datepicker2').val();
+        //if (checkin && currentcheckout)
+        //    $('#period-btn').prop('disabled', false);
+
+        $DPicker2.destroy();
+        $DPicker2.datepicker({
+            uiLibrary: 'bootstrap4',
+            format: 'yyyy-mm-dd',
+            value: currentcheckout,
+            minDate: mindate,
+            disableDates: unavailableperiods,
+            change: function (e) {
+                RecreateDatePicker1();
+            }
+        });
+    }
+</script>
 
 <script src="~/js/editgallery.js"></script>
 <script src="~/js/editattributesscript.js"></script>
 <script src="~/js/ClienSideInputValidation.js"></script>
-<script src="~/js/editdatepicker.js"></script>
+@*<script src="~/js/editdatepicker.js"></script>*@
 <script src="~/js/mapa.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>

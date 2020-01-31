@@ -632,8 +632,24 @@ namespace TuristRegistar.Controllers
                 ImgsSrc = myobject.ObjectImages.ToList(),
                 CheckIn = checkin,
                 CheckOut = checkout,
+                CheckInString = checkin == DateTime.MinValue ? "" : checkin.Year + "-"+checkin.Month+"-"+checkin.Day,
+                CheckOutString = checkout == DateTime.MinValue ? "" : checkout.Year+"-"+checkout.Month+"-"+checkout.Day,
                 Occupancy = occupancy,
+                MinOccupancy = myobject.StandardPricingModel == null ? (myobject.OccupancyBasedPricing != null && myobject.OccupancyBasedPricing.MinOccupancy != null ? (int)myobject.OccupancyBasedPricing.MinOccupancy : 1) : (myobject.StandardPricingModel.MinOccupancy != null ? (int)myobject.StandardPricingModel.MinOccupancy : 1),
+                MaxOccupancy = myobject.StandardPricingModel == null ? (myobject.OccupancyBasedPricing != null && myobject.OccupancyBasedPricing.MaxOccupancy != null ? (int)myobject.OccupancyBasedPricing.MaxOccupancy : 30) : (myobject.StandardPricingModel.MaxOccupancy != null ? (int)myobject.StandardPricingModel.MaxOccupancy : 30),
+                MinDaysOffer = myobject.StandardPricingModel == null ? (myobject.OccupancyBasedPricing != null && myobject.OccupancyBasedPricing.MinDaysOffer != null ? (int)myobject.OccupancyBasedPricing.MinDaysOffer : 1) : (myobject.StandardPricingModel.MinDaysOffer != null ? (int)myobject.StandardPricingModel.MinDaysOffer : 1),
+                MaxDaysOffer = myobject.StandardPricingModel == null ? (myobject.OccupancyBasedPricing != null && myobject.OccupancyBasedPricing.MaxDaysOffer != null ? (int)myobject.OccupancyBasedPricing.MaxDaysOffer : 355) : (myobject.StandardPricingModel.MaxDaysOffer != null ? (int)myobject.StandardPricingModel.MaxDaysOffer : 355),
+                UnavailablePeriods = myobject.UnavailablePeriods,
             };
+            model.UnavailablePeriodsModel = new List<DateTime>();
+            foreach (var item in model.UnavailablePeriods)
+            {
+                for (DateTime i = item.From; i <= item.To; i=i.AddDays(1))
+                {
+                    model.UnavailablePeriodsModel.Add(i);
+                }
+            }
+
             if (model.Occupancy != 0 && model.CheckIn != DateTime.MinValue && model.CheckOut != DateTime.MinValue)
             {
                 if (model.StandardPricingModel != null)
@@ -643,6 +659,27 @@ namespace TuristRegistar.Controllers
             }
 
             return View(model);
+        }
+
+        public async Task<IActionResult> FindPrice(ObjectDetailsViewModel model)
+        {
+            model.CheckIn = model.CheckInString == null ? DateTime.MinValue : DateTime.Parse(model.CheckInString);
+            model.CheckOut = model.CheckOutString == null ? DateTime.MinValue : DateTime.Parse(model.CheckOutString);
+            if (!(model.CheckIn != DateTime.MinValue && model.CheckIn != DateTime.MinValue && model.Occupancy > 0))
+            {
+                ViewData["Error-Notification"] = "Unesite ispravne podatke";
+                //da li radi?
+                return View(model);
+            }
+            var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
+            if (model.OccupancyPricing == false)
+            {
+                model.Price = await _touristObject.GetPriceForStandardModel(model.Occupancy, currency, model.CheckIn, model.CheckOut, model.StandardPricingModel);
+            }
+            else if (model.OccupancyPricing == true)
+                model.Price = await _touristObject.GetPriceForOccupancyBasedModel(model.Occupancy, currency, model.CheckIn, model.CheckOut, model.OccupancyBasedPricing);
+
+            return PartialView("_PricePartial", model);
         }
 
         //još delete

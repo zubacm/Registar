@@ -57,9 +57,23 @@ namespace TuristRegistar.Models
         [Display(Name = "Tip objekta")]
         public String ObjectType { get; set; }
 
+        [Display(Name = "Broj osoba")]
+        [Range(1, 30, ErrorMessage = "Broj osoba mora biti u opsegu od 1 do 30.")]
         public int Occupancy { get; set; }
+        [Display(Name = "Dolazak")]
         public DateTime CheckIn { get; set; }
+        public String CheckInString { get; set; }
+        [Display(Name = "Odlazak")]
         public DateTime CheckOut { get; set; }
+        public String CheckOutString { get; set; }
+        [Display(Name = "Cijena")]
         public Decimal Price { get; set; }
+
+        public int MinOccupancy { get; set; }
+        public int MaxOccupancy { get; set; }
+        public int MinDaysOffer { get; set; }
+        public int MaxDaysOffer { get; set; }
+        public ICollection<UnavailablePeriods> UnavailablePeriods { get; set; }
+        public List<DateTime> UnavailablePeriodsModel { get; set; }
     }
 }

@@ -49,13 +49,13 @@
                         <div class="card-group container">
                             <div class="">
                                 <label asp-for="Search.CheckIn"></label>
-                                <input asp-for="Search.CheckInString" id="datepicker1" class="datepicker" width=""  />
+                                <input asp-for="Search.CheckInString" onkeydown="return false" id="datepicker1" class="datepicker" width=""  />
                                 <span asp-validation-for="Search.CheckInString" class="text-danger"></span>
                             </div>
                             <br />
                             <div class="">
                                 <label asp-for="Search.CheckOut"></label>
-                                <input asp-for="Search.CheckOutString" id="datepicker2" class="datepicker" width="" />
+                                <input asp-for="Search.CheckOutString" id="datepicker2" onkeydown="return false" class="datepicker" width="" />
                                 @*<span asp-validation-for="Search.CheckOutString" class="text-danger"></span>*@
                             </div>
                         </div>
@@ -170,54 +170,7 @@
             <!--Objects-->
             <div class="col-sm-9">
                 <div class="container" id="obj-container">
-                    <partial name="_ObjectsListed" for="@Model" />
-                    @*@if (Model.ObjectsList != null)
-                    {
-                        @foreach (var item in Model.ObjectsList)
-                        {
-                            <br />
-                            <div class="card">
-                                <div class="card-body pointer">
-                                    <div class="row">
-                                        <div class="card-img card-group col-sm-4">
-                                            <img src="@item.ImgSrc" alt="Unable to load image" style="max-width:100%" />
-                                        </div>
-                                        <div class="card-title card-group col-sm-8">
-                                            <div class="col-sm-12">
-                                                <h4 class="col-sm-12">
-                                                    @item.Name
-                                                    <span class="float-right">
-                                                        <span class="text-warning"><i class="fas fa-star"></i>&nbsp;@item.Rating</span>
-                                                        <br />
-                                                        <span class="text-muted" style="font-size:14px;">broj ocjena: @item.NumberOfRatings</span>
-                                                    </span>
-                                                </h4>
-                                                <a href="#" class="text-primary">
-                                                    <i class="fa fa-map-marker-alt"></i>&nbsp;@item.Location
-                                                </a>
-
-                                            </div>
-                                            <div class="col-sm-12">
-                                                @item.Description
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="col-sm-12">
-                                        @if (!string.IsNullOrWhiteSpace(item.Type))
-                                        {
-                                            <span class="btn-sm bg-danger text-white" style="margin-top:8px!important;">
-                                                @item.Type
-                                            </span>
-                                        }
-                                        <i data-toggle="tooltip" title="Sačuvaj" class="far fa-bookmark fa-2x float-right align-text-bottom pointer"></i>
-                                    </div>
-
-                                </div>
-                            </div>
-                        }
-                    }*@
+                    <partial name="_ObjectsListed" for="@Model" />                  
                 </div>
             </div>
             <!--./Objects-->
