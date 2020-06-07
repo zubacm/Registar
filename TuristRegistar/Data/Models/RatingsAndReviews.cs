@@ -11,7 +11,7 @@ namespace TuristRegistar.Data.Models
         public int Rating { get; set; }
         public String Review { get; set; }
 
-        public int UserId { get; set; }
+        public String UserId { get; set; }
         public Users User { get; set; }
         public int ObjectId { get; set; }
         public Objects Object { get; set; }

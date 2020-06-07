@@ -1,0 +1,55 @@
+﻿
+<link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
+<link href="~/css/regst.css" rel="stylesheet" />
+<link href="~/css/tabs.css" rel="stylesheet" />
+<link href="~/css/site.css" rel="stylesheet" />
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+@*<script src="~/js/toast-show.js"></script>*@
+
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Settings";
+}
+@*<div class="d-none d-sm-block"><br /><br /><br /><br /></div>*@
+
+
+
+
+<!-- Tabs -->
+<section id="tabs">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-lg-12">
+                <nav>
+                    <div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist" >
+                        <a class="nav-item nav-link active" id="nav-userobjects-tab" style="background-color:transparent" data-toggle="tab" href="#nav-userobjects" role="tab" aria-controls="nav-userobjects" aria-selected="true">Objekti</a>
+                        <a class="nav-item nav-link" style="background-color:transparent" id="nav-bookmarks-tab" data-toggle="tab" href="#nav-bookmarks" role="tab" aria-controls="nav-bookmarks" aria-selected="false">Zabilješke</a>
+                    </div>
+                </nav>
+                <div class="tab-content py-3 px-3 px-sm-0" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-userobjects" role="tabpanel" aria-labelledby="nav-userobjects-tab">
+                    </div>
+                    <div class="tab-pane fade" id="nav-bookmarks" role="tabpanel" aria-labelledby="nav-bookmarks-tab">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ./Tabs -->
+<script src="~/js/Navbarcolor.js"></script>
+<script>
+
+    $.get('@Url.Action("_UserObjects", "Auth")', function (content) {
+        $("#nav-userobjects").html(content);
+    });
+    $.get('@Url.Action("_UserBookmarks", "Auth")', function (content) {
+        $("#nav-bookmarks").html(content);
+    });
+</script>

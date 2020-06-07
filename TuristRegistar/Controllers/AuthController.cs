@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
@@ -22,14 +23,17 @@ namespace TuristRegistar.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly IUser _user;
+        private readonly ITouristObject _touristObject;
+
 
         public AuthController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-            IConfiguration configuration, IUser user)
+            IConfiguration configuration, IUser user, ITouristObject touristObject)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _user = user;
+            _touristObject = touristObject;
         }
 
         [Route("register")] // /register
@@ -249,6 +253,188 @@ namespace TuristRegistar.Controllers
             return RedirectToAction("Settings", "Auth");
         }
 
+        [Authorize]
+        public IActionResult UserAccount()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> _UserObjects()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
+            }
+
+                
+            var model = new UserObjectsModel()
+            {
+                IdentUserId = user.Id,             
+            };
+            var pager = new Pager(_user.CountUserObjects(user.Id), 1);
+            model.Pager = pager;
+
+            //check when list is null
+            var bookmarks = _user.GetAllUserBookmarksId(user.Id);
+            model.ObjectsList = _user.GetUserObjects(user.Id, pager.CurrentPage, pager.PageSize).Select(ob => new ObjectItemModel()
+            {
+                Id = ob.Id,
+                Name = ob.Name,
+                Location = ob.City != null ? ob.Address + ", " + ob.City.Name : ob.Address,
+                ImgSrc = ob.ObjectImages.Count > 0 ? ob.ObjectImages.ElementAt(0).Path : "/pink.png",
+                Lat = ob.Lat,
+                Lng = ob.Lng,
+                Description = ob.Description,
+                WebContact = ob.WebContact,
+                EmailContact = ob.EmailContact,
+                PhoneNumberContact = ob.PhoneNumberContact,
+                Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
+                NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
+                Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
+                IsBookmark = bookmarks.Contains(ob.Id) ? true : false,//as above check for null
+            }).ToList();
+            //napravi view
+            return PartialView("_UserObjects", model);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> UserObjectsChangePage(UserObjectsModel model)
+        {
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var pager = new Pager(_user.CountUserObjects(model.IdentUserId), model.CurrPage);
+
+            if (model.CurrPage == 0)
+                pager.CurrentPage = 1;
+            model.Pager = pager;
+
+            //check when list is null
+            var bookmarks = _user.GetAllUserBookmarksId(user.Id);
+
+
+            model.ObjectsList = _user.GetUserObjects(model.IdentUserId, model.Pager.CurrentPage, model.Pager.PageSize).Select(ob => new ObjectItemModel()
+            {
+                Id = ob.Id,
+                Name = ob.Name,
+                Location = ob.City != null ? ob.Address + ", " + ob.City.Name : ob.Address,
+                ImgSrc = ob.ObjectImages.Count > 0 ? ob.ObjectImages.ElementAt(0).Path : "/pink.png",
+                Lat = ob.Lat,
+                Lng = ob.Lng,
+                Description = ob.Description,
+                WebContact = ob.WebContact,
+                EmailContact = ob.EmailContact,
+                PhoneNumberContact = ob.PhoneNumberContact,
+                Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
+                NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
+                Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
+                IsBookmark = bookmarks.Contains(ob.Id) ? true : false,//as above check for null
+            }).ToList();
+
+            //napravi view
+            return PartialView("_UserObjects", model);
+
+        }
+
+        [Authorize]
+        public async Task<IActionResult> _UserBookmarks()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var model = new UserBookmarksModel()
+            {
+                IdentUserId = user.Id,
+            };
+            var pager = new Pager(_user.CountUserBookmarks(user.Id), 1);
+            model.Pager = pager;
+            model.Bookmarks = _user.GetUserBookmarks(user.Id, pager.CurrentPage, pager.PageSize).Select(ob => new ObjectItemModel()
+            {
+                Id = ob.Id,
+                Name = ob.Name,
+                Location = ob.City != null ? ob.Address + ", " + ob.City.Name : ob.Address,
+                ImgSrc = ob.ObjectImages.Count > 0 ? ob.ObjectImages.ElementAt(0).Path : "/pink.png",
+                Lat = ob.Lat,
+                Lng = ob.Lng,
+                Description = ob.Description,
+                WebContact = ob.WebContact,
+                EmailContact = ob.EmailContact,
+                PhoneNumberContact = ob.PhoneNumberContact,
+                Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
+                NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
+                Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
+
+            }).ToList();
+
+            //napravi view
+            return PartialView("_UserBookmarks", model);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> UserBookmarksChangePage(UserBookmarksModel model)
+        {
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var pager = new Pager(_user.CountUserBookmarks(model.IdentUserId), model.CurrPage);
+
+            if (model.CurrPage == 0)
+                pager.CurrentPage = 1;
+            model.Pager = pager;
+
+
+            model.Bookmarks = _user.GetUserBookmarks(user.Id, pager.CurrentPage, pager.PageSize).Select(ob => new ObjectItemModel()
+            {
+                Id = ob.Id,
+                Name = ob.Name,
+                Location = ob.City != null ? ob.Address + ", " + ob.City.Name : ob.Address,
+                ImgSrc = ob.ObjectImages.Count > 0 ? ob.ObjectImages.ElementAt(0).Path : "/pink.png",
+                Lat = ob.Lat,
+                Lng = ob.Lng,
+                Description = ob.Description,
+                WebContact = ob.WebContact,
+                EmailContact = ob.EmailContact,
+                PhoneNumberContact = ob.PhoneNumberContact,
+                Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
+                NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
+                Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
+
+            }).ToList();
+
+            //napravi view
+            return PartialView("_UserBookmarks", model);
+
+        }
+
+
+        [Authorize]
+        public IActionResult AddBookmark(String identUserId, int objectId)
+        {
+            _user.AddBookmark(identUserId, objectId);
+
+            return Ok();
+        }
+
+        [Authorize]
+        public IActionResult RemoveBookmark(String identUserId, int objectId)
+        {
+            _user.RemoveBookmark(identUserId, objectId);
+
+            return Ok();
+        }
 
     }
 }

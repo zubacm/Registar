@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,6 +39,13 @@ namespace TuristRegistar.Services
                 .FirstOrDefault();
         }
 
+        public Users GetUserFromIdentUser(string identUserId)
+        {
+            return _context.Userss
+                .Where(u => u.IdentUserId == identUserId)
+                .FirstOrDefault();
+        }
+
         public void UpdateUser(Users user)
         {
             var myuser = _context.Userss.FirstOrDefault(u => u.Id == user.Id);
@@ -57,6 +66,105 @@ namespace TuristRegistar.Services
         public IEnumerable<Currencies> GetCurrencies()
         {
             return _context.Currencies;
+        }
+
+        public IEnumerable<Objects> GetUserObjects(String identUserId, int pagenumber, int pagesize)
+        {
+            return _context.Objects
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                //.Include(o => o.SpecialOffers)
+                //.Include(o => o.UnavailablePeriods)
+                .Include(o => o.ObjectImages)
+                //.Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
+                //.Include(o => o.StandardPricingModel)
+                .Where(o => o.IdentUserId == identUserId)
+                .Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
+        }
+        public int CountUserObjects(String identUserId)
+        {
+            return _context.Objects
+                   .Where(o => o.IdentUserId == identUserId).Count();
+
+        }
+
+        public IEnumerable<int> GetAllUserBookmarksId(String identUserId)
+        {
+            //Check this shit
+            return _context.Bookmark
+                .Where(b => b.UserId == identUserId)
+                .Select(b => b.ObjectId)
+                .ToList();
+
+        }
+
+
+
+        public IEnumerable<Objects> GetUserBookmarks(String identUserId, int pagenumber, int pagesize)
+        {
+            //Check this shit
+            var bookmarksObjectsId = _context.Bookmark
+                .Where(b => b.UserId == identUserId)
+                .Select(b => b.ObjectId)
+                .ToList();
+
+            return _context.Objects
+                .Include(o => o.Country)
+                .Include(o => o.City)
+                .Include(o => o.ObjectType)
+                .Include(o => o.ObjectHasAttributes)
+                .Include(o => o.CntObjAttributesCount)
+                .Include(o => o.RatingsAndReviews)
+                //.Include(o => o.SpecialOffers)
+                //.Include(o => o.UnavailablePeriods)
+                .Include(o => o.ObjectImages)
+                //.Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
+                //.Include(o => o.StandardPricingModel)
+                .Where(o => bookmarksObjectsId.Contains(o.Id))
+                .Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
+                
+        }
+
+        public int CountUserBookmarks(String identUserId)
+        {
+            //Check this shit
+            var bookmarksObjectsId = _context.Bookmark
+                .Where(b => b.UserId == identUserId)
+                .Select(b => b.ObjectId)
+                .ToList();
+
+            return _context.Objects
+                .Where(o => bookmarksObjectsId.Contains(o.Id))
+                .Count();
+
+        }
+
+        public void AddBookmark(String identUserId, int objectId)
+        {
+            var bookmark = new Bookmark() {
+            ObjectId = objectId,
+            UserId = identUserId,
+            };
+
+            _context.Bookmark.Add(bookmark);
+            _context.SaveChanges();
+        }
+
+        public void RemoveBookmark(String identUserId, int objectId)
+        {
+            var bookmark = new Bookmark()
+            {
+                ObjectId = objectId,
+                UserId = identUserId,
+            };
+
+            _context.Bookmark.Attach(bookmark);
+            _context.Bookmark.Remove(bookmark);
+            _context.SaveChanges();
         }
     }
 }

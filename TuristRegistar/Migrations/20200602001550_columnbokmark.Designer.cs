@@ -10,8 +10,8 @@ using TuristRegistar.Data;
 namespace TuristRegistar.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200103193231_Ajmooo")]
-    partial class Ajmooo
+    [Migration("20200602001550_columnbokmark")]
+    partial class columnbokmark
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -182,23 +182,17 @@ namespace TuristRegistar.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.AvailablePeriods", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.Bookmark", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("ObjectId");
 
-                    b.Property<DateTime>("AvailableFrom");
+                    b.Property<string>("UserId");
 
-                    b.Property<DateTime>("AvailableTo");
+                    b.HasKey("ObjectId", "UserId");
 
-                    b.Property<int?>("ObjectsId");
+                    b.HasIndex("UserId");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("ObjectsId");
-
-                    b.ToTable("AvailablePeriods");
+                    b.ToTable("Bookmark");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.Cities", b =>
@@ -209,6 +203,10 @@ namespace TuristRegistar.Migrations
 
                     b.Property<int?>("CountriesId");
 
+                    b.Property<double>("Lat");
+
+                    b.Property<double>("Lng");
+
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
@@ -216,11 +214,21 @@ namespace TuristRegistar.Migrations
                     b.HasIndex("CountriesId");
 
                     b.ToTable("Cities");
+                });
 
-                    b.HasData(
-                        new { Id = 10, CountriesId = 5, Name = "Skoplje" },
-                        new { Id = 11, CountriesId = 5, Name = "Ohrid" }
-                    );
+            modelBuilder.Entity("TuristRegistar.Data.Models.CntObjAttributesCount", b =>
+                {
+                    b.Property<int>("CountableObjAttrId");
+
+                    b.Property<int>("ObjectId");
+
+                    b.Property<int>("Count");
+
+                    b.HasKey("CountableObjAttrId", "ObjectId");
+
+                    b.HasIndex("ObjectId");
+
+                    b.ToTable("CntObjAttributesCount");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.CountableObjectAttributes", b =>
@@ -229,15 +237,9 @@ namespace TuristRegistar.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("Count");
-
                     b.Property<string>("Name");
 
-                    b.Property<int?>("ObjectsId");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ObjectsId");
 
                     b.ToTable("CountableObjectAttributes");
                 });
@@ -248,11 +250,28 @@ namespace TuristRegistar.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<double>("Lat");
+
+                    b.Property<double>("Lng");
+
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
 
                     b.ToTable("Counries");
+                });
+
+            modelBuilder.Entity("TuristRegistar.Data.Models.Currencies", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Key");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Currencies");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.ObjectAttributes", b =>
@@ -263,13 +282,22 @@ namespace TuristRegistar.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<int?>("ObjectsId");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ObjectsId");
-
                     b.ToTable("ObjectAttributes");
+                });
+
+            modelBuilder.Entity("TuristRegistar.Data.Models.ObjectHasAttributes", b =>
+                {
+                    b.Property<int>("ObjectId");
+
+                    b.Property<int>("AttributeId");
+
+                    b.HasKey("ObjectId", "AttributeId");
+
+                    b.HasAlternateKey("AttributeId", "ObjectId");
+
+                    b.ToTable("ObjectHasAttributes");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.ObjectImages", b =>
@@ -303,9 +331,13 @@ namespace TuristRegistar.Migrations
 
                     b.Property<int>("SpecialOfferId");
 
+                    b.Property<int?>("SpecialOffersPricesObjectId");
+
+                    b.Property<int?>("SpecialOffersPricesSpecialOfferId");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("SpecialOfferId");
+                    b.HasIndex("SpecialOffersPricesSpecialOfferId", "SpecialOffersPricesObjectId");
 
                     b.ToTable("ObjectOffers");
                 });
@@ -318,11 +350,11 @@ namespace TuristRegistar.Migrations
 
                     b.Property<string>("Address");
 
-                    b.Property<int>("CityId");
+                    b.Property<int?>("CityId");
 
-                    b.Property<int>("CountryId");
+                    b.Property<int?>("CountryId");
 
-                    b.Property<int>("CreatorId");
+                    b.Property<int?>("CreatorId");
 
                     b.Property<string>("CreatorId1");
 
@@ -331,33 +363,27 @@ namespace TuristRegistar.Migrations
                     b.Property<string>("EmailContact")
                         .HasMaxLength(256);
 
+                    b.Property<string>("FullAddress");
+
+                    b.Property<string>("IdentUserId");
+
                     b.Property<double>("Lat");
 
                     b.Property<double>("Lng");
 
-                    b.Property<int>("MaxDaysOffer");
-
-                    b.Property<int>("MaxOccupancy");
-
-                    b.Property<int>("MinDaysOffer");
-
-                    b.Property<int>("MinOccupancy");
-
                     b.Property<string>("Name");
-
-                    b.Property<int>("ObejectTypeId");
 
                     b.Property<int?>("ObjectTypeId");
 
-                    b.Property<int>("OccupancyBasedPricingId");
+                    b.Property<int?>("OccupancyBasedPricingId");
+
+                    b.Property<bool>("OccupancyPricing");
 
                     b.Property<string>("PhoneNumberContact");
 
-                    b.Property<bool>("StandardPricingM");
+                    b.Property<int?>("StandardPricingModelId");
 
-                    b.Property<int>("StandardPricingModelId");
-
-                    b.Property<float>("Surface");
+                    b.Property<float?>("Surface");
 
                     b.Property<string>("WebContact");
 
@@ -369,11 +395,17 @@ namespace TuristRegistar.Migrations
 
                     b.HasIndex("CreatorId1");
 
+                    b.HasIndex("IdentUserId");
+
                     b.HasIndex("ObjectTypeId");
 
-                    b.HasIndex("OccupancyBasedPricingId");
+                    b.HasIndex("OccupancyBasedPricingId")
+                        .IsUnique()
+                        .HasFilter("[OccupancyBasedPricingId] IS NOT NULL");
 
-                    b.HasIndex("StandardPricingModelId");
+                    b.HasIndex("StandardPricingModelId")
+                        .IsUnique()
+                        .HasFilter("[StandardPricingModelId] IS NOT NULL");
 
                     b.ToTable("Objects");
                 });
@@ -397,15 +429,15 @@ namespace TuristRegistar.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("OccunapncyBasedPricingId");
+
                     b.Property<int>("Occupancy");
 
-                    b.Property<int?>("OccupancyBasedPricingId");
-
-                    b.Property<float>("PricePerNight");
+                    b.Property<decimal>("PricePerNight");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OccupancyBasedPricingId");
+                    b.HasIndex("OccunapncyBasedPricingId");
 
                     b.ToTable("OccupancyBasedPrices");
                 });
@@ -416,9 +448,13 @@ namespace TuristRegistar.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("MaxOccupancy");
+                    b.Property<int?>("MaxDaysOffer");
 
-                    b.Property<int>("MinOccupancy");
+                    b.Property<int?>("MaxOccupancy");
+
+                    b.Property<int?>("MinDaysOffer");
+
+                    b.Property<int?>("MinOccupancy");
 
                     b.HasKey("Id");
 
@@ -437,34 +473,30 @@ namespace TuristRegistar.Migrations
 
                     b.Property<string>("Review");
 
-                    b.Property<int>("UserId");
-
-                    b.Property<string>("UserId1");
+                    b.Property<string>("UserId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ObjectId");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("RatingsAndReviews");
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.SpecialOffers", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.SpecialOffersPrices", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("SpecialOfferId");
 
-                    b.Property<string>("Name");
+                    b.Property<int>("ObjectId");
 
-                    b.Property<int?>("ObjectsId");
+                    b.Property<decimal>("Price");
 
-                    b.HasKey("Id");
+                    b.HasKey("SpecialOfferId", "ObjectId");
 
-                    b.HasIndex("ObjectsId");
+                    b.HasAlternateKey("ObjectId", "SpecialOfferId");
 
-                    b.ToTable("SpecialOffers");
+                    b.ToTable("SpecialOffersPrices");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.StandardPricingModel", b =>
@@ -473,19 +505,42 @@ namespace TuristRegistar.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("MaxOccupancy");
+                    b.Property<int?>("MaxDaysOffer");
 
-                    b.Property<int>("MinOccupancy");
+                    b.Property<int?>("MaxOccupancy");
 
-                    b.Property<float>("OffsetPercentage");
+                    b.Property<int?>("MinDaysOffer");
 
-                    b.Property<int>("StandardOccupancy");
+                    b.Property<int?>("MinOccupancy");
 
-                    b.Property<float>("StandardPricePerNight");
+                    b.Property<decimal?>("OffsetPercentage");
+
+                    b.Property<int?>("StandardOccupancy");
+
+                    b.Property<decimal?>("StandardPricePerNight");
 
                     b.HasKey("Id");
 
                     b.ToTable("StandardPricingModels");
+                });
+
+            modelBuilder.Entity("TuristRegistar.Data.Models.UnavailablePeriods", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("From");
+
+                    b.Property<int?>("ObjectsId");
+
+                    b.Property<DateTime>("To");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ObjectsId");
+
+                    b.ToTable("AvailablePeriods");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.Users", b =>
@@ -566,11 +621,17 @@ namespace TuristRegistar.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.AvailablePeriods", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.Bookmark", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.Objects")
-                        .WithMany("AvailablePeriods")
-                        .HasForeignKey("ObjectsId");
+                    b.HasOne("TuristRegistar.Data.Models.Objects", "Object")
+                        .WithMany()
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristRegistar.Data.Models.Users", "User")
+                        .WithMany("ObjectHasAttributes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.Cities", b =>
@@ -580,71 +641,83 @@ namespace TuristRegistar.Migrations
                         .HasForeignKey("CountriesId");
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.CountableObjectAttributes", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.CntObjAttributesCount", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.Objects")
-                        .WithMany("CountableObjectAttributes")
-                        .HasForeignKey("ObjectsId");
+                    b.HasOne("TuristRegistar.Data.Models.CountableObjectAttributes", "CountableObjAttr")
+                        .WithMany()
+                        .HasForeignKey("CountableObjAttrId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristRegistar.Data.Models.Objects", "Object")
+                        .WithMany("CntObjAttributesCount")
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.ObjectAttributes", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.ObjectHasAttributes", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.Objects")
-                        .WithMany("ObjectAttributes")
-                        .HasForeignKey("ObjectsId");
+                    b.HasOne("TuristRegistar.Data.Models.ObjectAttributes", "Attribute")
+                        .WithMany()
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristRegistar.Data.Models.Objects", "Object")
+                        .WithMany("ObjectHasAttributes")
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.ObjectImages", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.Objects")
+                    b.HasOne("TuristRegistar.Data.Models.Objects", "Objects")
                         .WithMany("ObjectImages")
                         .HasForeignKey("ObjectsId");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.ObjectOffers", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.SpecialOffers", "SpecialOffer")
+                    b.HasOne("TuristRegistar.Data.Models.SpecialOffersPrices", "SpecialOffersPrices")
                         .WithMany()
-                        .HasForeignKey("SpecialOfferId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("SpecialOffersPricesSpecialOfferId", "SpecialOffersPricesObjectId");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.Objects", b =>
                 {
                     b.HasOne("TuristRegistar.Data.Models.Cities", "City")
                         .WithMany()
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CityId");
 
                     b.HasOne("TuristRegistar.Data.Models.Countries", "Country")
                         .WithMany()
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CountryId");
 
                     b.HasOne("TuristRegistar.Data.Models.Users", "Creator")
-                        .WithMany("BookmarkedObjects")
+                        .WithMany()
                         .HasForeignKey("CreatorId1");
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentUser")
+                        .WithMany()
+                        .HasForeignKey("IdentUserId");
 
                     b.HasOne("TuristRegistar.Data.Models.ObjectTypes", "ObjectType")
                         .WithMany()
                         .HasForeignKey("ObjectTypeId");
 
                     b.HasOne("TuristRegistar.Data.Models.OccupancyBasedPricing", "OccupancyBasedPricing")
-                        .WithMany()
-                        .HasForeignKey("OccupancyBasedPricingId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithOne("Objects")
+                        .HasForeignKey("TuristRegistar.Data.Models.Objects", "OccupancyBasedPricingId");
 
                     b.HasOne("TuristRegistar.Data.Models.StandardPricingModel", "StandardPricingModel")
-                        .WithMany()
-                        .HasForeignKey("StandardPricingModelId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithOne("Objects")
+                        .HasForeignKey("TuristRegistar.Data.Models.Objects", "StandardPricingModelId");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.OccupancyBasedPrices", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.OccupancyBasedPricing")
+                    b.HasOne("TuristRegistar.Data.Models.OccupancyBasedPricing", "OccunapncyBasedPricing")
                         .WithMany("Prices")
-                        .HasForeignKey("OccupancyBasedPricingId");
+                        .HasForeignKey("OccunapncyBasedPricingId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.RatingsAndReviews", b =>
@@ -656,13 +729,26 @@ namespace TuristRegistar.Migrations
 
                     b.HasOne("TuristRegistar.Data.Models.Users", "User")
                         .WithMany()
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.SpecialOffers", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.SpecialOffersPrices", b =>
                 {
-                    b.HasOne("TuristRegistar.Data.Models.Objects")
+                    b.HasOne("TuristRegistar.Data.Models.Objects", "Object")
                         .WithMany("SpecialOffers")
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristRegistar.Data.Models.ObjectAttributes", "SpecialOffer")
+                        .WithMany()
+                        .HasForeignKey("SpecialOfferId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("TuristRegistar.Data.Models.UnavailablePeriods", b =>
+                {
+                    b.HasOne("TuristRegistar.Data.Models.Objects", "Objects")
+                        .WithMany("UnavailablePeriods")
                         .HasForeignKey("ObjectsId");
                 });
 

@@ -154,6 +154,8 @@ namespace TuristRegistar.Services
                 .Include(o => o.ObjectImages)
                 .Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
                 .Include(o => o.StandardPricingModel)
+                .Include(o => o.Creator)
+                .Include(o => o.IdentUser)
                 .FirstOrDefault(o => o.Id == id);
             obj = await ExchangeCurrencyAsync(obj, "BAM", currency);
 
@@ -277,7 +279,7 @@ namespace TuristRegistar.Services
             _context.SaveChanges();
         }
 
-        //ako ovo bude radilo ++++
+        //ako ovo bude radilo ++++ msm da radi
         public async Task NewOccupancyBasedPricing(OccupancyBasedPricing occupanybp, int objectid, string currency)
         {
             var curr_correlation = await GetExchangeRate(currency, "BAM");
@@ -462,6 +464,52 @@ namespace TuristRegistar.Services
             return myobjects.Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
         }
 
+
+        public async Task<IEnumerable<Objects>> GetAllFilteredObjects(Search search, string currency)
+        {
+            var myobjects = GetCheckedRatingAndSearch(search);
+
+            if (search.Occupancy != 0 && search.PriceBelow != 0 && search.CheckIn != DateTime.MinValue && search.CheckOut != DateTime.MinValue)
+            {
+                var priceBelowBAM = (await GetExchangeRate(currency, "BAM")) * search.PriceBelow;
+                int numberOfDays = (search.CheckOut - search.CheckIn).Days;
+
+                myobjects = myobjects
+                    .Where(ob => ((ob.StandardPricingModelId != null && checkNumberOfStayDays(search.CheckIn, search.CheckOut, ob.StandardPricingModel.MinDaysOffer, ob.StandardPricingModel.MaxDaysOffer)))
+                    || (ob.OccupancyBasedPricingId != null && checkNumberOfStayDays(search.CheckIn, search.CheckOut, ob.OccupancyBasedPricing.MinDaysOffer, ob.OccupancyBasedPricing.MaxDaysOffer)))
+                    .Where(ob => CheckCheckInAndOut(search.CheckIn, search.CheckOut, ob.UnavailablePeriods.ToList()))
+                    .Where(ob => (ob.OccupancyBasedPricingId != null && GetOccupancyBasedPricing(ob.Id).MinOccupancy <= search.Occupancy && GetOccupancyBasedPricing(ob.Id).MaxOccupancy >= search.Occupancy && GetPriceForOccupancyModel(ob.Id, search.Occupancy) * numberOfDays <= priceBelowBAM)
+                || (ob.StandardPricingModelId != null && GetStandardPricingModel(ob.Id).MinOccupancy <= search.Occupancy && GetStandardPricingModel(ob.Id).MaxOccupancy >= search.Occupancy && GetPriceForStandardModel(ob.Id, search.Occupancy) * numberOfDays <= priceBelowBAM));
+            }
+            else if (search.Occupancy != 0 && search.CheckIn != DateTime.MinValue && search.CheckOut != DateTime.MinValue)
+            {
+                myobjects = myobjects
+                    .Where(ob => ((ob.StandardPricingModelId != null && checkNumberOfStayDays(search.CheckIn, search.CheckOut, ob.StandardPricingModel.MinDaysOffer, ob.StandardPricingModel.MaxDaysOffer)))
+                    || (ob.OccupancyBasedPricingId != null && checkNumberOfStayDays(search.CheckIn, search.CheckOut, ob.OccupancyBasedPricing.MinDaysOffer, ob.OccupancyBasedPricing.MaxDaysOffer)))
+                    .Where(ob => CheckCheckInAndOut(search.CheckIn, search.CheckOut, ob.UnavailablePeriods.ToList()))
+                    .Where(ob => (ob.OccupancyBasedPricingId != null && GetOccupancyBasedPricing(ob.Id).MinOccupancy <= search.Occupancy && GetOccupancyBasedPricing(ob.Id).MaxOccupancy >= search.Occupancy)
+                || (ob.StandardPricingModelId != null && GetStandardPricingModel(ob.Id).MinOccupancy <= search.Occupancy && GetStandardPricingModel(ob.Id).MaxOccupancy >= search.Occupancy));
+            }
+            else if (search.CheckIn != DateTime.MinValue && search.CheckOut != DateTime.MinValue)
+            {
+                myobjects = myobjects
+                    .Where(ob => (ob.StandardPricingModelId != null && checkNumberOfStayDays(search.CheckIn, search.CheckOut, ob.StandardPricingModel.MinDaysOffer, ob.StandardPricingModel.MaxDaysOffer))
+                    || (ob.OccupancyBasedPricingId != null && checkNumberOfStayDays(search.CheckIn, search.CheckOut, ob.OccupancyBasedPricing.MinDaysOffer, ob.OccupancyBasedPricing.MaxDaysOffer)))
+                    .Where(ob => CheckCheckInAndOut(search.CheckIn, search.CheckOut, ob.UnavailablePeriods.ToList()));
+            }
+            else if (search.Occupancy != 0)
+            {
+                myobjects = myobjects.Where(ob => (ob.OccupancyBasedPricingId != null && GetOccupancyBasedPricing(ob.Id).MinOccupancy <= search.Occupancy && GetOccupancyBasedPricing(ob.Id).MaxOccupancy >= search.Occupancy)
+                || (ob.StandardPricingModelId != null && GetStandardPricingModel(ob.Id).MinOccupancy <= search.Occupancy && GetStandardPricingModel(ob.Id).MaxOccupancy >= search.Occupancy));
+            }
+
+            return myobjects.ToList();
+        }
+
+
+
+
+
         public bool checkNumberOfStayDays(DateTime checkIn, DateTime checkOut, int? minDays = 0, int? maxDays = 0)
         {
             int numberOfDays = (checkOut - checkIn).Days;
@@ -490,7 +538,17 @@ namespace TuristRegistar.Services
         {
             return _context.OccupancyBasedPricings.FirstOrDefault(obp => obp.Objects.Id == objectId);
         }
-        
+        public StandardPricingModel GetStandardPricingModelWithId(int id)
+        {
+            return _context.StandardPricingModels.FirstOrDefault(spm => spm.Id == id);
+        }
+        public OccupancyBasedPricing GetOccupancyBasedPricingWithId(int id)
+        {
+            return _context.OccupancyBasedPricings
+                .Include(obp => obp.Prices)
+                .FirstOrDefault(obp => obp.Id == id);
+        }
+
         private Decimal GetPriceForStandardModel(int objectId, int occupancy)
         {
             var standardPM = GetStandardPricingModel(objectId);
@@ -870,7 +928,7 @@ namespace TuristRegistar.Services
             var curr_correlation = await GetExchangeRate("BAM", currency);
             var daysNum = (checkOut - checkIn).Days;
             var occupancyOffset = occupancy - standardModel.StandardOccupancy;
-            return Math.Round(curr_correlation *occupancy*((Decimal)standardModel.StandardPricePerNight + (Decimal)(occupancyOffset * standardModel.StandardPricePerNight * (standardModel.OffsetPercentage / 100))), 2);
+            return Math.Round(daysNum*curr_correlation *occupancy*((Decimal)standardModel.StandardPricePerNight + (Decimal)(occupancyOffset * standardModel.StandardPricePerNight * (standardModel.OffsetPercentage / 100))), 2);
  }
         public async Task<decimal> GetPriceForOccupancyBasedModel(int occupancy, string currency, DateTime checkIn, DateTime checkOut, OccupancyBasedPricing occupancyModel)
         {
@@ -879,5 +937,76 @@ namespace TuristRegistar.Services
             return Math.Round(occupancyModel.Prices.FirstOrDefault(pr => pr.Occupancy == occupancy).PricePerNight * daysNum * curr_correlation, 2);
         }
 
+        public int CountRatingsAndReviews(int objectId)
+        {
+            return _context.RatingsAndReviews.Where(rr => rr.ObjectId == objectId).Count();
+        }
+
+        //use this
+        public IEnumerable<RatingsAndReviews> GetRatingsAndReviews(int pagenumber, int pagesize, int objectId)
+        {
+            return _context.RatingsAndReviews.Where(rr => rr.ObjectId == objectId)
+                .Include(u => u.User)
+                .Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
+        }
+
+        public void AddRatingAndReview(RatingsAndReviews ratingAndReview)
+        {
+            _context.RatingsAndReviews.Add(ratingAndReview);
+            _context.SaveChanges();
+        }
+
+
+        public Coordinates GetCityCoordinates(String search)
+        {
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var city = _context.Cities.FirstOrDefault(c => c.Name.ToLower().Equals(search.ToLower()));
+                if (city != null)
+                    return new Coordinates() { Lat = city.Lat, Lng = city.Lng, };
+            }
+            return null;
+        }
+        public Coordinates GetCountryCoordinates(String search)
+        {
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var country = _context.Counries.FirstOrDefault(c => c.Name.ToLower().Equals(search.ToLower()));
+                if (country != null)
+                    return new Coordinates() { Lat = country.Lat, Lng = country.Lng, };
+            }
+            return null;
+        }
+
+        //check if its working
+        //slike brisiiiiiiiiiii
+        public void DeleteObjectAndRelatedColumns(int objectId)
+        {
+            var bookmarks = _context.Bookmark.Where(b => b.ObjectId == objectId);
+            var objHasAttr = _context.ObjectHasAttributes.Where(oha => oha.ObjectId == objectId);
+            var spcOffersPrices = _context.SpecialOffersPrices.Where(so => so.ObjectId == objectId);
+
+            var obj = _context.Objects.Where(o => o.Id == objectId).FirstOrDefault();
+            //vidi je li null ili nula
+            if (obj.StandardPricingModelId != null)
+            {
+                var standPM = _context.StandardPricingModels.Where(spm => spm.Id == obj.StandardPricingModelId).FirstOrDefault();//ovo nije range nego jedno
+                _context.StandardPricingModels.Remove(standPM);
+            }
+            else if (obj.OccupancyBasedPricingId != null)
+            {
+                var occupancyPrices = _context.OccupancyBasedPrices.Where(obp => obp.OccunapncyBasedPricingId == obj.OccupancyBasedPricingId);
+                var occupancyBasedModel = _context.OccupancyBasedPricings.Where(obm => obm.Id == obj.OccupancyBasedPricingId).FirstOrDefault();// i ovo je jedno
+                _context.OccupancyBasedPrices.RemoveRange(occupancyPrices);
+                _context.OccupancyBasedPricings.Remove(occupancyBasedModel);
+            }
+
+            _context.Bookmark.RemoveRange(bookmarks);
+            _context.ObjectHasAttributes.RemoveRange(objHasAttr);
+            _context.SpecialOffersPrices.RemoveRange(spcOffersPrices);
+            _context.Objects.Remove(obj);
+
+            _context.SaveChanges();
+        }
     }
 }

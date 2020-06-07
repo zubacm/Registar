@@ -11,8 +11,16 @@ namespace TuristRegistar.Data
         Task AddLegalPerson(Users user);
         Task AddNaturalPerson(Users user);
         Users GetUser(string id);
+        Users GetUserFromIdentUser(string identUserId);
         void UpdateUser(Users user);
         void ChangeUsername(string identUserId, string username);
         IEnumerable<Currencies> GetCurrencies();
+        IEnumerable<Objects> GetUserObjects(String identUserId, int pagenumber, int pagesize);
+        IEnumerable<int> GetAllUserBookmarksId(String identUserId);
+        IEnumerable<Objects> GetUserBookmarks(String identUserId, int pagenumber, int pagesize);
+        int CountUserObjects(String identUserId);
+        int CountUserBookmarks(String identUserId);
+        void AddBookmark(String identUserId, int objectId);
+        void RemoveBookmark(String identUserId, int objectId);
     }
 }

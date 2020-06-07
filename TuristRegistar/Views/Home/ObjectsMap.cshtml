@@ -1,0 +1,97 @@
+﻿@model ObjectsMapViewModel
+@*@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor*@
+@using Newtonsoft.Json;
+
+<div id="objects-map" style="height:500px" class="mb-3"></div>
+
+@*<div class="container">
+    <div class="card">
+        <div class="card-header text-info"><h4></h4></div>
+        <div class="card-body">
+            <span class="text-warning"><i class="fas fa-star"></i>&nbsp;@item.Rating</span>
+            <br />
+            <span class="text-muted" style="font-size:14px;">broj ocjena: @item.NumberOfRatings</span>
+            <a href="#" class="text-primary">
+                <i class="fa fa-map-marker-alt"></i>&nbsp;@item.Location
+            </a>
+        </div>
+    </div>
+</div>*@
+
+<script>
+    var map;
+    var markeri = [];
+    var infowindow;
+    function centerToUsersLocation() {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                function success(position) {
+                    var pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    map.setCenter(pos);
+                    map.setZoom(12);
+                }
+            );
+        }
+    }
+    function initMap() {
+        //center to city in search, if not counry if not to user loc
+       // centerToUsersLocation();
+        infowindow = new google.maps.InfoWindow();
+        map = new google.maps.Map(document.getElementById('objects-map'), {
+            center: { lat: 43.823508, lng: 18.374364 },
+            zoom: 12
+        });
+        infowindow = new google.maps.InfoWindow();
+        addMarkers();
+        infowindow = new google.maps.InfoWindow();
+    }
+    function addMarkers() {
+        var objList = @Json.Serialize(Model.ObjectsList);
+       // console.log(objList);
+        for (var i = 0; i < objList.length; i++) {
+            var marker = new google.maps.Marker({
+                position: { lat: objList[i].lat, lng: objList[i].lng },
+                map: map,
+                draggable: false,
+                title: objList[i].name
+            });
+
+            var content = '<div class="container">' +
+                '<h4 class="text-primary text-uppercase text-center font-weight-light">' + objList[i].name + '</h4>' +
+                ' <a href="#" class="text-primary font-weight-light">' +
+                ' <i class="fa fa-map-marker-alt"></i>&nbsp;' + objList[i].location +
+                ' </a><br>' +
+                '<hr>' +
+                '<h6 class="font-weight-light"><span class="text-warning"><i class="fas fa-star"></i>&nbsp;' + objList[i].rating + '</span><br/>' +
+                '  <span class="text-muted" style="font-size:14px;">broj ocjena: ' + objList[i].numberOfRatings + '</span></h6>';
+                
+            if (!(objList[i].description === null))
+            {
+                content += '<div class="text-muted">' + objList[i].description + '</div>';
+            }
+            content += '<hr><a class="btn btn-primary col-sm-12 text-white font-weight-light pointer" href="/Object/ObjectDetails/' + objList[i].id + '"> Prikaži više</a>' +
+                 '</div>';
+             google.maps.event.addListener(marker, 'click', function(content){
+                return function(){
+                    infowindow.setContent(content);
+                    infowindow.open(map, this);
+                }
+             }(content));
+            markeri.push(marker);
+            map.setCenter(new google.maps.LatLng(@Model.CenterLat, @Model.CenterLng));
+
+            console.log(@Model.CenterLat + " koor " + @Model.CenterLng);
+            if (+(@Model.CenterLat) !== 0 && +(@Model.CenterLng) !== 0)
+                map.setCenter(new google.maps.LatLng(@Model.CenterLat, @Model.CenterLng));
+            else
+                centerToUsersLocation();
+        }
+    }
+</script>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>
+

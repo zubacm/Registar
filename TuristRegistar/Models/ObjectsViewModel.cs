@@ -13,6 +13,8 @@ namespace TuristRegistar.Models
         public Search Search { get; set; }
 
         public int CurrPage { get; set; }
+
+        public String IdentUserId { get; set; }
   
         //[Display(Name = "Tip objekta")]
         //public List<ObjectTypeModel> ObjectTypes { get; set; }

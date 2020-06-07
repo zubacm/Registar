@@ -53,9 +53,17 @@ namespace TuristRegistar.Data
         String GetCityName(int cityId);
         String GetCoutnryName(int countryId);
         Task<IEnumerable<Objects>> GetFilteredObjects(int pagenumber, int pagesize, Search search, string currency);
+        Task<IEnumerable<Objects>> GetAllFilteredObjects(Search search, string currency);
         Task<decimal> GetPriceForStandardModel(int occupancy, string currency, DateTime checkIn, DateTime checkOut, StandardPricingModel standardModel);
         Task<decimal> GetPriceForOccupancyBasedModel(int occupancy, string currency, DateTime checkIn, DateTime checkOut, OccupancyBasedPricing occupancyModel);
         bool checkNumberOfStayDays(DateTime checkIn, DateTime checkOut, int? minDays = 0, int? maxDays = 0);
         bool CheckCheckInAndOut(DateTime checkIn, DateTime checkOut, List<UnavailablePeriods> unavailablePeriods);
+        StandardPricingModel GetStandardPricingModelWithId(int id);
+        OccupancyBasedPricing GetOccupancyBasedPricingWithId(int id);
+        int CountRatingsAndReviews(int objectId);
+        IEnumerable<RatingsAndReviews> GetRatingsAndReviews(int pagenumber, int pagesize, int objectId);
+        void AddRatingAndReview(RatingsAndReviews ratingAndReview);
+        Coordinates GetCityCoordinates(String search);
+        Coordinates GetCountryCoordinates(String search);
     }
 }

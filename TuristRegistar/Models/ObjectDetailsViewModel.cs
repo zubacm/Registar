@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace TuristRegistar.Models
     {
         public int Id { get; set; }
 
-        public string IdentUserId { get; set; }
+        public String IdentUserId { get; set; }
         [Required(ErrorMessage = "Obavezno polje")]
         [Display(Name = "Naziv")]
         public String Name { get; set; }
@@ -41,7 +42,9 @@ namespace TuristRegistar.Models
         public Decimal Rating { get; set; }
 
         public bool OccupancyPricing { get; set; }
+        public int? StandardPricingModelId { get; set; }
         public StandardPricingModel StandardPricingModel { get; set; }
+        public int? OccupancyBasedPricingId { get; set; }
         public OccupancyBasedPricing OccupancyBasedPricing { get; set; }
 
         public List<ObjectHasAttributes> Offers { get; set; }
@@ -57,9 +60,12 @@ namespace TuristRegistar.Models
         [Display(Name = "Tip objekta")]
         public String ObjectType { get; set; }
 
-        [Display(Name = "Broj osoba")]
-        [Range(1, 30, ErrorMessage = "Broj osoba mora biti u opsegu od 1 do 30.")]
-        public int Occupancy { get; set; }
+        public String CreatorIdentUserId {get; set;}
+        public String CreatorId { get; set; }
+        public String CreatorName { get; set; }
+        //[Display(Name = "Broj osoba")]
+        //[Range(1, 30, ErrorMessage = "Broj osoba mora biti u opsegu od 1 do 30.")]
+        //public int Occupancy { get; set; }
         [Display(Name = "Dolazak")]
         public DateTime CheckIn { get; set; }
         public String CheckInString { get; set; }
@@ -69,11 +75,22 @@ namespace TuristRegistar.Models
         [Display(Name = "Cijena")]
         public Decimal Price { get; set; }
 
+        [Display(Name = "Broj osoba")]
+        public IEnumerable<SelectListItem> Occupancy { get; set; }
+        public int SelectedOccupancy { get; set; }
         public int MinOccupancy { get; set; }
         public int MaxOccupancy { get; set; }
         public int MinDaysOffer { get; set; }
         public int MaxDaysOffer { get; set; }
         public ICollection<UnavailablePeriods> UnavailablePeriods { get; set; }
         public List<DateTime> UnavailablePeriodsModel { get; set; }
+
+        public Review Review { get; set; }
+        public List<Review> Reviews { get; set; }
+        public Pager Pager { get; set; }
+        public int CurrPage { get; set; }
+
+
+        public bool IsBookmark { get; set; }
     }
 }

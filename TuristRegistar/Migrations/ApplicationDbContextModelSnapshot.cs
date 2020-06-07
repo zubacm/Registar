@@ -180,19 +180,21 @@ namespace TuristRegistar.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.Bookmarks", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.Bookmark", b =>
                 {
                     b.Property<int>("ObjectId");
 
-                    b.Property<int>("UserId");
+                    b.Property<string>("UserId");
 
-                    b.Property<string>("UserId1");
+                    b.Property<string>("UsersId");
 
                     b.HasKey("ObjectId", "UserId");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("Bookmarks");
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("Bookmark");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.Cities", b =>
@@ -202,6 +204,10 @@ namespace TuristRegistar.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("CountriesId");
+
+                    b.Property<double>("Lat");
+
+                    b.Property<double>("Lng");
 
                     b.Property<string>("Name");
 
@@ -245,6 +251,10 @@ namespace TuristRegistar.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<double>("Lat");
+
+                    b.Property<double>("Lng");
 
                     b.Property<string>("Name");
 
@@ -465,15 +475,13 @@ namespace TuristRegistar.Migrations
 
                     b.Property<string>("Review");
 
-                    b.Property<int>("UserId");
-
-                    b.Property<string>("UserId1");
+                    b.Property<string>("UserId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ObjectId");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("RatingsAndReviews");
                 });
@@ -615,16 +623,21 @@ namespace TuristRegistar.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("TuristRegistar.Data.Models.Bookmarks", b =>
+            modelBuilder.Entity("TuristRegistar.Data.Models.Bookmark", b =>
                 {
                     b.HasOne("TuristRegistar.Data.Models.Objects", "Object")
                         .WithMany()
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("TuristRegistar.Data.Models.Users", "User")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristRegistar.Data.Models.Users")
                         .WithMany("ObjectHasAttributes")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UsersId");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.Cities", b =>
@@ -722,7 +735,7 @@ namespace TuristRegistar.Migrations
 
                     b.HasOne("TuristRegistar.Data.Models.Users", "User")
                         .WithMany()
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("TuristRegistar.Data.Models.SpecialOffersPrices", b =>

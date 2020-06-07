@@ -19,12 +19,14 @@ namespace TuristRegistar.Controllers
     public class HomeController : Controller
     {
         private readonly ITouristObject _touristObject;
+        private readonly IUser _user;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public HomeController(ITouristObject touristObject,  UserManager<IdentityUser> userManager)
+        public HomeController(ITouristObject touristObject,  UserManager<IdentityUser> userManager, IUser user)
         {
             _touristObject = touristObject;
             _userManager = userManager;
+            _user = user;
         }
 
         public IActionResult Index()
@@ -33,7 +35,7 @@ namespace TuristRegistar.Controllers
         }
 
         [Route("objectlist")] // /objectlist
-        public IActionResult ObjectList()
+        public async Task<IActionResult> ObjectList()
         {
             
                 var model = new ObjectsViewModel();
@@ -45,11 +47,18 @@ namespace TuristRegistar.Controllers
                             .Select(type => new ObjectTypeModel() { Id = type.Id, Name = type.Name, Selected = false }).ToList(),
                 };
 
-            
+
+            var user = await _userManager.GetUserAsync(User);
+            var bookmarks = new List<int>();
+            if (user != null)
+            {
+                bookmarks = _user.GetAllUserBookmarksId(user.Id).ToList();
+                model.IdentUserId = user.Id;
+            }
+
             var pager = new Pager(_touristObject.CountObjects(), 1);
             //if (model.CurrPage == 0)
             //    pager.CurrentPage = pager.EndPage;
-
 
             //nekretnine = _nekretnina.GetNekretnine(pager.CurrentPage, pager.PageSize);
             model.Pager = pager;
@@ -69,8 +78,10 @@ namespace TuristRegistar.Controllers
                                    PhoneNumberContact = ob.PhoneNumberContact,
                                    Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
                                    NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
-                                   Rating = _touristObject.GetAvarageRating(ob.Id),
-                                   }).ToList();
+                                   Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
+                                   IsBookmark = bookmarks.Contains(ob.Id) ? true : false,
+                               }).ToList();
+
 
 
 
@@ -113,7 +124,7 @@ namespace TuristRegistar.Controllers
                                    PhoneNumberContact = ob.PhoneNumberContact,
                                    Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
                                    NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
-                                   Rating = _touristObject.GetAvarageRating(ob.Id),
+                                   Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
                                }).ToList();
 
             return View("ObjectList", model);
@@ -130,9 +141,20 @@ namespace TuristRegistar.Controllers
             //    //reset
             //    model.Search.PriceBelow = 0;
             //}
+
+
             var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
             var pager = new Pager((await _touristObject.CountFilteredObjects(model.Search, currency)), 1);
             model.Pager = pager;
+
+            var user = await _userManager.GetUserAsync(User);
+            var bookmarks = new List<int>();
+            if (user != null)
+            {
+                bookmarks = _user.GetAllUserBookmarksId(user.Id).ToList();
+                model.IdentUserId = user.Id;
+
+            }
 
             model.ObjectsList = (await _touristObject.GetFilteredObjects(pager.CurrentPage, pager.PageSize, model.Search, currency))
                 .Select(ob => new ObjectItemModel()
@@ -149,7 +171,8 @@ namespace TuristRegistar.Controllers
                     PhoneNumberContact = ob.PhoneNumberContact,
                     Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
                     NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
-                    Rating = _touristObject.GetAvarageRating(ob.Id),
+                    Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
+                    IsBookmark = bookmarks.Contains(ob.Id) ? true : false,
                 }).ToList();
 
             return PartialView("_ObjectsListed", model);
@@ -168,6 +191,14 @@ namespace TuristRegistar.Controllers
 
             model.Pager = pager;
 
+            var user = await _userManager.GetUserAsync(User);
+            var bookmarks = new List<int>();
+            if (user != null)
+            {
+                bookmarks = _user.GetAllUserBookmarksId(user.Id).ToList();
+                model.IdentUserId = user.Id;
+            }
+
             model.ObjectsList = (await _touristObject.GetFilteredObjects(pager.CurrentPage, pager.PageSize, model.Search, currency))
                .Select(ob => new ObjectItemModel()
                {
@@ -183,11 +214,138 @@ namespace TuristRegistar.Controllers
                    PhoneNumberContact = ob.PhoneNumberContact,
                    Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
                    NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
-                   Rating = _touristObject.GetAvarageRating(ob.Id),
+                   Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
+                   IsBookmark = bookmarks.Contains(ob.Id) ? true : false,                  
                }).ToList();
 
             return PartialView("_ObjectsListed", model);
         }
+
+        //public async Task<IActionResult> GoToFilteredMap(ObjectsViewModel model)
+        //{
+        //    ObjectsMapViewModel mapModel = new ObjectsMapViewModel()
+        //    {
+        //        Search = model.Search,
+        //    };
+
+        //    var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
+
+
+        //    model.ObjectsList = (await _touristObject.GetAllFilteredObjects(mapModel.Search, currency))
+        //        .Select(ob => new ObjectItemModel()
+        //        {
+        //            Id = ob.Id,
+        //            Name = ob.Name,
+        //            Location = ob.City != null ? ob.Address + ", " + ob.City.Name : ob.Address,
+        //            ImgSrc = ob.ObjectImages.Count > 0 ? ob.ObjectImages.ElementAt(0).Path : "/pink.png",
+        //            Lat = ob.Lat,
+        //            Lng = ob.Lng,
+        //            Description = ob.Description,
+        //            WebContact = ob.WebContact,
+        //            EmailContact = ob.EmailContact,
+        //            PhoneNumberContact = ob.PhoneNumberContact,
+        //            Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
+        //            NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
+        //            Rating = _touristObject.GetAvarageRating(ob.Id),
+        //        }).ToList();
+
+        //    if (!string.IsNullOrWhiteSpace(mapModel.Search.SearchString))
+        //    {
+        //        var coordinates = _touristObject.GetCityCoordinates(model.Search.SearchString);
+        //        if (coordinates == null)
+        //            coordinates = _touristObject.GetCountryCoordinates(mapModel.Search.SearchString);
+
+        //        if (coordinates != null)
+        //        {
+        //            mapModel.CenterLat = coordinates.Lat;
+        //            mapModel.CenterLng = coordinates.Lng;
+        //        }
+        //    }
+
+        //    return View("Map", mapModel);
+        //    //await FilterObjectsMap(mapModel);
+
+      //  }
+
+
+        ////[Route("objectsmap")] // /objectlist
+        public IActionResult Map()
+        {
+
+            var model = new ObjectsMapViewModel();
+            model.Search = new Search()
+            {
+                ObjectAttributes = _touristObject.GetAllObjectAttributes()
+                            .Select(atr => new ObjectAttributesModel() { Id = atr.Id, Name = atr.Name, Selected = false }).ToList(),
+                ObjectTypes = _touristObject.GetObjectTypes()
+                        .Select(type => new ObjectTypeModel() { Id = type.Id, Name = type.Name, Selected = false }).ToList(),
+            };
+
+
+
+            model.ObjectsList = _touristObject.GetAllObjects()
+                               .Select(ob => new ObjectItemModel()
+                               {
+                                   Id = ob.Id,
+                                   Name = ob.Name,
+                                   Location = ob.City != null ? ob.Address + ", " + ob.City.Name : ob.Address,
+                                   ImgSrc = ob.ObjectImages.Count > 0 ? ob.ObjectImages.ElementAt(0).Path : "/pink.png",
+                                   Lat = ob.Lat,
+                                   Lng = ob.Lng,
+                                   Description = ob.Description,
+                                   WebContact = ob.WebContact,
+                                   EmailContact = ob.EmailContact,
+                                   PhoneNumberContact = ob.PhoneNumberContact,
+                                   Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
+                                   NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
+                                   Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
+                               }).ToList();
+
+
+
+            return View(model);
+        }
+
+        //test this the last for map
+        public async Task<IActionResult> FilterObjectsMap(ObjectsMapViewModel model)
+        {
+            var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
+
+
+            model.ObjectsList = (await _touristObject.GetAllFilteredObjects(model.Search, currency))
+                .Select(ob => new ObjectItemModel()
+                {
+                    Id = ob.Id,
+                    Name = ob.Name,
+                    Location = ob.City != null ? ob.Address + ", " + ob.City.Name : ob.Address,
+                    ImgSrc = ob.ObjectImages.Count > 0 ? ob.ObjectImages.ElementAt(0).Path : "/pink.png",
+                    Lat = ob.Lat,
+                    Lng = ob.Lng,
+                    Description = ob.Description,
+                    WebContact = ob.WebContact,
+                    EmailContact = ob.EmailContact,
+                    PhoneNumberContact = ob.PhoneNumberContact,
+                    Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
+                    NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
+                    Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
+                }).ToList();
+
+            if(!string.IsNullOrWhiteSpace(model.Search.SearchString))
+            {
+                var coordinates = _touristObject.GetCityCoordinates(model.Search.SearchString);
+                if (coordinates == null)
+                    coordinates = _touristObject.GetCountryCoordinates(model.Search.SearchString);
+
+                if (coordinates != null)
+                {
+                    model.CenterLat = coordinates.Lat;
+                    model.CenterLng = coordinates.Lng;
+                }
+            }
+
+            return PartialView("ObjectsMap", model);
+        }
+
 
         public IActionResult About()
         {

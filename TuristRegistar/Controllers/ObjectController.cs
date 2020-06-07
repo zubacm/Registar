@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,13 +23,15 @@ namespace TuristRegistar.Controllers
         private readonly ITouristObject _touristObject;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IUser _user;
 
 
-        public ObjectController(ITouristObject touristObject, IHostingEnvironment hostingEnvironment, UserManager<IdentityUser> userManager)
+        public ObjectController(ITouristObject touristObject, IUser user, IHostingEnvironment hostingEnvironment, UserManager<IdentityUser> userManager)
         {
             _touristObject = touristObject;
             _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
+            _user = user;
         }
 
        
@@ -607,6 +610,8 @@ namespace TuristRegistar.Controllers
         {
             var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
             var myobject = await _touristObject.GetObject(id, currency);
+
+
             var model = new ObjectDetailsViewModel()
             {
                 Id = myobject.Id,
@@ -625,6 +630,8 @@ namespace TuristRegistar.Controllers
                 OccupancyPricing = myobject.OccupancyPricing,
                 OccupancyBasedPricing = myobject.OccupancyBasedPricing,
                 StandardPricingModel = myobject.StandardPricingModel,
+                StandardPricingModelId = myobject.StandardPricingModelId,
+                OccupancyBasedPricingId = myobject.OccupancyBasedPricingId,
                 IdentUserId = myobject.IdentUserId,
                 City = myobject.CityId == null ? null : myobject.CityId.ToString(),
                 Country = myobject.CountryId == null ? null : myobject.CountryId.ToString(),
@@ -634,13 +641,33 @@ namespace TuristRegistar.Controllers
                 CheckOut = checkout,
                 CheckInString = checkin == DateTime.MinValue ? "" : checkin.Year + "-"+checkin.Month+"-"+checkin.Day,
                 CheckOutString = checkout == DateTime.MinValue ? "" : checkout.Year+"-"+checkout.Month+"-"+checkout.Day,
-                Occupancy = occupancy,
+                SelectedOccupancy = occupancy,
                 MinOccupancy = myobject.StandardPricingModel == null ? (myobject.OccupancyBasedPricing != null && myobject.OccupancyBasedPricing.MinOccupancy != null ? (int)myobject.OccupancyBasedPricing.MinOccupancy : 1) : (myobject.StandardPricingModel.MinOccupancy != null ? (int)myobject.StandardPricingModel.MinOccupancy : 1),
                 MaxOccupancy = myobject.StandardPricingModel == null ? (myobject.OccupancyBasedPricing != null && myobject.OccupancyBasedPricing.MaxOccupancy != null ? (int)myobject.OccupancyBasedPricing.MaxOccupancy : 30) : (myobject.StandardPricingModel.MaxOccupancy != null ? (int)myobject.StandardPricingModel.MaxOccupancy : 30),
                 MinDaysOffer = myobject.StandardPricingModel == null ? (myobject.OccupancyBasedPricing != null && myobject.OccupancyBasedPricing.MinDaysOffer != null ? (int)myobject.OccupancyBasedPricing.MinDaysOffer : 1) : (myobject.StandardPricingModel.MinDaysOffer != null ? (int)myobject.StandardPricingModel.MinDaysOffer : 1),
                 MaxDaysOffer = myobject.StandardPricingModel == null ? (myobject.OccupancyBasedPricing != null && myobject.OccupancyBasedPricing.MaxDaysOffer != null ? (int)myobject.OccupancyBasedPricing.MaxDaysOffer : 355) : (myobject.StandardPricingModel.MaxDaysOffer != null ? (int)myobject.StandardPricingModel.MaxDaysOffer : 355),
                 UnavailablePeriods = myobject.UnavailablePeriods,
+                NumberOfRatings = _touristObject.GetNumberOfRatings(myobject.Id),
+                Rating = Math.Round(_touristObject.GetAvarageRating(myobject.Id), 2),
+                CreatorIdentUserId = myobject.IdentUserId,
             };
+            Users myuser = _user.GetUserFromIdentUser(myobject.IdentUserId);
+            model.CreatorId = myuser.Id;
+            model.CreatorName = myuser.Name + " " + myuser.LastName;
+
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                var bookmarks = _user.GetAllUserBookmarksId(user.Id).ToList();
+                model.IsBookmark = bookmarks.Contains(model.Id) ? true : false;
+            }
+
+
+            model.Occupancy = Enumerable.Range(model.MinOccupancy, model.MaxOccupancy).Select(item => new SelectListItem()
+            { Text = item.ToString(), Value = item.ToString(),
+                Selected = item == occupancy ? true: false,
+            });
             model.UnavailablePeriodsModel = new List<DateTime>();
             foreach (var item in model.UnavailablePeriods)
             {
@@ -650,22 +677,83 @@ namespace TuristRegistar.Controllers
                 }
             }
 
-            if (model.Occupancy != 0 && model.CheckIn != DateTime.MinValue && model.CheckOut != DateTime.MinValue)
+            if (occupancy != 0 && model.CheckIn != DateTime.MinValue && model.CheckOut != DateTime.MinValue)
             {
                 if (model.StandardPricingModel != null)
-                    model.Price = await _touristObject.GetPriceForStandardModel(model.Occupancy, currency, model.CheckIn, model.CheckOut, model.StandardPricingModel);
+                    model.Price = await _touristObject.GetPriceForStandardModel(occupancy, currency, model.CheckIn, model.CheckOut, model.StandardPricingModel);
                 else if (model.OccupancyBasedPricing != null)
-                    model.Price = await _touristObject.GetPriceForOccupancyBasedModel(model.Occupancy, currency, model.CheckIn, model.CheckOut, model.OccupancyBasedPricing);
+                    model.Price = await _touristObject.GetPriceForOccupancyBasedModel(occupancy, currency, model.CheckIn, model.CheckOut, model.OccupancyBasedPricing);
             }
 
+            model.CurrPage = 1;
+            model.Pager = new Pager(_touristObject.CountRatingsAndReviews(model.Id), 1);
+            model.Reviews = _touristObject.GetRatingsAndReviews(1, model.Pager.PageSize, model.Id)
+                .Select(rr => new Review() {
+                    Id = rr.Id,
+                    Rating = rr.Rating,
+                    Text = rr.Review,
+                    User = rr.User,
+                }).ToList();
+
             return View(model);
+        }
+
+        [Authorize]
+        public IActionResult AddReview(ObjectDetailsViewModel model)
+        {
+           // var user = await _userManager.GetUserAsync(User);
+            var identUserId = _userManager.GetUserId(this.User);
+            var currentUser = _user.GetUserFromIdentUser(identUserId);
+
+            var ratingAndReview = new RatingsAndReviews()
+            {
+                Rating = model.Review.Rating,
+                Review = model.Review.Text,
+                User = currentUser,
+                ObjectId = model.Id,
+            };
+
+            _touristObject.AddRatingAndReview(ratingAndReview);
+
+            //this will be first page
+            var ratingsAndReviews = _touristObject.GetRatingsAndReviews(1,5,model.Id);
+
+            var ratingsAndReviwsModel = ratingsAndReviews.Select(rr => new Review()
+            {
+                Id = rr.Id,
+                Text = rr.Review,
+                Rating = rr.Rating,
+                UserId = rr.UserId,
+                User = rr.User
+            }).ToList();
+
+           // TempData["Notification"] = "Uspješno ste dodali utisak i ocjenu.";
+            return Ok(ratingsAndReviwsModel);
+        }
+
+        public IActionResult ChangeReviewsPage(ObjectDetailsViewModel model)
+        {
+            model.Pager = new Pager(_touristObject.CountRatingsAndReviews(model.Id), model.CurrPage);
+            if (model.CurrPage == 0)
+                model.Pager.CurrentPage = 1; 
+
+            model.Reviews = _touristObject.GetRatingsAndReviews(model.Pager.CurrentPage, model.Pager.PageSize, model.Id)
+                .Select(rr => new Review()
+                {
+                    Id = rr.Id,
+                    Rating = rr.Rating,
+                    Text = rr.Review,
+                    User = rr.User,
+                }).ToList();
+
+            return PartialView("_Reviews", model);
         }
 
         public async Task<IActionResult> FindPrice(ObjectDetailsViewModel model)
         {
             model.CheckIn = model.CheckInString == null ? DateTime.MinValue : DateTime.Parse(model.CheckInString);
             model.CheckOut = model.CheckOutString == null ? DateTime.MinValue : DateTime.Parse(model.CheckOutString);
-            if (!(model.CheckIn != DateTime.MinValue && model.CheckIn != DateTime.MinValue && model.Occupancy > 0))
+            if (!(model.CheckIn != DateTime.MinValue && model.CheckIn != DateTime.MinValue && model.SelectedOccupancy > 0))
             {
                 ViewData["Error-Notification"] = "Unesite ispravne podatke";
                 //da li radi?
@@ -674,10 +762,14 @@ namespace TuristRegistar.Controllers
             var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
             if (model.OccupancyPricing == false)
             {
-                model.Price = await _touristObject.GetPriceForStandardModel(model.Occupancy, currency, model.CheckIn, model.CheckOut, model.StandardPricingModel);
+                model.StandardPricingModel = _touristObject.GetStandardPricingModelWithId((int)model.StandardPricingModelId);
+                model.Price = await _touristObject.GetPriceForStandardModel(model.SelectedOccupancy, currency, model.CheckIn, model.CheckOut, model.StandardPricingModel);
             }
             else if (model.OccupancyPricing == true)
-                model.Price = await _touristObject.GetPriceForOccupancyBasedModel(model.Occupancy, currency, model.CheckIn, model.CheckOut, model.OccupancyBasedPricing);
+            {
+                model.OccupancyBasedPricing = _touristObject.GetOccupancyBasedPricingWithId((int)model.OccupancyBasedPricingId);
+                model.Price = await _touristObject.GetPriceForOccupancyBasedModel(model.SelectedOccupancy, currency, model.CheckIn, model.CheckOut, model.OccupancyBasedPricing);
+            }
 
             return PartialView("_PricePartial", model);
         }

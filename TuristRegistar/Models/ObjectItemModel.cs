@@ -28,5 +28,7 @@ namespace TuristRegistar.Models
         public int Occupancy { get; set; }
         public String CheckIn { get; set; }
         public String CheckOut { get; set; }
+
+        public bool IsBookmark { get; set; }
     }
 }

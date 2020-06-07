@@ -31,13 +31,12 @@
 
 <!--Osnovno-->
 @*<div class="tab-pane fade show active" id="nav-basic" role="tabpanel" aria-labelledby="nav-basic-tab">*@
-<form id="formDetails">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="OccupancyPricing" />
-    <br />
-    <div class="row bg-white rounded-lg shadow-sm p-5">
-        @*mapa*@
-        <div class="col-md-4 order-md-2 mb-4">
+
+<br />
+<div class="row bg-white rounded-lg shadow-sm p-5">
+
+    @*mapa*@
+    @*<div class="col-md-4 order-md-2 mb-4">
             <h4 class="d-flex justify-content-between align-items-center mb-3">
                 <span class="text-muted">Mapa</span>
             </h4>
@@ -55,20 +54,34 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-8 order-md-1">
+        </div>*@
+    <div class="col-md-8 order-md-1">
+        <form id="formDetails">
+            <input type="hidden" asp-for="Id" />
+            <input asp-for="@Model.IdentUserId" id="ident-user-id" type="hidden" />
+            <input type="hidden" asp-for="OccupancyPricing" />
             <div class="mb-3">
-                <div class="row">
-                    <h2>@Model.Name</h2>
+                <div class="row ">
+                    <h2 class="text-capitalize">
+                        @Model.Name
+                        <br /><a href="#" class="" style="font-size:20px;">@Model.CreatorName</a>
+                    </h2>
+                    <h4 class="ml-auto">
+
+                        <span class="float-right">
+                            <span class="text-warning"><i class="fas fa-star"></i>&nbsp;@Model.Rating</span>
+                            <br />
+                            <span class="text-muted" style="font-size:14px;">broj ocjena: @Model.NumberOfRatings</span>
+                        </span>
+                    </h4>
+
                 </div>
                 @if (!string.IsNullOrWhiteSpace(Model.ObjectType))
                 {
-                    <span class="btn-sm bg-danger text-white" style="margin-top:8px!important;">
+                    <span class="btn-sm bg-danger text-white" style="margin-top:8px!important;word-wrap: break-word;">
                         @Model.ObjectType
                     </span>
                 }
-                @*<label asp-for="Name"></label>
-                    <input id="oj" type="text" class="form-control" asp-for="Name" disabled>*@
             </div>
             <hr />
             @if (!string.IsNullOrWhiteSpace(Model.Description))
@@ -79,50 +92,36 @@
                 <hr />
             }
 
-            <div id="obj-container">
-                <partial name="_PricePartial" for="@Model" />
-            </div>
-            @*<div class="row">
-                    <div class="col-md-4">
-                        <label asp-for="CheckIn" class="text-muted">Dolazak</label>
-                        <input id="datepicker1" class="datepicker" width="276" asp-for="CheckInString" onkeydown="return false" />
-                    </div>
-                    <div class="col-md-4 float-right">
-                        <label asp-for="CheckOut" class="text-muted"></label>
-                        <input id="datepicker2" class="datepicker" width="276" asp-for="CheckOutString" onkeydown="return false" />
-                    </div>
-                    <div class="col-md-3 float-right">
-                        &nbsp;&nbsp;<label asp-for="Occupancy" class="text-muted"></label>
-                        <div class="m-auto input-group col-sm-12">
-                            @if (Model.Occupancy == 0)
-                            {
-                                <input asp-for="Occupancy" id="occupancy" class="form-control" type="number" min="1" max="30" value="" onkeydown="return false" />
-                            }
-                            else
-                            {
-                                <input asp-for="Occupancy" id="occupancy" class="form-control" type="number" min="1" max="30" onkeydown="return false" />
-                            }
-                            <div class="input-group-append">
-                                <span class="input-group-text text-muted">
-                                    <i class="fas fa-users"></i>
-                                </span>
-                            </div>
+            <input type="hidden" asp-for="StandardPricingModelId" />
+            <input type="hidden" asp-for="OccupancyBasedPricingId" />
+            <div class="row">
+                <div class="col-md-4">
+                    <label asp-for="CheckIn" class="text-muted">Dolazak</label>
+                    <input id="datepicker1" class="datepicker" width="276" asp-for="CheckInString" onkeydown="return false" />
+                </div>
+                <div class="col-md-4 float-right">
+                    <label asp-for="CheckOut" class="text-muted"></label>
+                    <input id="datepicker2" class="datepicker" width="276" asp-for="CheckOutString" onkeydown="return false" />
+                </div>
+                <div class="col-md-3 float-right">
+                    &nbsp;&nbsp;&nbsp;<label asp-for="Occupancy" class="text-muted"></label>
+                    <div class="m-auto input-group col-sm-12">
+                        <select class="custom-select" asp-for="SelectedOccupancy" asp-items="@Model.Occupancy"></select>
+                        <div class="input-group-append">
+                            <span class="input-group-text text-muted">
+                                <i class="fas fa-users"></i>
+                            </span>
                         </div>
                     </div>
-                    <div class="col-md-1 col-sm-12"><br /><a class="btn btn-primary text-white pointer" style="margin-top:0.5rem;"><i class="fas fa-search"></i></a></div>
                 </div>
-                <br />
-                <div class="col-sm-12">
-                    @if (Model.Occupancy == 0)
-                    {
-                        <h5 class="text-success">Cijena:  - @mycurrency</h5>
-                    }
-                    else
-                    {
-                        <h5 class="text-success">Cijena:  @Model.Price @mycurrency</h5>
-                    }
-                </div>
-                <hr />*@
+                <div class="col-md-1 col-sm-12"><br /><a class="btn btn-primary text-white pointer" onclick="searchPrice()" style="margin-top:0.5rem;"><i class="fas fa-search"></i></a></div>
+            </div>
+            <span class="text-muted">Opseg broja dana za rezervaciju @Model.MinDaysOffer - @Model.MaxDaysOffer</span>
+            <br /><br />
+            <div class="col-sm-12" id="obj-container">
+                <partial name="_PricePartial" for="@Model" />
+            </div>
+            <hr />
             <div class="mb-3">
                 <label asp-for="Location"></label>
                 <div class="input-group">
@@ -209,14 +208,143 @@
                     </table>
                 </div>
             }
-        </div>
+        </form>
+
     </div>
-</form>
+
+
+    @*mapa*@
+    <div class="col-md-4 order-md-2 mb-4">
+        @if (Model.IsBookmark)
+        {
+            <i data-toggle="tooltip" title="Ukloni iz zabilješki" class="fas fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@Model.Id"></i>
+        }
+        else
+        {
+            <i data-toggle="tooltip" title="Sačuvaj" class="far fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@Model.Id"></i>
+        }
+        @*<span class="float-right">*@
+        @*<h4>
+            <span class="text-warning"><i class="fas fa-star"></i>&nbsp;@Model.Rating</span>
+            <br />
+            <span class="text-muted" style="font-size:14px;">broj ocjena: @Model.NumberOfRatings</span>
+        </h4>*@
+        @*</span>*@
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted">Mapa</span>
+        </h4>
+        <div id="map" class="mb-3" style="height:300px"></div>
+        <hr />
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Lat"></label>
+                <input class="form-control myinput" asp-for="Lat" id="latitude-value" disabled>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="Lng"></label>
+                <div class="input-group">
+                    <input asp-for="Lng" class="form-control myinput" id="longitude-value" disabled>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <form id="reviewsForm">
+            <input asp-for="CurrPage" id="CurrPage" type="hidden" />
+            <input asp-for="Id" type="hidden" />
+            <div class="col-sm-12" id="reviews-container">
+                <partial name="_Reviews" for="@Model" />
+            </div>
+        </form>
+    </div>
+</div>
+@*</form>*@
 @*</div>*@
 <!--./Osnovno-->
 
 
+<script>
+    function AddReview() {
+        //  alert($('#formIndex').serialize
+        $.ajax({
+            type: 'GET',
+            url: "/Object/AddReview",
+            data: $('#reviewsForm').serialize(),
+            dataType: 'html',
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                // $('#rat-rew-container').empty();
+                alert("Uspješno ste dodali utisak i ocjenu.");
 
+                $('#review-textarea').val('');
+                $('#ocjena').val('');
+                resetColor();
+                goToFirst();
+                //console.log(response);
+                //myObjects = JSON.parse(response);
+                //console.log(myObjects);
+
+                //myObjects.forEach(function (data) {
+                //    console.log("dataa: " + data.text + data.rating + data.user.name + " " + data.user.lastName)
+
+                //});
+
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+</script>
+
+@*@*Ovo mora ovdje jer pristupa modelu...*@
+<script>
+    function resetPager() {
+                document.getElementById("CurrPage").value = 0;
+    }
+    function goToNext() {
+        document.getElementById("CurrPage").value = @Model.Pager.CurrentPage+1;
+        ChangePage();
+        //document.getElementById("formIndex").submit();
+    }
+    function goToPrevious() {
+        document.getElementById("CurrPage").value = @Model.Pager.CurrentPage-1;
+        ChangePage();
+        //document.getElementById("formIndex").submit();
+    }
+    function goToFirst() {
+        document.getElementById("CurrPage").value = 1;
+        ChangePage();
+        //document.getElementById("formIndex").submit();
+    }
+    function goToLast() {
+        document.getElementById("CurrPage").value = @Model.Pager.TotalPages;
+        ChangePage();
+
+        //document.getElementById("formIndex").submit();
+    }
+    function goToPage(pagee) {
+        document.getElementById("CurrPage").value = pagee;
+        ChangePage();
+        //document.getElementById("formIndex").submit();
+    }
+
+
+    function ChangePage() {
+        $.ajax({
+            type: 'GET',
+            url: "/Object/ChangeReviewsPage",
+            data: $('#reviewsForm').serialize(),
+            dataType: 'html', // modify
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                $('#reviews-container').html(response);
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+</script>
 
 <script src="~/js/Navbarcolor.js"></script>
 
@@ -235,18 +363,18 @@
 </script>
 <script>
     function searchPrice() {
-        //if ($('#datepicker2').val() === '' && $('#datepicker1').val() === '')
-        //    alert('Unesite datume za dolzak i odlazak!');
-        //else if ($('#datepicker2').val() === '' && $('#datepicker1').val() !== '')
-        //    alert('Unesite datum za odlazak!');
-        //else if ($('#datepicker2').val() !== '' && $('#datepicker1').val() === '')
-        //    alert('Unesite datum za dolazak!');
-        //else if ($('#occupancy').val() === '')
-        //    alert('Unesite broj osoba!');
-        //else if ($('#occupancy').val() !== '' && +($('#occupancy').val()) <= 0)
-        //    alert('Unesite ispravan broj osoba!');
-        //else
-        findPrice();
+        if ($('#datepicker2').val() === '' && $('#datepicker1').val() === '')
+            alert('Unesite datume za dolzak i odlazak!');
+        else if ($('#datepicker2').val() === '' && $('#datepicker1').val() !== '')
+            alert('Unesite datum za odlazak!');
+        else if ($('#datepicker2').val() !== '' && $('#datepicker1').val() === '')
+            alert('Unesite datum za dolazak!');
+        else if ($('#occupancy').val() === '')
+            alert('Unesite broj osoba!');
+        else if ($('#occupancy').val() !== '' && +($('#occupancy').val()) <= 0)
+            alert('Unesite ispravan broj osoba!');
+        else
+            findPrice();
     }
 
     function findPrice() {
@@ -269,10 +397,11 @@
 <script>
     var unavailableperiodsJSON = '@Html.Raw(JsonConvert.SerializeObject(Model.UnavailablePeriodsModel.ToArray()))';
     var unavailableperiods = JSON.parse(unavailableperiodsJSON);
+    var minDaysOffer = @Model.MinDaysOffer;
+    var maxDaysOffer = @Model.MaxDaysOffer;
 
     var $DPicker1 = $('#datepicker1');
     var $DPicker2 = $('#datepicker2');
-    console.log(unavailableperiods);
 
     $DPicker1.datepicker({
         uiLibrary: 'bootstrap4',
@@ -288,7 +417,7 @@
     $DPicker2.datepicker({
         uiLibrary: 'bootstrap4',
         format: 'yyyy-mm-dd',
-        minDate: new Date(new Date() + (24 * 60 * 60 * 1000)),
+        minDate: new Date(),
         disableDates: unavailableperiods,
         change: function (e) {
             RecreateDatePicker1();
@@ -297,20 +426,32 @@
 
     function RecreateDatePicker1() {
         var unavailableperiodsJSON = '@Html.Raw(JsonConvert.SerializeObject(Model.UnavailablePeriodsModel.ToArray()))';
-    var unavailableperiods = JSON.parse(unavailableperiodsJSON);
-        console.log(unavailableperiods);
+        var unavailableperiods = JSON.parse(unavailableperiodsJSON);
+        var minDaysOffer = @Model.MinDaysOffer;
+        var maxDaysOffer = @Model.MaxDaysOffer;
+
+
         var checkout = $('#datepicker2').val();
         var maxDate = new Date(new Date(checkout) - (24 * 60 * 60 * 1000));
+        var mindate = new Date(new Date() - (24 * 60 * 60 * 1000));
+        if (checkout) {
+            maxDate = new Date(new Date(checkout) - minDaysOffer * (24 * 60 * 60 * 1000));
+            mindate = new Date(new Date(checkout) - maxDaysOffer * (24 * 60 * 60 * 1000));
+
+            if (mindate < new Date(new Date() - (24 * 60 * 60 * 1000))) {
+                mindate = new Date(new Date() - (24 * 60 * 60 * 1000));
+            }
+        }
         var currentcheckin = $('#datepicker1').val();
         //if (checkout && currentcheckin)
         //    $('#period-btn').prop('disabled', false);
-
         $DPicker1.destroy();
         $DPicker1.datepicker({
             uiLibrary: 'bootstrap4',
             format: 'yyyy-mm-dd',
             value: currentcheckin,
-            minDate: new Date(),
+            //minDate: new Date(new Date() - (24 * 60 * 60 * 1000)),
+            minDate: mindate,
             maxDate: maxDate,
             disableDates: unavailableperiods,
             change: function (e) {
@@ -322,12 +463,17 @@
     function RecreateDatePicker2() {
         var unavailableperiodsJSON = '@Html.Raw(JsonConvert.SerializeObject(Model.UnavailablePeriodsModel.ToArray()))';
         var unavailableperiods = JSON.parse(unavailableperiodsJSON);
+        var minDaysOffer = @Model.MinDaysOffer;
+        var maxDaysOffer = @Model.MaxDaysOffer;
 
         var checkin = $('#datepicker1').val();
         var mindate = new Date();
-        if (checkin)
-            mindate = new Date(new Date(checkin) + (24 * 60 * 60 * 1000));
+        var maxdate = new Date(new Date(checkin).getTime() + (24 * 60 * 60 * 1000));
 
+        if (checkin) {
+            mindate = new Date((new Date(checkin)).getTime() + (minDaysOffer-1) * (24 * 60 * 60 * 1000));
+            maxdate = new Date((new Date(checkin)).getTime() + (maxDaysOffer-1) * (24 * 60 * 60 * 1000));
+        }
         var currentcheckout = $('#datepicker2').val();
         //if (checkin && currentcheckout)
         //    $('#period-btn').prop('disabled', false);
@@ -338,6 +484,7 @@
             format: 'yyyy-mm-dd',
             value: currentcheckout,
             minDate: mindate,
+            maxDate: maxdate,
             disableDates: unavailableperiods,
             change: function (e) {
                 RecreateDatePicker1();
@@ -346,9 +493,65 @@
     }
 </script>
 
+@*za bookmarke*@
+<script>
+    function changecolor(el) {
+        if ($(el).hasClass('far')) {
+            $(el).removeClass('far');
+            $(el).addClass('fas');
+        }
+        else {
+            $(el).removeClass('fas');
+            $(el).addClass('far');
+        }
+    }
+
+    function addRemoveBookmark(el) {
+        var data = { 'objectId': $(el).attr('obj-id'), 'identUserId': ($('#ident-user-id')).val() };
+        if ($(el).hasClass('far')) {
+            $.ajax({
+                url: "/Auth/RemoveBookmark",
+                data: data,
+                type: "POST",
+                /// dataType: 'JSON',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (response) {
+                    $(el).removeClass('far');
+                    $(el).addClass('fas');
+                    //  $('#obj-container').html(response);
+                },
+                error: function () {
+                    alert('Greška prilikom pribavljanja podataka.');
+                }
+            });
+        }
+
+        else {
+
+            $.ajax({
+                // type: 'GET',
+                url: "/Auth/AddBookmark",
+                data: data,
+                type: "POST",
+                /// dataType: 'JSON',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (response) {
+                    $(el).removeClass('fas');
+                    $(el).addClass('far');
+                    //  $('#obj-container').html(response);
+                },
+                error: function () {
+                    alert('Greška prilikom pribavljanja podataka.');
+                }
+            });
+        }
+    }
+</script>
+
 <script src="~/js/editgallery.js"></script>
 <script src="~/js/editattributesscript.js"></script>
 <script src="~/js/ClienSideInputValidation.js"></script>
 @*<script src="~/js/editdatepicker.js"></script>*@
-<script src="~/js/mapa.js"></script>
+@*<script src="~/js/mapa.js"></script>*@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>
+<script src="~/js/mapdetails.js"></script>

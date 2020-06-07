@@ -147,7 +147,7 @@
                     <a href="#" class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-2x text-white"></i></a>
                     <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink" style="right:5%;left:auto">
-                        <a asp-controller="Auth" asp-action="Signout" class="dropdown-item">Moj nalog</a>
+                        <a asp-controller="Auth" asp-action="UserAccount" class="dropdown-item">Moj nalog</a>
                         <a asp-controller="Auth" asp-action="Settings" class="dropdown-item">Podešavanja&nbsp;&nbsp;<i class="fas fa-user-cog pull-right"></i></a>
                         <a asp-controller="Auth" asp-action="Signout" class="dropdown-item">Odjava&nbsp;&nbsp;<i class="fas fa-sign-out-alt pull-right"></i></a>
                     </div>
@@ -156,7 +156,7 @@
             }
             else
             {
-                <a asp-controller="Auth" asp-action="Login"> <i class="fas fa-user-circle fa-2x text-white"></i></a>
+                <a asp-controller="Auth" asp-action="Login" data-toggle="tooltip" title="Prijava"> <i class="fas fa-user-circle fa-2x text-white"></i></a>
             }
             @*</div>*@
         </div>
