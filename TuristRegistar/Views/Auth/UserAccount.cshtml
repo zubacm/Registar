@@ -18,8 +18,6 @@
 @*<div class="d-none d-sm-block"><br /><br /><br /><br /></div>*@
 
 
-
-
 <!-- Tabs -->
 <section id="tabs">
     <div class="container">
@@ -45,7 +43,6 @@
 <!-- ./Tabs -->
 <script src="~/js/Navbarcolor.js"></script>
 <script>
-
     $.get('@Url.Action("_UserObjects", "Auth")', function (content) {
         $("#nav-userobjects").html(content);
     });

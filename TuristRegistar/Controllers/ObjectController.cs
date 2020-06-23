@@ -202,6 +202,8 @@ namespace TuristRegistar.Controllers
         [Route("editobject")] // /editobject
         public async Task<IActionResult> EditObject(int id)
         {
+            //if user admin or owns object
+            //Napravit servis da li korisik owns object
             var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
             var myobject = await _touristObject.GetObject(id, currency);
 
@@ -397,7 +399,7 @@ namespace TuristRegistar.Controllers
             return model;
         }
 
-
+        //Bili su u temp folderu i na save se sačuvavaju 
         public List<ObjectImages> CopyFiles(string sourcePath, string destinationPath)
         {
             var imgs = new List<ObjectImages>();
@@ -452,15 +454,19 @@ namespace TuristRegistar.Controllers
             }
         }
 
+        [Authorize]
         public IActionResult DeletePeriod(EditObjectViewModel model)
         {
+            //Admin ili owner
             _touristObject.DeletePeriod(model.DeletePeriodId);
 
             return Ok();
         }
 
+        [Authorize]
         public IActionResult AddPeriod(EditObjectViewModel model)
         {
+            //admin ili owner
             if (!string.IsNullOrWhiteSpace(model.UnavailablePeriodsString))
                 model.UnavailablePeriods = (_touristObject.ParseDates(model.UnavailablePeriodsString))
                     .Select(item => new UnavailablePeriods() { From = item.Key, To = item.Value }).ToList();
@@ -471,6 +477,7 @@ namespace TuristRegistar.Controllers
 
 
         [HttpPost]
+        [Authorize]//admin ili owner
         public IActionResult EditOccupancyBased(EditObjectViewModel model)
         {
             model.OccupancyPricing = true;
@@ -503,6 +510,7 @@ namespace TuristRegistar.Controllers
             //return RedirectToAction("Index", "Object");
         }
 
+        [Authorize]//admin ili owner ili jednostavno stavit httppost
         public IActionResult EditStandardModel(EditObjectViewModel model)
         {
             model.OccupancyPricing = false;
@@ -530,12 +538,14 @@ namespace TuristRegistar.Controllers
             return null;
         }
 
+        [Authorize]//isto
         public IActionResult DeleteObjectHasAttribute(EditObjectViewModel model)
         {
             _touristObject.DeleteObjectHasAttributes(model.Id, model.DeleteAttributeId);
             return Ok();
         }
 
+        [Authorize]
         public IActionResult AddObjectHasAttribute(EditObjectViewModel model)
         {
             var objHasAttribute = new ObjectHasAttributes()
@@ -547,6 +557,7 @@ namespace TuristRegistar.Controllers
             return Ok();
         }
 
+        [Authorize]//Isto
         public IActionResult AddCntAttribute(EditObjectViewModel model)
         {
             var cntObjAttribute = new CntObjAttributesCount()
@@ -558,12 +569,14 @@ namespace TuristRegistar.Controllers
             _touristObject.AddCntAttributeCount(cntObjAttribute);
             return Ok();
         }
+        [Authorize]//isto
         public IActionResult DeleteCntAttribute(EditObjectViewModel model)
         {
             _touristObject.DeleteCntAttributeCount(model.Id, model.DeleteCntAttributeId);
             return Ok();
         }
 
+        [Authorize]//isto
         public IActionResult AddSpecialOffer(EditObjectViewModel model)
         {
             var specialoffer = new SpecialOffersPrices()
@@ -575,12 +588,14 @@ namespace TuristRegistar.Controllers
             _touristObject.AddSpecialOffer(specialoffer);
             return Ok();
         }
+        [Authorize]//isto
         public IActionResult DeleteSpecialOffer(EditObjectViewModel model)
         {
             _touristObject.DeleteSpecialOffer(model.Id, model.DeleteSpecialOfferId);
             return Ok();
         }
 
+        [Authorize]//isto
         public IActionResult EditObjectBasic(EditObjectViewModel model)
         {
             Objects myobject = new Objects()
@@ -774,6 +789,12 @@ namespace TuristRegistar.Controllers
             return PartialView("_PricePartial", model);
         }
 
+        [Authorize(Roles = "ADMIN")]
+        public IActionResult RemoveReview(int id)
+        {
+            _touristObject.DeleteReview(id);
+            return Ok();
+        }
         //još delete
 
     }

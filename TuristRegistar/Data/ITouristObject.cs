@@ -65,5 +65,7 @@ namespace TuristRegistar.Data
         void AddRatingAndReview(RatingsAndReviews ratingAndReview);
         Coordinates GetCityCoordinates(String search);
         Coordinates GetCountryCoordinates(String search);
+        void DeleteReview(int id);
+        void DeleteObjectAndRelatedColumns(int objectId);
     }
 }

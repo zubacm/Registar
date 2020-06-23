@@ -18,10 +18,10 @@
                 physical_cls = "active";
             }
             <li class="nav-item">
-                <a class="nav-link @legal_cls sub-tabs-clr" id="legal-tab" data-toggle="tab" href="#legal" role="tab" aria-controls="legal" aria-selected="true">Poslovno lice</a>
+                <a style="background-color:transparent" class="nav-link @legal_cls sub-tabs-clr" id="legal-tab" data-toggle="tab" href="#legal" role="tab" aria-controls="legal" aria-selected="true">Poslovno lice</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link @physical_cls sub-tabs-clr" id="physical-tab" data-toggle="tab" href="#physical" role="tab" aria-controls="physical" aria-selected="false">Fizičko lice</a>
+                <a style="background-color:transparent" class="nav-link @physical_cls sub-tabs-clr" id="physical-tab" data-toggle="tab" href="#physical" role="tab" aria-controls="physical" aria-selected="false">Fizičko lice</a>
             </li>
         </ul>
     </div>
@@ -32,6 +32,7 @@
                 <input type="hidden" asp-for="KorisnikId" />
                 <input type="hidden" asp-for="Username" />
                 <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="AdminAction"/>
                         <br />
                         <div class="form-group">
                             <input asp-for="Name" type="text" class="form-control myinput" placeholder="Naziv *" required/>
@@ -60,6 +61,7 @@
                 <input type="hidden" asp-for="KorisnikId" />
                 <input type="hidden" asp-for="Username" />
                 <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="AdminAction" />
                 <br />
                 <div class="form-group">
                     <input asp-for="Name" type="text" class="form-control myinput" placeholder="Ime *" required />

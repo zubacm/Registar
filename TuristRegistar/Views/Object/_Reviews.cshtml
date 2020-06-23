@@ -1,23 +1,26 @@
 ﻿@model ObjectDetailsViewModel
 
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 
 <div class="card">
-        <input asp-for="Review.Rating" type="hidden" id="ocjena" />
-        <div class="card-header">
-            <div class="row">
-                <i class="far fa-star fa-lg pointer" style="color:black;" id="rating1" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
-                <i class="far fa-star fa-lg pointer" style="color:black;" id="rating2" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
-                <i class="far fa-star fa-lg pointer" style="color:black;" id="rating3" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
-                <i class="far fa-star fa-lg pointer" style="color:black;" id="rating4" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
-                <i class="far fa-star fa-lg pointer" style="color:black;" id="rating5" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
-            </div>
+    <input asp-for="Review.Rating" type="hidden" id="ocjena" />
+    <div class="card-header">
+        <div class="row">
+            <i class="far fa-star fa-lg pointer" style="color:black;" id="rating1" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
+            <i class="far fa-star fa-lg pointer" style="color:black;" id="rating2" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
+            <i class="far fa-star fa-lg pointer" style="color:black;" id="rating3" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
+            <i class="far fa-star fa-lg pointer" style="color:black;" id="rating4" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
+            <i class="far fa-star fa-lg pointer" style="color:black;" id="rating5" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
         </div>
-        <div class="card-body">
-            <textarea asp-for="Review.Text" id="review-textarea" placeholder="Vaš utisak..." class="form-control" style="font-size:15px; margin-bottom:7px"></textarea>
-            @*<br />*@
-            <a class="pointer text-white btn btn-primary float-right" onclick="AddReview()">Dodaj utisak</a>
-            <br />
-        </div>
+    </div>
+    <div class="card-body">
+        <textarea asp-for="Review.Text" id="review-textarea" placeholder="Vaš utisak..." class="form-control" style="font-size:15px; margin-bottom:7px"></textarea>
+        @*<br />*@
+        <a class="pointer text-white btn btn-primary float-right" onclick="AddReview()">Dodaj utisak</a>
+        <br />
+    </div>
 </div>
 <div id="rat-rew-container">
 
@@ -37,9 +40,23 @@
                     </span>
                 </h6>
                 @*@item.User.Name+" "@item.User.LastName
-                    @item.Rating*@
+        @item.Rating*@
                 @item.Text
-            </div>
+
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    
+                        var user = await UserManager.FindByIdAsync(UserManager.GetUserId(User));
+                        var roles = await UserManager.GetRolesAsync(user);
+                    
+                    @if (roles.Contains("ADMIN"))
+                    {
+                        <div>
+                            <i class="fa fa-trash pointer fa-2x float-right" aria-hidden="true" review-id="@item.Id" onclick="RemoveReview(this)"></i>
+                        </div>
+                    }
+                  }
+                </div>
         </div>
     }
 }
@@ -87,7 +104,28 @@
 
 
 
-
+@*//za komentare*@
+<script>
+    function RemoveReview(el) {
+        var elem = $(el).parent().parent().parent();
+        var data = { 'id': $(el).attr('review-id') };
+        $.ajax({
+            url: "/Object/RemoveReview",
+            data: data,
+            type: "POST",
+            /// dataType: 'JSON',
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (response) {
+                alert("Napravi svoj alert");
+                elem.remove();
+                //  $('#obj-container').html(response);
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+</script>
 
 
 <script>

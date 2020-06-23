@@ -23,5 +23,7 @@ namespace TuristRegistar.Models
 
         [EmailAddress]
         public String Email { get; set; }
+
+        public bool AdminAction { get; set; }
     }
 }

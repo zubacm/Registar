@@ -1,0 +1,144 @@
+﻿@model AdministrationModel
+
+@if (Model.UsersList != null)
+{
+    <div class="col-md-12 table-responsive">
+        <table class="table table-bordered table-striped">
+            @foreach (var item in Model.UsersList)
+            {
+                <input type="hidden" asp-for="@item.IdentUserId" id="identuserid"/>
+                <input type="hidden" asp-for="@item.Id"/>
+                <tr>
+                    <td>
+                        <div class="text-primary font-weight-bolder">
+
+                            <h5 style="display:inline"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;@item.UserName</h5>
+                            &nbsp;&nbsp;<span class="text-muted">@item.TypeOfUser</span>
+                        </div>
+                        <h6>
+                            @item.Name<span>&nbsp;</span>@item.LastName
+                        </h6>
+
+                        <div class="d-none">
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    </div>
+                                    <input type="email" asp-for="@item.EmailAddress" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    </div>
+                                    <input type="text" asp-for="@item.PhoneContact" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-globe"></i></span>
+                                    </div>
+                                    <input type="text" asp-for="@item.ContactAddress" class="form-control" disabled>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </td>
+                    @*<td class="text-center"><strong>@item.RoleName</strong></td>*@
+                    <td class="text-center">
+                        <strong>
+                            <select class="custom-select d-block w-100" asp-for="@item.RoleId" asp-items="@item.Roles" id="role-select" onchange="ChangeUserRole(this)">
+                                <option disabled selected>Izaberite...</option>
+                            </select>
+                            <span asp-validation-for="@item.RoleId" class="text-danger"></span>
+                        </strong>
+                    </td>
+
+                    <td class="text-center pointer"><a asp-controller="Auth" asp-action="UserSettingsAdmin" asp-route-identUserId="@item.IdentUserId"><strong><i class="fas fa-edit text-dark fa-2x"></i></strong></a></td>
+                    <td class="text-center pointer"><strong class="text-primary" onclick="ShowMore(this)">više</strong></td>
+                </tr>
+
+            }
+            <caption>Korisnici</caption>
+
+        </table>
+    </div>
+}
+
+
+<br />
+<!-- Pager -->
+<div class="offset-sm-3 col-sm-9" id="pager">
+    @if (Model.Pager.EndPage > 1)
+    {
+        <ul class="pagination m-auto">
+            @if (Model.Pager.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a href="#" onclick="goToFirst()" class="page-link">&laquo;</a>
+                </li>
+                <li class="page-item">
+                    <a href="#" onclick="goToPrevious()" class="page-link">&lang;</a>
+                </li>
+            }
+
+            @for (var pagee = Model.Pager.StartPage; pagee <= Model.Pager.EndPage; pagee++)
+            {
+                <li class="@(pagee == Model.Pager.CurrentPage ? "active-page" : "") hidden-sm hidden-xs page-link">
+                    <a href="#" onclick="goToPage(@pagee)">@pagee</a>
+                </li>
+            }
+
+            @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+            {
+                <li class="page-item">
+                    <a href="#" onclick="goToNext()" class="page-link">&rang;</a>
+                </li>
+                <li class="page-item">
+                    <a href="#" onclick="goToLast()" class="page-link">&raquo;</a>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+<script>
+    function ShowMore(el) {
+        var parentelement = $(el).parent().parent().children()[0];
+        var myelement = $(parentelement).children()[2];
+        if ($(el).text() == "više") {
+            $(el).text('manje')
+            $(myelement).removeClass('d-none');
+            $(myelement).addClass('d-block');
+        }
+        else {
+            $(el).text('više')
+            $(myelement).removeClass('d-block');
+            $(myelement).addClass('d-none');
+        }
+
+    }
+
+    function ChangeUserRole(el) {
+        var data = { 'roleId': $(el).val(), 'identUserId': ($('#identuserid')).val() };
+
+            $.ajax({
+                url: "/Administration/ChangeUserRole",
+                data: data,
+                type: "POST",
+                /// dataType: 'JSON',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (response) {
+                    
+                },
+                error: function () {
+                    alert('Greška prilikom pribavljanja podataka.');
+                }
+        });
+    }
+    
+</script>

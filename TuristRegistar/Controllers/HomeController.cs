@@ -346,7 +346,7 @@ namespace TuristRegistar.Controllers
             return PartialView("ObjectsMap", model);
         }
 
-
+        [Authorize(Roles = "USER")]
         public IActionResult About()
         {
 

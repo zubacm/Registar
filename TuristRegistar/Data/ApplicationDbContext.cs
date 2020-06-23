@@ -61,8 +61,9 @@ namespace TuristRegistar.Data
             #region "Seed data"
 
             //modelBuilder.Entity<IdentityRole>().HasData(
-            //    new { Id = "1", Name="User", NormalizedName="USER"},
-            //    new { Id = "2", Name = "Admin", NormalizedName ="ADMIN"}
+            //    new { Id = "1", Name = "USER", NormalizedName = "USER" },
+            //    new { Id = "2", Name = "ADMIN", NormalizedName = "ADMIN" }
+            //    new { Id = "3", Name = "BANNED", NormalizedName = "BANNED" }
             //    );
             //modelBuilder.Entity<Countries>().HasData(
             //    new { Id = 1, Name = "Bosna i Hercegovina" },

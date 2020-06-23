@@ -1,0 +1,166 @@
+﻿@model AdministrationModel
+
+@{
+    ViewData["Title"] = "UsersList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
+@*<link href="~/css/regst.css" rel="stylesheet" />*@
+<link href="~/css/site.css" rel="stylesheet" />
+
+<script src="~/js/toast-show.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+<script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+<link href="~/css/gallery.css" rel="stylesheet" />
+<link href="~/css/sitestyles.css" rel="stylesheet" />
+<link href="~/css/checkbox.css" rel="stylesheet" />
+
+
+<br /><br />
+<form method="get" id="formIndex">
+    <div class="container">
+        <div class="row">
+            <br />
+            <!--Search and filters-->
+            <div class="col-sm-2"></div>
+            <div class="col-sm-4">
+                <!--Search-->
+                @*<div class="row">
+            <div class="col-sm-6">
+                <input class="form-control" asp-for="SearchString" placeholder="Pretraga" id="search-string" />
+                <span asp-validation-for="SearchString" class="text-danger"></span>
+            </div>
+            <div class="col-sm-2">
+                <a class="pointer btn btn-outline-secondary col-sm-12 text-white" onclick="SearchObjects()">
+                    <i class="fa fa-search text-dark" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>*@
+                @*<div class="input-group">
+            <input class="form-control" asp-for="SearchString" placeholder="Pretraga" id="search-string" />
+            <span asp-validation-for="SearchString" class="text-danger"></span>
+            <div class="input-group-prepend">
+                    <a class="pointer btn btn-outline-secondary col-sm-12 text-white" onclick="SearchObjects()">
+                        <i class="fa fa-search text-dark" aria-hidden="true"></i>
+                    </a>
+            </div>
+        </div>*@
+                <div class="md-form my-0">
+                    <input asp-for="SearchString" class="form-control mr-sm-2" type="text" placeholder="Pretraga" id="users-search" aria-label="Search">
+                </div>
+                <br />
+
+            </div>
+                <!--./Search-->
+                @*dodati na change asinhrono da se pretražuje*@
+                <div class="col-md-4 mb-3">
+                    <select class="custom-select d-block w-100" asp-for="SelectedRole" asp-items="@Model.Roles" onchange="FilterObjects()">
+                        <option disabled selected>Izaberite ulogu...</option>
+                    </select>
+                    <span asp-validation-for="SelectedRole" class="text-danger"></span>
+                </div>
+                <!--./Search and filters-->
+            </div>
+                <input asp-for="@Model.CurrPage" id="CurrPage" type="hidden" />
+
+                <div class="col-sm-12">
+                    <!--Objects-->
+                    <div class="container" id="obj-container">
+                        <partial name="_UsersListed" for="@Model" />
+                    </div>
+                    <!--./Objects-->
+                </div>
+
+            </div>
+
+
+            <!--./Pager-->
+        </div>
+
+</form>
+
+
+
+
+
+<script src="~/js/Navbarcolor.js"></script>
+
+@*Ovo mora ovdje jer pristupa modelu...*@
+<script>
+    function resetPager() {
+                document.getElementById("CurrPage").value = 0;
+    }
+    function goToNext() {
+        document.getElementById("CurrPage").value = @Model.Pager.CurrentPage+1;
+        ChangePage();
+        //document.getElementById("formIndex").submit();
+    }
+    function goToPrevious() {
+        document.getElementById("CurrPage").value = @Model.Pager.CurrentPage-1;
+        ChangePage();
+        //document.getElementById("formIndex").submit();
+    }
+    function goToFirst() {
+        document.getElementById("CurrPage").value = 1;
+        ChangePage();
+        //document.getElementById("formIndex").submit();
+    }
+    function goToLast() {
+        document.getElementById("CurrPage").value = @Model.Pager.TotalPages;
+        ChangePage();
+
+        //document.getElementById("formIndex").submit();
+    }
+    function goToPage(pagee) {
+        document.getElementById("CurrPage").value = pagee;
+        ChangePage();
+        //document.getElementById("formIndex").submit();
+    }
+</script>
+<script>
+                        function FilterObjects() {
+                            $(this).scrollTop(0);
+                            $.ajax({
+                                type: 'GET',
+                                url: "/Administration/FilterUsersList",
+                                data: $('#formIndex').serialize(),
+                                dataType: 'html',
+                                contentType: "application/json; charset=utf-8",
+                                success: function (response) {
+                                    $('#obj-container').html(response);
+                                },
+                                error: function () {
+                                    alert('Greška prilikom pribavljanja podataka.');
+                                }
+                            });
+                        }
+
+                        function ChangePage() {
+                            $.ajax({
+                                type: 'GET',
+                                url: "/Administration/ChangePageUsersList",
+                                data: $('#formIndex').serialize(),
+                                dataType: 'html', // modify
+                                contentType: "application/json; charset=utf-8",
+                                success: function (response) {
+                                    $('#obj-container').html(response);
+                                },
+                                error: function () {
+                                    alert('Greška prilikom pribavljanja podataka.');
+                                }
+                            });
+    }
+
+
+    $("#users-search").on('keyup', function (e) {
+        if (e.keyCode === 13) {
+            FilterObjects();
+        }
+    });
+</script>

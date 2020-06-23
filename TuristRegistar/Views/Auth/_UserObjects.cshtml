@@ -83,14 +83,14 @@
                                 @item.Type
                             </span>
                         }
-                        @if (item.IsBookmark)
+                        @*@if (item.IsBookmark)
                         {
                             <i data-toggle="tooltip" title="Ukloni iz zabilješki" class="fas fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@item.Id"></i>
                         }
                         else
                         {
                             <i data-toggle="tooltip" title="Sačuvaj" class="far fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@item.Id"></i>
-                        }
+                        }*@
                     </div>
 
                 </div>
@@ -204,55 +204,55 @@
         });
     }
 
-    function changecolor(el) {
-        if ($(el).hasClass('far')) {
-            $(el).removeClass('far');
-            $(el).addClass('fas');
-        }
-        else {
-            $(el).removeClass('fas');
-            $(el).addClass('far');
-        }
-    }
+    //function changecolor(el) {
+    //    if ($(el).hasClass('far')) {
+    //        $(el).removeClass('far');
+    //        $(el).addClass('fas');
+    //    }
+    //    else {
+    //        $(el).removeClass('fas');
+    //        $(el).addClass('far');
+    //    }
+    //}
 
-    function addRemoveBookmark(el) {
-        var data = { 'objectId': $(el).attr('obj-id'), 'identUserId': ($('#ident-user-id')).val() };
-        if ($(el).hasClass('far')) {
-            $.ajax({
-                url: "/Auth/RemoveBookmark",
-                data: data,
-                type: "POST",
-                /// dataType: 'JSON',
-                contentType: 'application/x-www-form-urlencoded',
-                success: function (response) {
-                    $(el).removeClass('far');
-                    $(el).addClass('fas');
-                    //  $('#obj-container').html(response);
-                },
-                error: function () {
-                    alert('Greška prilikom pribavljanja podataka.');
-                }
-            });
-        }
+    //function addRemoveBookmark(el) {
+    //    var data = { 'objectId': $(el).attr('obj-id'), 'identUserId': ($('#ident-user-id')).val() };
+    //    if ($(el).hasClass('far')) {
+    //        $.ajax({
+    //            url: "/Auth/RemoveBookmark",
+    //            data: data,
+    //            type: "POST",
+    //            /// dataType: 'JSON',
+    //            contentType: 'application/x-www-form-urlencoded',
+    //            success: function (response) {
+    //                $(el).removeClass('far');
+    //                $(el).addClass('fas');
+    //                //  $('#obj-container').html(response);
+    //            },
+    //            error: function () {
+    //                alert('Greška prilikom pribavljanja podataka.');
+    //            }
+    //        });
+    //    }
 
-        else {
+    //    else {
 
-            $.ajax({
-               // type: 'GET',
-                url: "/Auth/AddBookmark",
-                data: data,
-                type: "POST",
-               /// dataType: 'JSON',
-                contentType: 'application/x-www-form-urlencoded',
-                success: function (response) {
-                    $(el).removeClass('fas');
-                    $(el).addClass('far');
-                  //  $('#obj-container').html(response);
-                },
-                error: function () {
-                    alert('Greška prilikom pribavljanja podataka.');
-                }
-            });
-        }
-    }
+    //        $.ajax({
+    //           // type: 'GET',
+    //            url: "/Auth/AddBookmark",
+    //            data: data,
+    //            type: "POST",
+    //           /// dataType: 'JSON',
+    //            contentType: 'application/x-www-form-urlencoded',
+    //            success: function (response) {
+    //                $(el).removeClass('fas');
+    //                $(el).addClass('far');
+    //              //  $('#obj-container').html(response);
+    //            },
+    //            error: function () {
+    //                alert('Greška prilikom pribavljanja podataka.');
+    //            }
+    //        });
+    //    }
+    //}
 </script>

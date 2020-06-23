@@ -46,6 +46,7 @@ namespace TuristRegistar
             services.AddSingleton(Configuration);
             services.AddScoped<IUser, UserService>();
             services.AddScoped<ITouristObject, TouristObjectService>();
+            services.AddScoped<IUserAdministration, UserAdministrationService>();
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
@@ -61,7 +62,9 @@ namespace TuristRegistar
                     config.Password.RequireUppercase = false;
                     config.Password.RequireLowercase = false;
                 }
-                ).AddEntityFrameworkStores<ApplicationDbContext>()
+                ).AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
                  .AddDefaultTokenProviders();
 
             //services.AddAuthentication(option =>

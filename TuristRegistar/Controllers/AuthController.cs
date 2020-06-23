@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using TuristRegistar.Data;
@@ -24,16 +25,18 @@ namespace TuristRegistar.Controllers
         private readonly IConfiguration _configuration;
         private readonly IUser _user;
         private readonly ITouristObject _touristObject;
+        private readonly IUserAdministration _userAdministration;
 
 
         public AuthController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-            IConfiguration configuration, IUser user, ITouristObject touristObject)
+            IConfiguration configuration, IUser user, ITouristObject touristObject, IUserAdministration userAdministration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _user = user;
             _touristObject = touristObject;
+            _userAdministration = userAdministration;
         }
 
         [Route("register")] // /register
@@ -57,7 +60,8 @@ namespace TuristRegistar.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "User");
+                  //  await _userManager.AddToRoleAsync(user, "User");
+                    await _userManager.AddToRoleAsync(user, "USER");
                 }
                 var userLPPP = new TuristRegistar.Data.Models.Users()
                 {
@@ -83,7 +87,7 @@ namespace TuristRegistar.Controllers
 
         [Route("login")] // /login
         [HttpGet]
-        public async Task<ActionResult> Login()
+        public ActionResult Login()
         {
             return View();
         }
@@ -124,48 +128,38 @@ namespace TuristRegistar.Controllers
         }
 
         //Authorize user
+        [Authorize]
         [Route("settings")] // /login
         public IActionResult Settings()
         {
             return View();
         }
 
+
+        //[Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> UserSettingsAdmin(String identUserId)
+        {
+            var user = await _userManager.FindByIdAsync(identUserId);
+            var roles = _userAdministration.GetAllRoles();
+            var model = new UserSettingsAdminModel()
+            {
+                IdentUserId = identUserId,
+                Username = user.UserName,
+                Roles = roles.Select(r => new SelectListItem() { Text = r.Name, Value = r.Id.ToString() }).ToList(),
+                SelectedRoleId = _userAdministration.GetUserRoleId(user.Id),
+            };
+            return View(model);
+        }
+
+        [Authorize]
         public IActionResult _ChangePassword()
         {
 
             return PartialView();
         }
 
-        public async Task<IActionResult> _UpdateUser()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
-            }
-            var model = new UserViewModel()
-            {
-                Id = user.Id,
-                Username = user.UserName,
-            };
-            return PartialView(model);
-        }
-
-        public IActionResult UpdateUser(UserViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                TempData["Error-Notification"] = "Greška prilikom ažuriranja profila.";
-                return View("Settings");
-            }
-
-            _user.ChangeUsername(model.Id, model.Username);
-            TempData["Notification"] = "Ažurirali ste profil.";
-
-            return RedirectToAction("Settings", "Auth");
-        }
-
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> _ChangePassword(ChangePasswordModel model)
         {
             if (!ModelState.IsValid)
@@ -200,14 +194,66 @@ namespace TuristRegistar.Controllers
         }
 
 
-        public async Task<IActionResult> _UpdateProfile()
+        public async Task<IActionResult> _UpdateUser()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
             }
+            var model = new UserViewModel()
+            {
+                Id = user.Id,
+                Username = user.UserName,
+            };
+            return PartialView(model);
+        }
 
+        //public async Task<IActionResult> _UpdateUserAdmin(String identUserId)
+        //{
+        //    var user = await _userManager.FindByIdAsync(identUserId);
+        //    if (user == null)
+        //    {
+        //        return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
+        //    }
+        //    var model = new UserViewModel()
+        //    {
+        //        Id = user.Id,
+        //        Username = user.UserName,
+        //    };
+        //    return PartialView(model);
+        //}
+
+        public IActionResult UpdateUser(UserViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error-Notification"] = "Greška prilikom ažuriranja profila.";
+                return View("Settings");
+            }
+
+            _user.ChangeUsername(model.Id, model.Username);
+            TempData["Notification"] = "Ažurirali ste profil.";
+
+            return RedirectToAction("Settings", "Auth");
+        }
+
+        
+
+        [Authorize]
+        public async Task<IActionResult> _UpdateProfile(String identUserId)
+        {
+            IdentityUser user;
+            if(identUserId == null)
+                user = await _userManager.GetUserAsync(User);
+            else//dodadt ovdje autrizaciju za admina ne treba ovo user, samo administrator administracija
+                user = await _userManager.FindByIdAsync(identUserId.ToString());
+
+            if (user == null)
+            {
+                return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
+            }
+            //da li ovo uopšte treba wtf
             var current_user = _user.GetUser(user.Id);
 
             UpdateProfileViewModel model = new UpdateProfileViewModel()
@@ -221,12 +267,41 @@ namespace TuristRegistar.Controllers
                 Email = current_user.Email,
                 ContactAddress = current_user.ContactAddress,
                 Phone = current_user.PhoneNumber,
+                AdminAction = identUserId == null ? false : true,
             };
 
             return View(model);
         }
 
+        //[Authorize]
+        //public async Task<IActionResult> _UpdateProfileAdmin(String identUserId)
+        //{
+        //    var user = await _userManager.FindByIdAsync(identUserId);
+        //    if (user == null)
+        //    {
+        //        return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
+        //    }
+
+        //    var current_user = _user.GetUser(user.Id);
+
+        //    UpdateProfileViewModel model = new UpdateProfileViewModel()
+        //    {
+        //        KorisnikId = current_user.Id,
+        //        UserId = current_user.IdentUserId,
+        //        Username = current_user.UserName,
+        //        Name = current_user.Name,
+        //        LegalPerson = current_user.LegalPerson,
+        //        LastName = current_user.LastName,
+        //        Email = current_user.Email,
+        //        ContactAddress = current_user.ContactAddress,
+        //        Phone = current_user.PhoneNumber,
+        //    };
+
+        //    return View(model);
+        //}
+
         [HttpPost]
+        [Authorize]
         public IActionResult UpdateProfile(UpdateProfileViewModel model)
         {
             if (!ModelState.IsValid)
@@ -250,6 +325,8 @@ namespace TuristRegistar.Controllers
             _user.UpdateUser(updateUser);
             TempData["Notification"] = "Ažurirali ste profil.";
 
+            if (model.AdminAction)
+                return RedirectToAction("UserSettingsAdmin", "Auth", new { identUserId = model.UserId});
             return RedirectToAction("Settings", "Auth");
         }
 
@@ -260,9 +337,14 @@ namespace TuristRegistar.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> _UserObjects()
+        public async Task<IActionResult> _UserObjects(String identUserId)
         {
-            var user = await _userManager.GetUserAsync(User);
+            IdentityUser user;
+            if(identUserId == null)
+              user = await _userManager.GetUserAsync(User);
+            else// ne treba ovo samo autorizacija za admina bice null
+              user = await _userManager.FindByIdAsync(identUserId);
+
             if (user == null)
             {
                 return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
@@ -277,7 +359,7 @@ namespace TuristRegistar.Controllers
             model.Pager = pager;
 
             //check when list is null
-            var bookmarks = _user.GetAllUserBookmarksId(user.Id);
+            //var bookmarks = _user.GetAllUserBookmarksId(user.Id);
             model.ObjectsList = _user.GetUserObjects(user.Id, pager.CurrentPage, pager.PageSize).Select(ob => new ObjectItemModel()
             {
                 Id = ob.Id,
@@ -293,21 +375,25 @@ namespace TuristRegistar.Controllers
                 Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
                 NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
                 Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
-                IsBookmark = bookmarks.Contains(ob.Id) ? true : false,//as above check for null
+               // IsBookmark = bookmarks.Contains(ob.Id) ? true : false,//as above check for null
             }).ToList();
             //napravi view
             return PartialView("_UserObjects", model);
         }
 
         [Authorize]
-        public async Task<IActionResult> UserObjectsChangePage(UserObjectsModel model)
+        public IActionResult UserObjectsChangePage(UserObjectsModel model)
         {
 
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
-            }
+           // IdentityUser user;
+            //if (identUserId == null)
+            //    user = await _userManager.GetUserAsync(User);
+            //else//autorizacija za admina
+            //    user = await _userManager.FindByIdAsync(identUserId);
+            //if (user == null)
+            //{
+            //    return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
+            //}
 
             var pager = new Pager(_user.CountUserObjects(model.IdentUserId), model.CurrPage);
 
@@ -316,7 +402,7 @@ namespace TuristRegistar.Controllers
             model.Pager = pager;
 
             //check when list is null
-            var bookmarks = _user.GetAllUserBookmarksId(user.Id);
+            //var bookmarks = _user.GetAllUserBookmarksId(model.IdentUserId);
 
 
             model.ObjectsList = _user.GetUserObjects(model.IdentUserId, model.Pager.CurrentPage, model.Pager.PageSize).Select(ob => new ObjectItemModel()
@@ -334,7 +420,7 @@ namespace TuristRegistar.Controllers
                 Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
                 NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
                 Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
-                IsBookmark = bookmarks.Contains(ob.Id) ? true : false,//as above check for null
+               // IsBookmark = bookmarks.Contains(ob.Id) ? true : false,//as above check for null
             }).ToList();
 
             //napravi view
@@ -383,11 +469,11 @@ namespace TuristRegistar.Controllers
         public async Task<IActionResult> UserBookmarksChangePage(UserBookmarksModel model)
         {
 
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
-            }
+            //var user = await _userManager.GetUserAsync(User);
+            //if (user == null)
+            //{
+            //    return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
+            //}
 
             var pager = new Pager(_user.CountUserBookmarks(model.IdentUserId), model.CurrPage);
 
@@ -396,7 +482,7 @@ namespace TuristRegistar.Controllers
             model.Pager = pager;
 
 
-            model.Bookmarks = _user.GetUserBookmarks(user.Id, pager.CurrentPage, pager.PageSize).Select(ob => new ObjectItemModel()
+            model.Bookmarks = _user.GetUserBookmarks(model.IdentUserId, pager.CurrentPage, pager.PageSize).Select(ob => new ObjectItemModel()
             {
                 Id = ob.Id,
                 Name = ob.Name,

@@ -978,6 +978,13 @@ namespace TuristRegistar.Services
             return null;
         }
 
+        public void DeleteReview(int id)
+        {
+            var rating = _context.RatingsAndReviews.Where(r => r.Id == id).FirstOrDefault();
+            _context.RatingsAndReviews.Remove(rating);
+            _context.SaveChanges();
+        }
+
         //check if its working
         //slike brisiiiiiiiiiii
         public void DeleteObjectAndRelatedColumns(int objectId)
