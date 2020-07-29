@@ -1,0 +1,84 @@
+﻿
+
+<link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
+@*<link href="~/css/regst.css" rel="stylesheet" />*@
+<link href="~/css/tabs.css" rel="stylesheet" />
+<link href="~/css/site.css" rel="stylesheet" />
+<link href="~/css/paying-model-style.css" rel="stylesheet" />
+
+<script src="~/js/toast-show.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+<script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+<link href="~/css/gallery.css" rel="stylesheet" />
+
+@{
+    ViewData["Title"] = "Parameters";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Tabs -->
+<section id="tabs">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-lg-12">
+                <nav>
+                    <div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+                        <a class="nav-item nav-link active" id="nav-currency-tab" data-toggle="tab" href="#nav-currency" role="tab" aria-controls="nav-currency" aria-selected="true">Valute</a>
+                        <a class="nav-item nav-link" id="nav-country-tab" data-toggle="tab" href="#nav-country" role="tab" aria-controls="nav-country" aria-selected="false">Države</a>
+                        <a class="nav-item nav-link" id="nav-city-tab" data-toggle="tab" href="#nav-city" role="tab" aria-controls="nav-city" aria-selected="false">Gradovi</a>
+                        <a class="nav-item nav-link" id="nav-attribute-tab" data-toggle="tab" href="#nav-attribute" role="tab" aria-controls="nav-attribute" aria-selected="false">Atributi</a>
+                        <a class="nav-item nav-link" id="nav-cntattribute-tab" data-toggle="tab" href="#nav-cntattribute" role="tab" aria-controls="nav-cntattribute" aria-selected="false">Prebrojivi atributi</a>
+                    </div>
+                </nav>
+                <div class="tab-content py-3 px-3 px-sm-0" id="nav-tabContent">
+
+                    <!--Valute-->
+                    <div class="tab-pane fade show active" id="nav-currency" role="tabpanel" aria-labelledby="nav-currency-tab">
+                    </div>
+                    <!--./Valute-->
+                    <!--Države-->
+                    <div class="tab-pane fade" id="nav-country" role="tabpanel" aria-labelledby="nav-country-tab">
+                    </div>
+                    <!--./Države-->
+                    <!--Gradovi-->
+                    <div class="tab-pane fade" id="nav-city" role="tabpanel" aria-labelledby="nav-city-tab">
+                    </div>
+                    <!--./Gradovi-->
+                    <!--Atributi-->
+                    <div class="tab-pane fade" id="nav-attribute" role="tabpanel" aria-labelledby="nav-attribute-tab">
+
+                    </div>
+                    <!--./Atributi-->
+                    <!--Prebrojivi atributi-->
+                    <div class="tab-pane fade" id="nav-cntattribute" role="tabpanel" aria-labelledby="nav-cntattribute-tab">
+
+                    </div>
+                    <!--./Prebrojivi atributi-->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ./Tabs -->
+
+<script src="~/js/Navbarcolor.js"></script>
+
+<script>
+
+    $.get('@Url.Action("_EditCurrencies", "Administration")', function (content) {
+        $("#nav-currency").html(content);
+    });
+    $.get('@Url.Action("_EditCountries", "Administration")', function (content) {
+        $("#nav-country").html(content);
+    });
+    $.get('@Url.Action("_EditCities", "Administration")', function (content) {
+        $("#nav-city").html(content);
+    });
+    @*$.get('@Url.Action("", "Administration")', function (content) {
+        $("#nav-user").html(content);*@
+    //});
+</script>

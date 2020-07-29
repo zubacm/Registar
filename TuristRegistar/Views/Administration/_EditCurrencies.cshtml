@@ -1,0 +1,62 @@
+﻿@model CurrencyEditModel
+
+<br />
+<form id="formIndex">
+   <div id="obj-container">
+    <div class="col-md-12 mb-3">
+        <select onchange="addCurrency()" class="custom-select d-block w-100 col-md-6 m-auto" asp-items="@Model.AllCurrenciesFromAPI" asp-for="@Model.NewCurrency">
+            <option disabled selected>Dodajte valutu...</option>
+        </select>
+    </div>
+    <hr />
+    <ul class="list-group mb-3 m-auto">
+        @if (Model.AvailableCurrencies != null)
+        {
+            @foreach (var item in Model.AvailableCurrencies)
+            {
+                <li class="list-group-item d-flex justify-content-between lh-condensed">
+                    <h5 class="my-0 col-md-12">
+                        @item.Key
+                        <a class="btn btn-error pointer" currency-id="@item.Id" onclick="currencyRemove(this)" style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a>
+                    </h5>
+                </li>
+            }
+        }
+    </ul>
+    </div>
+</form>
+<script>
+    function addCurrency() {
+        $.ajax({
+            type: 'GET',
+            url: "/Administration/AddCurrency",
+            data: $('#formIndex').serialize(),
+            dataType: 'html',
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                $('#obj-container').html(response);
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+
+    function currencyRemove(ev) {
+        var myelement = $(ev).parent().parent();
+        var data = { 'currencyId': $(ev).attr('currency-id') };
+        $.ajax({
+            url: "/Administration/RemoveCurrency",
+            data: data,
+            type: "POST",
+            /// dataType: 'JSON',
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (response) {
+                $(myelement).remove();
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+</script>

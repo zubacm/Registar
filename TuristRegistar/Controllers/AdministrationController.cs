@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TuristRegistar.Data;
+using TuristRegistar.Data.Models;
 using TuristRegistar.Models;
 
 namespace TuristRegistar.Controllers
@@ -12,10 +14,12 @@ namespace TuristRegistar.Controllers
     public class AdministrationController : Controller
     {
         private readonly IUserAdministration _userAdministration;
+        private readonly ITouristObject _touristObject;
 
-        public AdministrationController(IUserAdministration userAdministration)
+        public AdministrationController(IUserAdministration userAdministration, ITouristObject touristObject)
         {
             _userAdministration = userAdministration;
+            _touristObject = touristObject;
         }
 
 
@@ -162,5 +166,142 @@ namespace TuristRegistar.Controllers
             return Ok();
         }
 
+
+        public IActionResult Parameters()
+        {
+            return View();
+        }
+
+
+        public IActionResult _EditCountries()
+        {
+            var model = new CountriesEditModel()
+            {
+                AvailableCountries = _touristObject.GetCountries(),
+            };
+
+            return PartialView(model);
+        }
+        public IActionResult AddCountry(CountriesEditModel model)
+        {
+            var country = new Countries() { Name = model.NewCountry};
+            _userAdministration.AddCountry(country);
+            model.AvailableCountries = _touristObject.GetCountries();
+
+            return PartialView("_EditCountries", model);
+        }
+        public IActionResult RemoveCountry(int countryId)
+        {
+            _userAdministration.RemoveCountry(countryId);
+            //see more
+            return Ok();
+        }
+
+        public IActionResult _EditCities()
+        {
+            var model = new CitiesEditModel()
+            {
+                Countries = (_touristObject.GetCountries())
+                                .Select(item => new SelectListItem() { Text = item.Name, Value = item.Id.ToString() }).ToList(),
+            };
+
+            return PartialView(model);
+        }
+        public IActionResult GetCitiesInCountry(int countryId)
+        {
+            var model = new CitiesEditModel()
+            {
+                Countries = (_touristObject.GetCountries())
+                               .Select(item => new SelectListItem() { Text = item.Name, Value = item.Id.ToString() }).ToList(),
+                SelectedCountry = countryId,
+            };
+            model.CitiesForCountry = _touristObject.GetCitiesFromCountry(countryId);
+
+            return PartialView("_EditCities", model);
+        }
+        public IActionResult CityAction(CitiesEditModel model)
+        {
+            switch (model.SubmitButton)
+            {
+                case "Dodaj":
+                    return AddCity(model);
+                case "Sačuvaj":
+                    return EditCity(model);
+            }
+            return null;
+        }
+        public IActionResult AddCity(CitiesEditModel model)
+        {
+            Cities city = new Cities()
+            {
+                Name = model.NewCity,
+                CountriesId = Convert.ToInt32(model.SelectedCountryAddModal),
+                Lat = model.LatAddModal,
+                Lng = model.LngAddModal,
+            };
+            _userAdministration.AddCity(city);
+            //model.Countries = (_touristObject.GetCountries())
+            //                    .Select(item => new SelectListItem() { Text = item.Name, Value = item.Id.ToString() });
+
+            return View("Parameters");
+        }
+        public IActionResult EditCity(CitiesEditModel model)
+        {
+            Cities city = new Cities()
+            {
+                Id = model.EditCityId,
+                Name = model.EditCity,
+                Lat = model.LatEditModal,
+                Lng = model.LngEditModal,
+                CountriesId = model.SelectedCountryEditModal,
+            };
+            _userAdministration.EditCity(city);
+            return View("Parameters");
+        }
+        public IActionResult DeleteCity(int cityId)
+        {
+            _userAdministration.RemoveCity(cityId);
+
+            return Ok();
+        }
+        //public IActionResult EditCity(CitiesEditModel model)
+        //{
+
+        //}
+
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> _EditCurrencies()
+        {
+            var model = new CurrencyEditModel()
+            {
+              AvailableCurrencies =_userAdministration.GetAllCurrenciesFromDataBase(),
+              
+            };
+            var currenciesFromAPI = (await _userAdministration.GetCurrenciesFromApi());
+            currenciesFromAPI = currenciesFromAPI.Where(item => !model.AvailableCurrencies.Any(x => x.Key == item)).ToList(); 
+            model.AllCurrenciesFromAPI = currenciesFromAPI
+                .Select(item => new SelectListItem() { Text = item, Value = item }).ToList(); ;
+            return PartialView(model);
+        }
+
+        public async Task<IActionResult> AddCurrency(CurrencyEditModel model)
+        {
+            var newCurrency = new Data.Models.Currencies() { Key = model.NewCurrency };
+            _userAdministration.AddCurrency(newCurrency);
+
+            model.AvailableCurrencies = _userAdministration.GetAllCurrenciesFromDataBase();
+            var currenciesFromAPI = (await _userAdministration.GetCurrenciesFromApi());
+            currenciesFromAPI = currenciesFromAPI.Where(item => !model.AvailableCurrencies.Any(x => x.Key == item)).ToList();
+            model.AllCurrenciesFromAPI = currenciesFromAPI
+                .Select(item => new SelectListItem() { Text = item, Value = item }).ToList(); 
+
+            return PartialView("_EditCurrencies", model);
+        }
+        public IActionResult RemoveCurrency(int currencyId)
+        {
+            _userAdministration.RemoveCurrency(currencyId);
+
+            return Ok();
+        }
     }
 }

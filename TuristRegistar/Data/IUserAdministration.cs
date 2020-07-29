@@ -20,5 +20,15 @@ namespace TuristRegistar.Data
         int CountUsers();
         int CountUsers(string searchString, string roleId);
         List<Users> GetUsers(int pagenumber, int pagesize, string searchString, string roleId);
+
+        void AddCountry(Countries country);
+        void RemoveCountry(int countryId);
+        void AddCity(Cities city);
+        void EditCity(Cities editedCity);
+        void RemoveCity(int id);
+        void AddCurrency(Currencies currency);
+        void RemoveCurrency(int currencyId);
+        IEnumerable<Currencies> GetAllCurrenciesFromDataBase();
+        Task<IEnumerable<String>> GetCurrenciesFromApi();
     }
 }

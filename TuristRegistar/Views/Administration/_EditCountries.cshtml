@@ -1,0 +1,110 @@
+﻿@model CountriesEditModel
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<br />
+<form id="formCountries">
+    <div id="countries-container">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="input-group">
+                    <input id="country-input" type="text" asp-for="@Model.NewCountry" class="form-control" placeholder="Unesite naziv države" required>
+                    <span asp-validation-for="@Model.NewCountry" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-mb-3">
+                <input onclick="addCountry()" class="btn btn-primary btn-block pointer" value="Dodaj državu">
+            </div>
+        </div>
+        <hr />
+        <ul class="list-group mb-3 m-auto">
+            @if (Model.AvailableCountries != null)
+            {
+                @foreach (var item in Model.AvailableCountries)
+                {
+                    var idAttribute = item.Id + "COUNTRY";
+                    <li id="@idAttribute" class="list-group-item d-flex justify-content-between lh-condensed">
+                        <h5 class="my-0 col-md-12">
+                            @item.Name
+                            <a href="#myModal" onclick="sendValuesToModal(this)" class="trigger-btn btn btn-error pointer" data-toggle="modal" country-id="@item.Id" style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a>
+                        </h5>
+
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+</form>
+
+<!-- Modal HTML -->
+<div id="myModal" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header flex-column">
+                <div class="icon-box">
+                    <i class="material-icons">&#xE5CD;</i>
+                </div>
+                <h4 class="modal-title w-100">Upozorenje!</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Brisanje ove države uzrokovat će brisanje srodnih gradova i ponuda korisnika.</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button id="dismiss-modal" type="button" class="btn btn-secondary" data-dismiss="modal">Nazad</button>
+                <button type="button" onclick="countryRemove()" class="btn btn-danger">Dalje</button>
+            </div>
+        </div>
+    </div>
+    <input id="hidden-country-id" hidden-removeelement-id="" hidden remove-el="" />
+</div>
+<script>
+
+    function addCountry() {
+        $.ajax({
+            type: 'GET',
+            url: "/Administration/AddCountry",
+            data: $('#formCountries').serialize(),
+            dataType: 'html',
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                $('#countries-container').html(response);
+                $('#country-input').val('');
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+
+    function sendValuesToModal(ev) {
+        $("#hidden-country-id").val($(ev).attr('country-id'));
+        var elementId = ($(ev).parent().parent()).attr('id');
+        $("#hidden-country-id").attr('hidden-removeelement-id', elementId);
+
+    }
+    function countryRemove() {
+        var removeelementid = $('#hidden-country-id').attr('hidden-removeelement-id');
+        var data = { 'countryId': $('#hidden-country-id').val() };
+        $.ajax({
+            url: "/Administration/RemoveCountry",
+            data: data,
+            type: "POST",
+            /// dataType: 'JSON',
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (response) {
+                var id = "#" + removeelementid
+                $(id).remove();
+                $('#dismiss-modal').trigger('click');
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+</script>

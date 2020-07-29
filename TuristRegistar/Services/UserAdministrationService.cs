@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TuristRegistar.Data;
 using TuristRegistar.Data.Models;
@@ -131,6 +135,135 @@ namespace TuristRegistar.Services
                 .Include(u => u.IdentUser)
                 .Where(u => u.UserName.ToLower().Contains(searchString.ToLower()) || u.Name.ToLower().Contains(searchString.ToLower()) || u.LastName.ToLower().Contains(searchString.ToLower()))
                 .Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
+        }
+
+
+
+        public IEnumerable<Currencies> GetAllCurrenciesFromDataBase()
+        {
+            return _context.Currencies.ToList();
+        }
+
+
+        //Provjeri moras li i u objektima brisat ove atribute ili gradove ili zemlje
+        public void AddCountableObjectAttribute(string attribute)
+        {
+            var cntObjAttribute = new CountableObjectAttributes() { Name = attribute };
+            _context.CountableObjectAttributes.Add(cntObjAttribute);
+            _context.SaveChanges();
+        }
+        public void RemoveCountableObjectAttribute(int id)
+        {
+            var cntObjAttribute = _context.CountableObjectAttributes.FirstOrDefault(coa => coa.Id == id);
+            _context.CountableObjectAttributes.Remove(cntObjAttribute);
+            _context.SaveChanges();
+        }
+        public void AddObjectAttributes(string attribute)
+        {
+            var objAttribute = new ObjectAttributes() { Name = attribute };
+            _context.ObjectAttributes.Add(objAttribute);
+            _context.SaveChanges();
+        }
+        public void RemoveObjectAttribute(int id)
+        {
+            var objAttribute = _context.ObjectAttributes.FirstOrDefault(oa => oa.Id == id);
+            _context.ObjectAttributes.Remove(objAttribute);
+            _context.SaveChanges();
+        }
+        public void AddCountry(Countries country)
+        {
+            _context.Counries.Add(country);
+            _context.SaveChanges();
+        }
+        public void RemoveCountry(int countryId)
+        {
+            var coutnry = new Countries() { Id = countryId };
+            _context.Counries.Remove(coutnry);
+            _context.RemoveRange(_context.Cities.Where(c => c.CountriesId == countryId));
+            _context.RemoveRange(_context.Objects.Where(c => c.CountryId == countryId));
+            _context.SaveChanges();
+        }
+        public void AddCity(Cities city)
+        {
+            _context.Cities.Add(city);
+            _context.SaveChanges();
+        }
+        public void EditCity(Cities editedCity)
+        {
+            var city = _context.Cities.FirstOrDefault(c => c.Id == editedCity.Id);
+            city.Name = editedCity.Name;
+            city.Lat = editedCity.Lat;
+            city.Lng = editedCity.Lng;
+            city.CountriesId = editedCity.CountriesId;
+            _context.Cities.Attach(city);
+            _context.SaveChanges();
+
+        }
+        public void RemoveCity(int id)
+        {
+            var city = _context.Cities.FirstOrDefault(c => c.Id == id);
+            _context.Cities.Remove(city);
+            _context.RemoveRange(_context.Objects.Where(c => c.CityId == id));
+            _context.SaveChanges();
+        }
+        //public void EditCity()
+        // public void RemoveCountry()
+        //public Hash<string, string> GetAllCurrenciesFromAPI()
+        //{
+
+        //}
+        public void AddCurrency(Currencies currency)
+        {
+            _context.Currencies.Add(currency);
+            _context.SaveChanges();
+        }
+        public void RemoveCurrency(int currencyId)
+        {
+            var currency = new Currencies() { Id = currencyId };
+            _context.Currencies.Remove(currency);
+            _context.SaveChanges();
+        }
+
+
+
+
+        public async Task<IEnumerable<String>> GetCurrenciesFromApi()
+        {
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    client.BaseAddress = new Uri("https://free.currencyconverterapi.com");
+                    //f49a41b74f3e1f052200 => this is my api key
+                    var response = await client.GetAsync($"/api/v6/currencies?apiKey=f49a41b74f3e1f052200");
+
+                    var stringResult = await response.Content.ReadAsStringAsync();
+                    var JSONobject = JObject.Parse(stringResult);
+
+                    var JSONlist = JSONobject["results"].ToList();
+                    var currenciesId = new List<String>();
+                    foreach (var item in JSONlist)
+                    {
+                        string stringBeforeChar = (item.ToString()).Substring(0, (item.ToString()).IndexOf(":"));
+                        
+                        int firstStringPosition = (item.ToString()).IndexOf("\"")+1;
+                        int secondStringPosition = (item.ToString()).IndexOf("\":");
+                        string stringBetweenTwoStrings = (item.ToString()).Substring(firstStringPosition,
+                            secondStringPosition - firstStringPosition);
+                        currenciesId.Add(stringBetweenTwoStrings);
+                    }
+
+
+                    return currenciesId;
+                }
+                catch (HttpRequestException httpRequestException)
+                {
+                    Console.WriteLine(httpRequestException.StackTrace);
+                    return null;
+                    //return new KeyValuePair<string, string> ( "Error", "Error calling API. Please do manual lookup." );
+                    //return "Error calling API. Please do manual lookup.";
+                }
+            }
         }
     }
 }

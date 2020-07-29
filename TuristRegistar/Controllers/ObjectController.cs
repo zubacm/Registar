@@ -40,6 +40,7 @@ namespace TuristRegistar.Controllers
             return View();
         }
 
+        [Authorize]
         [Route("createobject")] // /createobject
         public IActionResult CreateObject()
 

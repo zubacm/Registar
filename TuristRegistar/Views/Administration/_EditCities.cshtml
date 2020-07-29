@@ -1,0 +1,247 @@
+﻿@model CitiesEditModel
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<div id="cities-container" class="">
+    <br />
+    <div class="col-mb-3">
+        <a href="#cityAddModal" data-toggle="modal" class="trigger-btn btn btn-primary btn-block pointer col-md-6 m-auto" value="Dodaj grad">Dodaj grad</a>
+    </div>
+    <hr />
+    <form id="formCities" class="row" asp-controller="Administration" asp-action="CityAction">
+        <div class="col-md-6 mb-3">
+            <select id="selectcountry" class="custom-select d-block w-100 col-md-6 m-auto btn-lg" asp-for="@Model.SelectedCountry" asp-items="@Model.Countries">
+                <option disabled selected>Izaberite Državu...</option>
+            </select>
+        </div>
+        @*<hr />*@
+        <ul class="list-group mb-3 m-auto col-md-6" id="cities-list">
+            @if (Model.CitiesForCountry != null)
+            {
+                @foreach (var item in Model.CitiesForCountry)
+                {
+                    var idAttribute = item.Id + "CITY";
+                    <li id="@idAttribute" class="list-group-item d-flex justify-content-between lh-condensed">
+                        <h5 class="my-0 col-md-12">
+                            @item.Name
+                            <a href="#cityEditModal" onclick="sendValuesToCityEditModal(this)" class="trigger-btn btn btn-warning pointer" data-toggle="modal" city-id="@item.Id" city-name="@item.Name" city-lat="@item.Lat" city-lng="@item.Lng" city-country-id="@item.CountriesId" style="float:right;padding:0;line-height:0;"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                            <a href="#cityDeleteModal" onclick="sendValuesToCityDeleteModal(this)" class="trigger-btn btn btn-error pointer" data-toggle="modal" city-id="@item.Id" style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a>
+
+                        </h5>
+
+                    </li>
+                }
+            }
+        </ul>
+
+
+
+        <!-- Modal HTML Add City-->
+        <div id="cityAddModal" class="modal fade">
+            <div class="modal-dialog modal-confirm">
+                <div class="modal-content">
+                    <div class="modal-header flex-column">
+                        <div class="icon-box">
+                            <i class="material-icons">&#xe002;</i>
+                        </div>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <input type="text" class="form-control myinput" placeholder="Naziv grada" asp-for="NewCity" required>
+                            <span asp-validation-for="NewCity" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <select class="custom-select d-block w-100 col-md-12 m-auto btn-lg" asp-for="@Model.SelectedCountryAddModal" asp-items="@Model.Countries">
+                                <option disabled selected>Izaberite Državu...</option>
+                            </select>
+                        </div>
+                        @*mapa*@
+                        @*<div class="col-md-12 mb-4">
+                            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted">Mapa</span>
+                            </h4>
+                            <div id="map" class="mb-3" style="height:300px"></div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="LatAddModal"></label>
+                                    <input class="form-control myinput" asp-for="LatAddModal" id="latitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
+                                    <span asp-validation-for="LatAddModal" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="LngAddModal"></label>
+                                    <div class="input-group">
+                                        <input asp-for="LngAddModal" class="form-control myinput" id="longitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
+                                        <span asp-validation-for="LngAddModal" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>*@
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button @*id="dismiss-modal-cities" *@ type="button" class="btn btn-secondary" data-dismiss="modal">Nazad</button>
+                        @*<button type="button" onclick="addCity()" class="btn btn-danger">Dalje</button>*@
+                        <input type="submit" class="btn btn-success" asp-for="SubmitButton" value="Dodaj" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal HTML -->
+        <!-- Modal HTML Edit City-->
+        <div id="cityEditModal" class="modal fade">
+            <div class="modal-dialog modal-confirm">
+                <div class="modal-content">
+                    <div class="modal-header flex-column">
+                        <div class="icon-box">
+                            <i class="material-icons">&#xe002;</i>
+                        </div>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <input id="edit-city-name" type="text" class="form-control myinput" placeholder="Naziv grada" asp-for="EditCity" required>
+                            <span asp-validation-for="EditCity" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <select id="edit-city-select" class="custom-select d-block w-100 col-md-12 m-auto btn-lg" asp-for="@Model.SelectedCountryEditModal" asp-items="@Model.Countries">
+                                <option disabled selected>Izaberite Državu...</option>
+                            </select>
+                        </div>
+                        @*mapa*@
+                        <div class="col-md-12 mb-4">
+                            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted">Mapa</span>
+                            </h4>
+                            <div id="map" class="mb-3" style="height:300px"></div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="LatEditModal"></label>
+                                    <input id="city-edit-lat" class="form-control myinput" asp-for="LatEditModal" id="latitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
+                                    <span asp-validation-for="LatEditModal" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="LngEditModal"></label>
+                                    <div class="input-group">
+                                        <input id="city-edit-lng" asp-for="LngEditModal" class="form-control myinput" id="longitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
+                                        <span asp-validation-for="LngEditModal" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button id="dismiss-modal-cities" type="button" class="btn btn-secondary" data-dismiss="modal">Nazad</button>
+                        @*<button type="button" onclick="addCity()" class="btn btn-danger">Dalje</button>*@
+                        <input type="submit" class="btn btn-success" asp-for="SubmitButton" value="Sačuvaj" />
+                    </div>
+                </div>
+            </div>
+            <input id="hidden-cityedit-id" hidden-removeelement-id="" hidden />
+        </div>
+        <!-- Modal HTML -->
+    </form>
+</div>
+
+
+<div id="cityDeleteModal" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header flex-column">
+                <div class="icon-box">
+                    <i class="material-icons">&#xE5CD;</i>
+                </div>
+                <h4 class="modal-title w-100">Upozorenje!</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Brisanje ovog grada uzrokovat će brisanje srodnih ponuda korisnika.</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button id="dismiss-modal-cities" type="button" class="btn btn-secondary" data-dismiss="modal">Nazad</button>
+                <button type="button" onclick="cityRemove()" class="btn btn-danger">Dalje</button>
+            </div>
+        </div>
+    </div>
+    <input id="hidden-city-id" hidden-removeelement-id="" hidden  />
+</div>
+<script>
+
+    function addCountry() {
+        $.ajax({
+            type: 'GET',
+            url: "/Administration/AddCountry",
+            data: $('#formCountries').serialize(),
+            dataType: 'html',
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                $('#countries-container').html(response);
+                $('#country-input').val('');
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+
+    function sendValuesToCityDeleteModal(ev) {
+        $("#hidden-citydelete-id").val($(ev).attr('city-id'));
+        var elementId = ($(ev).parent().parent()).attr('id');
+        $("#hidden-citydelete-id").attr('hidden-removeelement-id', elementId);
+
+    }
+    function sendValuesToCityEditModal(ev) {
+        $("#hidden-citydelete-id").val($(ev).attr('city-id'));
+        $("#edit-city-name").val($(ev).attr('city-name'));
+        $("#edit-city-select").val($(ev).attr('city-country-id'));
+        $("#edit-city-lat").val($(ev).attr('city-lat'));
+        $("#edit-city-lng").val($(ev).attr('city-lng'));
+    }
+
+    function cityRemove() {
+        var removeelementid = $('#hidden-city-id').attr('hidden-removeelement-id');
+        var data = { 'cityId': $('#hidden-city-id').val() };
+        $.ajax({
+            url: "/Administration/RemoveCity",
+            data: data,
+            type: "POST",
+            /// dataType: 'JSON',
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (response) {
+                var id = "#" + removeelementid
+                $(id).remove();
+                $('#dismiss-modal-cities').trigger('click');
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+</script>
+<script>
+    $("#selectcountry").change(function () {
+        GetCities();
+    });
+    function GetCities() {
+        //var selCountry = $("#selectcountry option:selected").text();
+        $.ajax({
+            type: 'GET',
+            url: "/Administration/GetCitiesInCountry",
+            data: { countryId: document.getElementById('selectcountry').value, },
+            dataType: 'html',
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                $('#cities-container').html(response);
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        });
+    }
+
+</script>
+
+
+<script src="~/js/mapa.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>
