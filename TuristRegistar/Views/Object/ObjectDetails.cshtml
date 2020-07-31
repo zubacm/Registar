@@ -1,7 +1,9 @@
 ﻿@model ObjectDetailsViewModel
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-@using Newtonsoft.Json;
-
+@using Newtonsoft.Json
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<IdentityUser> SignInManager
 
 <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
@@ -30,31 +32,10 @@
 
 
 <!--Osnovno-->
-@*<div class="tab-pane fade show active" id="nav-basic" role="tabpanel" aria-labelledby="nav-basic-tab">*@
-
 <br />
 <div class="row bg-white rounded-lg shadow-sm p-5">
 
-    @*mapa*@
-    @*<div class="col-md-4 order-md-2 mb-4">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted">Mapa</span>
-            </h4>
-            <div id="map" class="mb-3" style="height:300px"></div>
-            <hr />
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Lat"></label>
-                    <input class="form-control myinput" asp-for="Lat" id="latitude-value" disabled>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Lng"></label>
-                    <div class="input-group">
-                        <input asp-for="Lng" class="form-control myinput" id="longitude-value" disabled>
-                    </div>
-                </div>
-            </div>
-        </div>*@
+
     <div class="col-md-8 order-md-1">
         <form id="formDetails">
             <input type="hidden" asp-for="Id" />
@@ -213,8 +194,27 @@
     </div>
 
 
-    @*mapa*@
+    @*mapa i delete*@
     <div class="col-md-4 order-md-2 mb-4">
+        @if (SignInManager.IsSignedIn(User))
+        {
+
+            var user = await UserManager.FindByIdAsync(UserManager.GetUserId(User));
+            var roles = await UserManager.GetRolesAsync(user);
+            var id = UserManager.GetUserId(User);
+            if (id == Model.IdentUserId)
+            {
+                <a asp-action="EditObject" asp-controller="Object" asp-route-id="@Model.Id" class="btn btn-secondary text-white pointer btn-block pointer m-auto">Izmijeni</a>
+                <br />
+            }
+            @if (roles.Contains("ADMIN") || (id == Model.IdentUserId))
+            {
+                <div class="col-mb-3">
+                    <a asp-action="DeleteObject" asp-controller="Object" asp-route-objectId="@Model.Id" class="btn btn-danger text-white pointer btn-block pointer m-auto">Obriši objekat</a>
+                </div>
+                <br />
+            }
+        }
         @if (Model.IsBookmark)
         {
             <i data-toggle="tooltip" title="Ukloni iz zabilješki" class="fas fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@Model.Id"></i>
@@ -266,21 +266,12 @@
             dataType: 'html',
             contentType: "application/json; charset=utf-8",
             success: function (response) {
-                // $('#rat-rew-container').empty();
                 alert("Uspješno ste dodali utisak i ocjenu.");
 
                 $('#review-textarea').val('');
                 $('#ocjena').val('');
                 resetColor();
                 goToFirst();
-                //console.log(response);
-                //myObjects = JSON.parse(response);
-                //console.log(myObjects);
-
-                //myObjects.forEach(function (data) {
-                //    console.log("dataa: " + data.text + data.rating + data.user.name + " " + data.user.lastName)
-
-                //});
 
             },
             error: function () {
@@ -469,8 +460,7 @@
             maxdate = new Date((new Date(checkin)).getTime() + (maxDaysOffer-1) * (24 * 60 * 60 * 1000));
         }
         var currentcheckout = $('#datepicker2').val();
-        //if (checkin && currentcheckout)
-        //    $('#period-btn').prop('disabled', false);
+
 
         $DPicker2.destroy();
         $DPicker2.datepicker({
@@ -523,7 +513,6 @@
         else {
 
             $.ajax({
-                // type: 'GET',
                 url: "/Auth/AddBookmark",
                 data: data,
                 type: "POST",

@@ -199,8 +199,8 @@ namespace TuristRegistar.Controllers
             return Redirect("createobject");
         }
 
-        //[Authorize]
-        [Route("editobject")] // /editobject
+        [Authorize]
+       // [Route("editobject")] // /editobject
         public async Task<IActionResult> EditObject(int id)
         {
             //if user admin or owns object
@@ -797,6 +797,12 @@ namespace TuristRegistar.Controllers
             return Ok();
         }
         //još delete
+        public IActionResult DeleteObject(int objectId)
+        {
+            _touristObject.DeleteObjectAndRelatedColumns(objectId);
 
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
+            return View("Index");
+        }
     }
 }

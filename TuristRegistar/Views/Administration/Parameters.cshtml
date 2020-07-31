@@ -30,6 +30,7 @@
                         <a class="nav-item nav-link active" id="nav-currency-tab" data-toggle="tab" href="#nav-currency" role="tab" aria-controls="nav-currency" aria-selected="true">Valute</a>
                         <a class="nav-item nav-link" id="nav-country-tab" data-toggle="tab" href="#nav-country" role="tab" aria-controls="nav-country" aria-selected="false">Države</a>
                         <a class="nav-item nav-link" id="nav-city-tab" data-toggle="tab" href="#nav-city" role="tab" aria-controls="nav-city" aria-selected="false">Gradovi</a>
+                        <a class="nav-item nav-link" id="nav-type-tab" data-toggle="tab" href="#nav-type" role="tab" aria-controls="nav-type" aria-selected="false">Tipovi ponuda</a>
                         <a class="nav-item nav-link" id="nav-attribute-tab" data-toggle="tab" href="#nav-attribute" role="tab" aria-controls="nav-attribute" aria-selected="false">Atributi</a>
                         <a class="nav-item nav-link" id="nav-cntattribute-tab" data-toggle="tab" href="#nav-cntattribute" role="tab" aria-controls="nav-cntattribute" aria-selected="false">Prebrojivi atributi</a>
                     </div>
@@ -48,6 +49,10 @@
                     <div class="tab-pane fade" id="nav-city" role="tabpanel" aria-labelledby="nav-city-tab">
                     </div>
                     <!--./Gradovi-->
+                    <!--Tipovi ponuda-->
+                    <div class="tab-pane fade" id="nav-type" role="tabpanel" aria-labelledby="nav-type-tab">
+                    </div>
+                    <!--./Tipovi ponuda-->
                     <!--Atributi-->
                     <div class="tab-pane fade" id="nav-attribute" role="tabpanel" aria-labelledby="nav-attribute-tab">
 
@@ -78,7 +83,13 @@
     $.get('@Url.Action("_EditCities", "Administration")', function (content) {
         $("#nav-city").html(content);
     });
-    @*$.get('@Url.Action("", "Administration")', function (content) {
-        $("#nav-user").html(content);*@
-    //});
+    $.get('@Url.Action("_EditTypes", "Administration")', function (content) {
+        $("#nav-type").html(content);
+    });
+    $.get('@Url.Action("_EditAttributes", "Administration")', function (content) {
+        $("#nav-attribute").html(content);
+    });
+    $.get('@Url.Action("_EditCntAttribute", "Administration")', function (content) {
+        $("#nav-cntattribute").html(content);
+    });
 </script>

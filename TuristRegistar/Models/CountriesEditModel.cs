@@ -11,5 +11,10 @@ namespace TuristRegistar.Models
     {
         public IEnumerable<Countries> AvailableCountries { get; set; }
         public String NewCountry { get; set; }
+
+        public int EditCountryId { get; set; }
+        public String EditCountryName { get; set; }
+
+        public String SubmitButton { get; set; }
     }
 }

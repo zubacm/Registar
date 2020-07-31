@@ -66,7 +66,7 @@ namespace TuristRegistar
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                  .AddDefaultTokenProviders();
-
+            services.ConfigureApplicationCookie(options => options.LoginPath = "/login");
             //services.AddAuthentication(option =>
             //{
             //    option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

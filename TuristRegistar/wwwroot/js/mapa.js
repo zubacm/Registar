@@ -20,7 +20,6 @@
 }
 
 function setLatLng() {
-    console.log("adfa " + $('#latitude-value').val() + ":" + $('#longitude-value').val());
         var pos = {
             lat: +($('#latitude-value').val()),
             lng: +($('#longitude-value').val())

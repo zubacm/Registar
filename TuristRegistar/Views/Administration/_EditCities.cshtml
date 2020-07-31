@@ -5,7 +5,7 @@
 <div id="cities-container" class="">
     <br />
     <div class="col-mb-3">
-        <a href="#cityAddModal" data-toggle="modal" class="trigger-btn btn btn-primary btn-block pointer col-md-6 m-auto" value="Dodaj grad">Dodaj grad</a>
+        <a href="#cityAddModal" onclick="modalForAddCIty()" data-toggle="modal" class="trigger-btn btn btn-primary btn-block pointer col-md-6 m-auto" value="Dodaj grad">Dodaj grad</a>
     </div>
     <hr />
     <form id="formCities" class="row" asp-controller="Administration" asp-action="CityAction">
@@ -24,8 +24,8 @@
                     <li id="@idAttribute" class="list-group-item d-flex justify-content-between lh-condensed">
                         <h5 class="my-0 col-md-12">
                             @item.Name
-                            <a href="#cityEditModal" onclick="sendValuesToCityEditModal(this)" class="trigger-btn btn btn-warning pointer" data-toggle="modal" city-id="@item.Id" city-name="@item.Name" city-lat="@item.Lat" city-lng="@item.Lng" city-country-id="@item.CountriesId" style="float:right;padding:0;line-height:0;"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                            <a href="#cityDeleteModal" onclick="sendValuesToCityDeleteModal(this)" class="trigger-btn btn btn-error pointer" data-toggle="modal" city-id="@item.Id" style="float:right;padding:0;line-height:0;"><i class="fa fa-times"></i></a>
+                            <a href="#cityDeleteModal" onclick="sendValuesToCityDeleteModal(this)" class="trigger-btn btn btn-error pointer" data-toggle="modal" city-id="@item.Id" style="float:right;padding:0;line-height:0;"><i class="fa fa-trash fa-2x" aria-hidden="true"></i></a>
+                            <a href="#cityEditModal" onclick="sendValuesToCityEditModal(this)" class="trigger-btn btn btn-error pointer" data-toggle="modal" city-id="@item.Id" city-name="@item.Name" city-lat="@item.Lat" city-lng="@item.Lng" city-country-id="@item.CountriesId" style="float:right;padding:0;line-height:0;"><i class="fa fa-pencil fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;</a>
 
                         </h5>
 
@@ -41,47 +41,46 @@
             <div class="modal-dialog modal-confirm">
                 <div class="modal-content">
                     <div class="modal-header flex-column">
-                        <div class="icon-box">
-                            <i class="material-icons">&#xe002;</i>
-                        </div>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <input type="text" class="form-control myinput" placeholder="Naziv grada" asp-for="NewCity" required>
-                            <span asp-validation-for="NewCity" class="text-danger"></span>
+                        <div class="col-md-12 mb-3">
+                            <div>
+                                <input type="text" id="new-city" class="form-control myinput" placeholder="Naziv grada" asp-for="NewCity" required>
+                                <span asp-validation-for="NewCity" class="text-danger"></span>
+
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <select class="custom-select d-block w-100 col-md-12 m-auto btn-lg" asp-for="@Model.SelectedCountryAddModal" asp-items="@Model.Countries">
-                                <option disabled selected>Izaberite Državu...</option>
+                        <div class="col-md-12 mb-3">
+                            <select class="custom-select d-block w-100 col-md-12 m-auto btn-lg myinput" asp-for="@Model.SelectedCountryAddModal" asp-items="@Model.Countries">
+                                @*<option disabled selected>Izaberite Državu...</option>*@
                             </select>
                         </div>
                         @*mapa*@
-                        @*<div class="col-md-12 mb-4">
+                        <div class="col-md-12 mb-4">
                             <h4 class="d-flex justify-content-between align-items-center mb-3">
                                 <span class="text-muted">Mapa</span>
                             </h4>
-                            <div id="map" class="mb-3" style="height:300px"></div>
+                            <div id="map-addcity" class="mb-3" style="height:300px"></div>
                             <hr />
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label asp-for="LatAddModal"></label>
-                                    <input class="form-control myinput" asp-for="LatAddModal" id="latitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
+                                    <input class="form-control myinput" asp-for="LatAddModal" id="latitude-value-addcity" pattern="[0-9]+([\.][0-9]*)?" required>
                                     <span asp-validation-for="LatAddModal" class="text-danger"></span>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label asp-for="LngAddModal"></label>
                                     <div class="input-group">
-                                        <input asp-for="LngAddModal" class="form-control myinput" id="longitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
+                                        <input asp-for="LngAddModal" class="form-control myinput" id="longitude-value-addcity" pattern="[0-9]+([\.][0-9]*)?" required>
                                         <span asp-validation-for="LngAddModal" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
-                        </div>*@
+                        </div>
                     </div>
                     <div class="modal-footer justify-content-center">
-                        <button @*id="dismiss-modal-cities" *@ type="button" class="btn btn-secondary" data-dismiss="modal">Nazad</button>
-                        @*<button type="button" onclick="addCity()" class="btn btn-danger">Dalje</button>*@
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Nazad</button>
                         <input type="submit" class="btn btn-success" asp-for="SubmitButton" value="Dodaj" />
                     </div>
                 </div>
@@ -93,19 +92,16 @@
             <div class="modal-dialog modal-confirm">
                 <div class="modal-content">
                     <div class="modal-header flex-column">
-                        <div class="icon-box">
-                            <i class="material-icons">&#xe002;</i>
-                        </div>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <div class="mb-3">
+                        <div class="col-md-12 mb-3">
                             <input id="edit-city-name" type="text" class="form-control myinput" placeholder="Naziv grada" asp-for="EditCity" required>
                             <span asp-validation-for="EditCity" class="text-danger"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-12 mb-3">
                             <select id="edit-city-select" class="custom-select d-block w-100 col-md-12 m-auto btn-lg" asp-for="@Model.SelectedCountryEditModal" asp-items="@Model.Countries">
-                                <option disabled selected>Izaberite Državu...</option>
+                                @*<option disabled selected>Izaberite Državu...</option>*@
                             </select>
                         </div>
                         @*mapa*@
@@ -118,13 +114,13 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label asp-for="LatEditModal"></label>
-                                    <input id="city-edit-lat" class="form-control myinput" asp-for="LatEditModal" id="latitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
+                                    <input class="form-control myinput" asp-for="LatEditModal" id="latitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
                                     <span asp-validation-for="LatEditModal" class="text-danger"></span>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label asp-for="LngEditModal"></label>
                                     <div class="input-group">
-                                        <input id="city-edit-lng" asp-for="LngEditModal" class="form-control myinput" id="longitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
+                                        <input asp-for="LngEditModal" class="form-control myinput" id="longitude-value" pattern="[0-9]+([\.][0-9]*)?" required>
                                         <span asp-validation-for="LngEditModal" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -132,13 +128,13 @@
                         </div>
                     </div>
                     <div class="modal-footer justify-content-center">
-                        <button id="dismiss-modal-cities" type="button" class="btn btn-secondary" data-dismiss="modal">Nazad</button>
-                        @*<button type="button" onclick="addCity()" class="btn btn-danger">Dalje</button>*@
-                        <input type="submit" class="btn btn-success" asp-for="SubmitButton" value="Sačuvaj" />
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Nazad</button>
+                        <input type="submit" class="btn btn-success" asp-for="SubmitButton"  value="Sačuvaj" />
                     </div>
                 </div>
+                <input asp-for="EditCityId" id="hidden-cityedit-id" hidden-removeelement-id="" hidden />
+
             </div>
-            <input id="hidden-cityedit-id" hidden-removeelement-id="" hidden />
         </div>
         <!-- Modal HTML -->
     </form>
@@ -163,8 +159,8 @@
                 <button type="button" onclick="cityRemove()" class="btn btn-danger">Dalje</button>
             </div>
         </div>
+        <input id="hidden-city-id" hidden-removeelement-id="" hidden />
     </div>
-    <input id="hidden-city-id" hidden-removeelement-id="" hidden  />
 </div>
 <script>
 
@@ -186,24 +182,32 @@
     }
 
     function sendValuesToCityDeleteModal(ev) {
-        $("#hidden-citydelete-id").val($(ev).attr('city-id'));
+        $("#hidden-city-id").val($(ev).attr('city-id'));
         var elementId = ($(ev).parent().parent()).attr('id');
-        $("#hidden-citydelete-id").attr('hidden-removeelement-id', elementId);
+        $("#hidden-city-id").attr('hidden-removeelement-id', elementId);
 
     }
+    function modalForAddCIty() {
+        document.getElementById('new-city').required = true;
+        document.getElementById('edit-city-name').required = false;
+    }
     function sendValuesToCityEditModal(ev) {
-        $("#hidden-citydelete-id").val($(ev).attr('city-id'));
+        document.getElementById('new-city').required = false;
+        document.getElementById('edit-city-name').required = true;
+
+        $("#hidden-cityedit-id").val($(ev).attr('city-id'));
         $("#edit-city-name").val($(ev).attr('city-name'));
         $("#edit-city-select").val($(ev).attr('city-country-id'));
-        $("#edit-city-lat").val($(ev).attr('city-lat'));
-        $("#edit-city-lng").val($(ev).attr('city-lng'));
+        $("#latitude-value").val($(ev).attr('city-lat'));
+        $("#longitude-value").val($(ev).attr('city-lng'));
+        initMap();
     }
 
     function cityRemove() {
         var removeelementid = $('#hidden-city-id').attr('hidden-removeelement-id');
         var data = { 'cityId': $('#hidden-city-id').val() };
         $.ajax({
-            url: "/Administration/RemoveCity",
+            url: "/Administration/DeleteCity",
             data: data,
             type: "POST",
             /// dataType: 'JSON',
@@ -243,5 +247,6 @@
 </script>
 
 
-<script src="~/js/mapa.js"></script>
+@*<script src="~/js/mapa.js"></script>*@
+<script src="~/js/AddCityMap.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>

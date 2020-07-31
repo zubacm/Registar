@@ -1,4 +1,4 @@
-﻿@model CountriesEditModel
+﻿@model TypesEditModel
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -10,23 +10,23 @@
 <br />
 <br />
 <div class="col-mb-3">
-    <a href="#countryAddModal" onclick="modalForAddCountry()" data-toggle="modal" class="trigger-btn btn btn-primary btn-block pointer col-md-6 m-auto">Dodaj državu</a>
+    <a href="#typeAddModal" onclick="modalForAddType()" data-toggle="modal" class="trigger-btn btn btn-primary btn-block pointer col-md-6 m-auto">Dodaj tip</a>
 </div>
 <hr />
-<form id="formCountries" asp-action="CountryAction" asp-controller="Administration">
+<form id="formTypes" asp-action="TypeAction" asp-controller="Administration">
     <div id="countries-container">
 
         <ul class="list-group mb-3 m-auto">
-            @if (Model.AvailableCountries != null)
+            @if (Model.AvailableTypes != null)
             {
-                @foreach (var item in Model.AvailableCountries)
+                @foreach (var item in Model.AvailableTypes)
                 {
-                    var idAttribute = item.Id + "COUNTRY";
+                    var idAttribute = item.Id + "TYPE";
                     <li id="@idAttribute" class="list-group-item d-flex justify-content-between lh-condensed">
                         <h5 class="my-0 col-md-12">
                             @item.Name
-                            <a href="#countryRemoveModal" onclick="sendValuesToCountryRemoveModal(this)" class="trigger-btn btn btn-error pointer" data-toggle="modal" country-id="@item.Id" style="float:right;padding:0;line-height:0;"><i class="fa fa-trash fa-2x"></i></a>
-                            <a href="#countryEditModal" onclick="sendValuesToCountryEditModal(this)" class="trigger-btn btn btn-error pointer" data-toggle="modal" country-id="@item.Id" country-name="@item.Name" style="float:right;padding:0;line-height:0;"><i class="fa fa-pencil fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;</a>
+                            <a href="#typeRemoveModal" onclick="sendValuesToTypeRemoveModal(this)" class="trigger-btn btn btn-error pointer" data-toggle="modal" type-id="@item.Id" style="float:right;padding:0;line-height:0;"><i class="fa fa-trash fa-2x"></i></a>
+                            <a href="#typeEditModal" onclick="sendValuesToTypeEditModal(this)" class="trigger-btn btn btn-error pointer" data-toggle="modal" type-id="@item.Id" type-name="@item.Name" style="float:right;padding:0;line-height:0;"><i class="fa fa-pencil fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;</a>
                         </h5>
 
                     </li>
@@ -36,8 +36,8 @@
     </div>
 
 
-    <!-- Modal HTML Add Country-->
-    <div id="countryAddModal" class="modal fade">
+    <!-- Modal HTML Add Type-->
+    <div id="typeAddModal" class="modal fade">
         <div class="modal-dialog modal-confirm">
             <div class="modal-content">
                 <div class="modal-header flex-column">
@@ -45,8 +45,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="col-md-12 mb-3">
-                        <input id="new-country-name" type="text" class="form-control myinput" placeholder="Naziv države" asp-for="NewCountry" required>
-                        <span asp-validation-for="NewCountry" class="text-danger"></span>
+                        <input id="new-type-name" type="text" class="form-control myinput" placeholder="Naziv tipa" asp-for="NewType" required>
+                        <span asp-validation-for="NewType" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="modal-footer justify-content-center">
@@ -57,8 +57,8 @@
         </div>
     </div>
     <!-- Modal HTML -->
-    <!-- Modal HTML Edit Country-->
-    <div id="countryEditModal" class="modal fade">
+    <!-- Modal HTML Edit Type-->
+    <div id="typeEditModal" class="modal fade">
         <div class="modal-dialog modal-confirm">
             <div class="modal-content">
                 <div class="modal-header flex-column">
@@ -66,8 +66,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="col-md-12 mb-3">
-                        <input id="edit-country-name" type="text" class="form-control myinput" placeholder="Naziv države" asp-for="EditCountryName" required>
-                        <span asp-validation-for="EditCountryName" class="text-danger"></span>
+                        <input id="edit-type-name" type="text" class="form-control myinput" placeholder="Naziv države" asp-for="EditTypeName" required>
+                        <span asp-validation-for="EditTypeName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="modal-footer justify-content-center">
@@ -75,15 +75,15 @@
                     <input type="submit" class="btn btn-success" asp-for="SubmitButton" value="Sačuvaj" />
                 </div>
             </div>
-            <input asp-for="EditCountryId" id="hidden-countryedit-id" hidden />
+            <input asp-for="EditTypeId" id="hidden-typeedit-id" hidden />
 
         </div>
     </div>
     <!-- Modal HTML -->
 </form>
 
-<!-- countryRemove Modal HTML -->
-<div id="countryRemoveModal" class="modal fade">
+<!--Remove Type Modal HTML -->
+<div id="typeRemoveModal" class="modal fade">
     <div class="modal-dialog modal-confirm">
         <div class="modal-content">
             <div class="modal-header flex-column">
@@ -94,40 +94,42 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Brisanje ove države uzrokovat će brisanje srodnih gradova i ponuda korisnika.</p>
+                <p>Brisanje ovog tipa uzrokovat će promjene u povezanim ponudama.</p>
             </div>
             <div class="modal-footer justify-content-center">
-                <button id="dismiss-modal-countries" type="button" class="btn btn-secondary" data-dismiss="modal">Nazad</button>
-                <button type="button" onclick="countryRemove()" class="btn btn-danger">Dalje</button>
+                <button id="dismiss-modal-edit-type" type="button" class="btn btn-secondary" data-dismiss="modal">Nazad</button>
+                <button type="button" onclick="typeRemove()" class="btn btn-danger">Dalje</button>
             </div>
         </div>
     </div>
-    <input id="hidden-country-id" hidden-removeelement-id="" hidden remove-el="" />
+    <input id="hidden-type-id" hidden-removeelement-id="" hidden remove-el="" />
 </div>
 <script>
-    function modalForAddCountry() {
-        document.getElementById('new-country-name').required = true;
-        document.getElementById('edit-country-name').required = false;
-    }
-    function sendValuesToCountryEditModal(ev) {
-        document.getElementById('new-country-name').required = false;
-        document.getElementById('edit-country-name').required = true;
 
-        $("#hidden-countryedit-id").val($(ev).attr('country-id'));
-        $("#edit-country-name").val($(ev).attr('country-name'));
+
+    function modalForAddType() {
+        document.getElementById('new-type-name').required = true;
+        document.getElementById('edit-type-name').required = false;
+    }
+    function sendValuesToTypeEditModal(ev) {
+        document.getElementById('new-type-name').required = false;
+        document.getElementById('edit-type-name').required = true;
+
+        $("#hidden-typeedit-id").val($(ev).attr('type-id'));
+        $("#edit-type-name").val($(ev).attr('type-name'));
     }
 
-    function sendValuesToCountryRemoveModal(ev) {
-        $("#hidden-country-id").val($(ev).attr('country-id'));
+    function sendValuesToTypeRemoveModal(ev) {
+        $("#hidden-type-id").val($(ev).attr('type-id'));
         var elementId = ($(ev).parent().parent()).attr('id');
-        $("#hidden-country-id").attr('hidden-removeelement-id', elementId);
+        $("#hidden-type-id").attr('hidden-removeelement-id', elementId);
 
     }
-    function countryRemove() {
-        var removeelementid = $('#hidden-country-id').attr('hidden-removeelement-id');
-        var data = { 'countryId': $('#hidden-country-id').val() };
+    function typeRemove() {
+        var removeelementid = $('#hidden-type-id').attr('hidden-removeelement-id');
+        var data = { 'typeId': $('#hidden-type-id').val() };
         $.ajax({
-            url: "/Administration/RemoveCountry",
+            url: "/Administration/DeleteType",
             data: data,
             type: "POST",
             /// dataType: 'JSON',
@@ -135,7 +137,7 @@
             success: function (response) {
                 var id = "#" + removeelementid
                 $(id).remove();
-                $('#dismiss-modal-countries').trigger('click');
+                $('#dismiss-modal-edit-type').trigger('click');
             },
             error: function () {
                 alert('Greška prilikom pribavljanja podataka.');

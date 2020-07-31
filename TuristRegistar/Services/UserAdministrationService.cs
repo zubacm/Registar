@@ -145,29 +145,63 @@ namespace TuristRegistar.Services
         }
 
 
-        //Provjeri moras li i u objektima brisat ove atribute ili gradove ili zemlje
-        public void AddCountableObjectAttribute(string attribute)
+        public void AddCountableObjectAttribute(CountableObjectAttributes attribute)
         {
-            var cntObjAttribute = new CountableObjectAttributes() { Name = attribute };
-            _context.CountableObjectAttributes.Add(cntObjAttribute);
+            _context.CountableObjectAttributes.Add(attribute);
             _context.SaveChanges();
         }
         public void RemoveCountableObjectAttribute(int id)
         {
             var cntObjAttribute = _context.CountableObjectAttributes.FirstOrDefault(coa => coa.Id == id);
+            _context.RemoveRange(_context.CntObjAttributesCount.Where(c => c.CountableObjAttrId == id));
             _context.CountableObjectAttributes.Remove(cntObjAttribute);
             _context.SaveChanges();
         }
-        public void AddObjectAttributes(string attribute)
+        public void EditCountableObjectAttribute(CountableObjectAttributes edittedAttribute)
         {
-            var objAttribute = new ObjectAttributes() { Name = attribute };
-            _context.ObjectAttributes.Add(objAttribute);
+            var attribute = _context.CountableObjectAttributes.FirstOrDefault(c => c.Id == edittedAttribute.Id);
+            attribute.Name = edittedAttribute.Name;
+            _context.CountableObjectAttributes.Attach(attribute);
+            _context.SaveChanges();
+        }
+        public void AddObjectAttributes(ObjectAttributes attribute)
+        {
+            _context.ObjectAttributes.Add(attribute);
             _context.SaveChanges();
         }
         public void RemoveObjectAttribute(int id)
         {
             var objAttribute = _context.ObjectAttributes.FirstOrDefault(oa => oa.Id == id);
+            _context.RemoveRange(_context.ObjectHasAttributes.Where(oha => oha.AttributeId == id));
             _context.ObjectAttributes.Remove(objAttribute);
+            _context.SaveChanges();
+        }
+        public void EditObjectAttribute(ObjectAttributes edittedAttribute)
+        {
+            var attribute = _context.ObjectAttributes.FirstOrDefault(a => a.Id == edittedAttribute.Id);
+            attribute.Name = edittedAttribute.Name;
+            _context.ObjectAttributes.Attach(attribute);
+            _context.SaveChanges();
+        }
+        public void AddObjectType(ObjectTypes type)
+        {
+            _context.ObjectTypes.Add(type);
+            _context.SaveChanges();
+        }
+        public void EditObjectTypes(ObjectTypes editedType)
+        {
+            var type = _context.ObjectTypes.FirstOrDefault(t => t.Id == editedType.Id);
+            type.Name = editedType.Name;
+            _context.ObjectTypes.Attach(type);
+            _context.SaveChanges();
+        }
+        //check if woeks
+        public void RemoveObjectType(int typeId)
+        {
+            var type = _context.ObjectTypes.FirstOrDefault(t => t.Id == typeId);
+            var objects = _context.Objects.Where(o => o.ObjectTypeId == typeId).ToList();
+            objects.ForEach(o => { o.ObjectTypeId = null; });
+            _context.ObjectTypes.Remove(type);
             _context.SaveChanges();
         }
         public void AddCountry(Countries country)
@@ -181,6 +215,13 @@ namespace TuristRegistar.Services
             _context.Counries.Remove(coutnry);
             _context.RemoveRange(_context.Cities.Where(c => c.CountriesId == countryId));
             _context.RemoveRange(_context.Objects.Where(c => c.CountryId == countryId));
+            _context.SaveChanges();
+        }
+        public void EditCountry(Countries editedCountries)
+        {
+            var country = _context.Counries.FirstOrDefault(c => c.Id == editedCountries.Id);
+            country.Name = editedCountries.Name;
+            _context.Counries.Attach(country);
             _context.SaveChanges();
         }
         public void AddCity(Cities city)
@@ -206,12 +247,7 @@ namespace TuristRegistar.Services
             _context.RemoveRange(_context.Objects.Where(c => c.CityId == id));
             _context.SaveChanges();
         }
-        //public void EditCity()
-        // public void RemoveCountry()
-        //public Hash<string, string> GetAllCurrenciesFromAPI()
-        //{
-
-        //}
+        
         public void AddCurrency(Currencies currency)
         {
             _context.Currencies.Add(currency);

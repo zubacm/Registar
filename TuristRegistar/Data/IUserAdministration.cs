@@ -21,8 +21,18 @@ namespace TuristRegistar.Data
         int CountUsers(string searchString, string roleId);
         List<Users> GetUsers(int pagenumber, int pagesize, string searchString, string roleId);
 
+        void AddCountableObjectAttribute(CountableObjectAttributes attribute);
+        void RemoveCountableObjectAttribute(int id);
+        void EditCountableObjectAttribute(CountableObjectAttributes edittedAttribute);
+        void AddObjectAttributes(ObjectAttributes attribute);
+        void RemoveObjectAttribute(int id);
+        void EditObjectAttribute(ObjectAttributes edittedAttribute);
+        void AddObjectType(ObjectTypes type);
+        void EditObjectTypes(ObjectTypes editedType);
+        void RemoveObjectType(int typeId);
         void AddCountry(Countries country);
         void RemoveCountry(int countryId);
+        void EditCountry(Countries editedCountries);
         void AddCity(Cities city);
         void EditCity(Cities editedCity);
         void RemoveCity(int id);

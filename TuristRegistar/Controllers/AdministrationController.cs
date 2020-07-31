@@ -182,19 +182,45 @@ namespace TuristRegistar.Controllers
 
             return PartialView(model);
         }
+
+        public IActionResult CountryAction(CountriesEditModel model)
+        {
+            switch (model.SubmitButton)
+            {
+                case "Dodaj":
+                    return AddCountry(model);
+                case "Sačuvaj":
+                    return EditCountry(model);
+            }
+            return null;
+        }
+
         public IActionResult AddCountry(CountriesEditModel model)
         {
             var country = new Countries() { Name = model.NewCountry};
             _userAdministration.AddCountry(country);
             model.AvailableCountries = _touristObject.GetCountries();
 
-            return PartialView("_EditCountries", model);
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
+            return View("Parameters");
         }
         public IActionResult RemoveCountry(int countryId)
         {
             _userAdministration.RemoveCountry(countryId);
             //see more
             return Ok();
+        }
+        public IActionResult EditCountry(CountriesEditModel countriesEditModel)
+        {
+            Countries country = new Countries()
+            {
+                Id = countriesEditModel.EditCountryId,
+                Name = countriesEditModel.EditCountryName,
+            };
+            _userAdministration.EditCountry(country);
+
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
+            return View("Parameters");
         }
 
         public IActionResult _EditCities()
@@ -240,9 +266,8 @@ namespace TuristRegistar.Controllers
                 Lng = model.LngAddModal,
             };
             _userAdministration.AddCity(city);
-            //model.Countries = (_touristObject.GetCountries())
-            //                    .Select(item => new SelectListItem() { Text = item.Name, Value = item.Id.ToString() });
 
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
             return View("Parameters");
         }
         public IActionResult EditCity(CitiesEditModel model)
@@ -256,18 +281,165 @@ namespace TuristRegistar.Controllers
                 CountriesId = model.SelectedCountryEditModal,
             };
             _userAdministration.EditCity(city);
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
             return View("Parameters");
         }
         public IActionResult DeleteCity(int cityId)
         {
             _userAdministration.RemoveCity(cityId);
+            
+            return Ok();
+        }
+        public IActionResult _EditTypes()
+        {
+            var model = new TypesEditModel()
+            {
+                AvailableTypes = _touristObject.GetObjectTypes(),
+            };
+
+            return PartialView(model);
+        }
+        public IActionResult TypeAction(TypesEditModel model)
+        {
+            switch (model.SubmitButton)
+            {
+                case "Dodaj":
+                    return AddType(model);
+                case "Sačuvaj":
+                    return EditType(model);
+            }
+            //return errorpage
+            return null;
+        }
+        public IActionResult AddType(TypesEditModel model)
+        {
+            var type = new ObjectTypes()
+            {
+                Name = model.NewType,
+            };
+            _userAdministration.AddObjectType(type);
+
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
+            return View("Parameters");
+        }
+        public IActionResult EditType(TypesEditModel model)
+        {
+            var type = new ObjectTypes()
+            {
+                Id = model.EditTypeId,
+                Name = model.EditTypeName,
+            };
+            _userAdministration.EditObjectTypes(type);
+
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
+            return View("Parameters");
+        }
+        public IActionResult DeleteType(int typeId)
+        {
+            _userAdministration.RemoveObjectType(typeId);
 
             return Ok();
         }
-        //public IActionResult EditCity(CitiesEditModel model)
-        //{
+        public IActionResult _EditAttributes()
+        {
+            var model = new AttributesEditModel()
+            {
+                AvailableAttributes = _touristObject.GetAllObjectAttributes(),
+            };
 
-        //}
+            return PartialView(model);
+        }
+        public IActionResult AttributeAction(AttributesEditModel model)
+        {
+            switch (model.SubmitButton)
+            {
+                case "Dodaj":
+                    return AddAttribute(model);
+                case "Sačuvaj":
+                    return EditAttribute(model);
+            }
+            //return errorpage
+            return null;
+        }
+        public IActionResult AddAttribute(AttributesEditModel model)
+        {
+            var attribute = new ObjectAttributes()
+            {
+                Name = model.NewAttribute,
+            };
+            _userAdministration.AddObjectAttributes(attribute);
+
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
+            return View("Parameters");
+        }
+        public IActionResult EditAttribute(AttributesEditModel model)
+        {
+            var attribute = new ObjectAttributes()
+            {
+                Id = model.EditAttributeId,
+                Name = model.EditAttributeName,
+            };
+            _userAdministration.EditObjectAttribute(attribute);
+
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
+            return View("Parameters");
+        }
+        public IActionResult DeleteAttribute(int attributeId)
+        {
+            _userAdministration.RemoveObjectAttribute(attributeId);
+
+            return Ok();
+        }
+        public IActionResult _EditCntAttribute()
+        {
+            var model = new CntAttributesEditModel()
+            {
+                AvailableCntAttributes = _touristObject.GetAllCountableObjectAttributes(),
+            };
+
+            return PartialView(model);
+        }
+        public IActionResult CntAttributeAction(CntAttributesEditModel model)
+        {
+            switch (model.SubmitButton)
+            {
+                case "Dodaj":
+                    return AddCntAttribute(model);
+                case "Sačuvaj":
+                    return EditCntAttribute(model);
+            }
+            //return errorpage
+            return null;
+        }
+        public IActionResult AddCntAttribute(CntAttributesEditModel model)
+        {
+            var cntAttribute = new CountableObjectAttributes()
+            {
+                Name = model.NewCntAttribute,
+            };
+            _userAdministration.AddCountableObjectAttribute(cntAttribute);
+
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
+            return View("Parameters");
+        }
+        public IActionResult EditCntAttribute(CntAttributesEditModel model)
+        {
+            var cntAttribute = new CountableObjectAttributes()
+            {
+                Id = model.EditCntAttributeId,
+                Name = model.EditCntAttributeName,
+            };
+            _userAdministration.EditCountableObjectAttribute(cntAttribute);
+
+            TempData["Notification"] = "Izmjene su uspješno sačuvane";
+            return View("Parameters");
+        }
+        public IActionResult DeleteCntAttribute(int cntAttributeId)
+        {
+            _userAdministration.RemoveCountableObjectAttribute(cntAttributeId);
+
+            return Ok();
+        }
 
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> _EditCurrencies()

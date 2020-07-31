@@ -4,7 +4,10 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-@inject TuristRegistar.Data.IUser MyService;
+@inject TuristRegistar.Data.IUser MyService
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManag
+@inject SignInManager<IdentityUser> SignInManager
 
 <!DOCTYPE html>
 <html>
@@ -36,34 +39,6 @@
 <body>
     <partial name="~/Views/Shared/_Notifications.cshtml" />
 
-    @*@if (TempData["Notification"] != null)
-        {
-            <div class="toast toast-position successgreen-background text-white" data-autohide="false">
-                <div class="toast-header successgreen-background">
-                    <strong class="mr-auto text-primary"><i class="fas fa-check text-white"></i></strong>
-                    <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast">&times;</button>
-                </div>
-                <div class="toast-body">
-                    &nbsp;&nbsp;&nbsp;
-                    @TempData["Notification"]
-                    &nbsp;&nbsp;&nbsp;
-                </div>
-            </div>
-        }
-        @if (TempData["Error-Notification"] != null)
-        {
-            <div class="toast toast-position error-background text-white" data-autohide="false">
-                <div class="toast-header error-background">
-                    <strong class="mr-auto text-primary"><i class="fas fa-times-circle text-white"></i></strong>
-                    <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast">&times;</button>
-                </div>
-                <div class="toast-body">
-                    &nbsp;&nbsp;&nbsp;
-                    @TempData["Error-Notification"]
-                    &nbsp;&nbsp;&nbsp;
-                </div>
-            </div>
-        }*@
     <!--Navbar-->
     <nav class="navbar navbar-expand-lg navbar-dark  fixed-top">
 
@@ -111,7 +86,6 @@
                                 {
                                     @if (item.Key != mycurrency)
                                     {
-                                        @*<a class="dropdown-item" asp-controller="Home" asp-action="SetCookieForCurrency" asp-route-currency="@item.Key">@item.Key</a>*@
                                         <a href="#" onclick="setCurrencyCookie('@item.Key')" class="dropdown-item">@item.Key</a>
                                     }
 
@@ -124,9 +98,29 @@
                 <li class="nav-item">
                     <a class="nav-link" href="~/objectlist"><i class="fa fa-search" aria-hidden="true"></i></a>
                 </li>
-                
+
             </ul>
             <!-- Links -->
+
+            @if (SignInManager.IsSignedIn(User))
+            {
+
+                var user = await UserManager.FindByIdAsync(UserManager.GetUserId(User));
+                var roles = await UserManager.GetRolesAsync(user);
+
+                @if (roles.Contains("ADMIN"))
+                {
+                     <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink2" data-toggle="dropdown"
+                           aria-haspopup="true" aria-expanded="false">Administracija</a>
+                        <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink2" style="right:5%;left:auto">
+                            <a asp-controller="Administration" asp-action="UsersList" class="dropdown-item">Korisnici</a>
+                            <a asp-controller="Administration" asp-action="Parameters" class="dropdown-item">Parametri</a>
+                        </div>
+                    </div>
+                    <span>&nbsp;</span>
+            }
+            }
 
 
             @if (SignInManager.IsSignedIn(User))
@@ -147,10 +141,10 @@
                 <a asp-controller="Auth" asp-action="Login" data-toggle="tooltip" title="Prijava"> <i class="fas fa-user-circle fa-2x text-white"></i></a>
             }
             @*</div>*@
-        </div>
-        <!-- Collapsible content -->
+            </div>
+            <!-- Collapsible content -->
 
-    </nav>
+        </nav>
     <!--/.Navbar-->
     @*<nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="container">
@@ -175,7 +169,7 @@
 
     @*<partial name="_CookieConsentPartial" />*@
 
-    
+
     <div class=" body-content">
         @RenderBody()
         <hr />
