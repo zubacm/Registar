@@ -1,8 +1,56 @@
 ﻿@model ErrorViewModel
+
+<link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<link href="~/css/sitestyles.css" rel="stylesheet" />
+
+@{
+    Layout = null;
+}
 @{
     ViewData["Title"] = "Error";
 }
+<div class="error-body">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-6 offset-lg-3 col-sm-6 offset-sm-3 col-12 p-3 error-main">
+                <div class="row">
+                    <div class="col-lg-8 col-12 col-sm-10 offset-lg-2 offset-sm-1">
+                        @if (Model.ShowRequestId)
+                        {
+                            <h1 class="m-0">@Model.RequestId</h1>
+                            @if (Model.RequestId == "403")
+                            {
+                                <h6>Ovaj korisnički nalog je banovan.</h6>
+                                @*<p>Lorem ipsum dolor sit <span class="text-info">amet</span>, consectetur <span class="text-info">adipisicing</span> elit, sed do eiusmod.</p>*@
+                            }
+                            else if (Model.RequestId == "401")
+                            {
+                                <h6>Neautorizovan pristup.</h6>
+                            }
+                            else if (Model.RequestId == "404")
+                            {
+                                <h6>Stranica nije pronađena.</h6>
+                            }
+                            else if (Model.RequestId == "400")
+                            {
+                                <h6>Traženi url nije pronađen na ovom serveru.</h6>
+                            }
+                            @*<p>
+                <strong>Request ID:</strong> <code>@Model.RequestId</code>
+            </p>*@
+                        }
 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*<br /><br /><br />
 <h1 class="text-danger">Error.</h1>
 <h2 class="text-danger">An error occurred while processing your request.</h2>
 
@@ -19,4 +67,11 @@
 </p>
 <p>
     <strong>Development environment should not be enabled in deployed applications</strong>, as it can result in sensitive information from exceptions being displayed to end users. For local debugging, development environment can be enabled by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>, and restarting the application.
-</p>
+</p>*@
+
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+<script src="~/lib/jquery/jquery.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.bundle.js"></script>
+
+<script src="~/lib/jquery/jquery.min.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>

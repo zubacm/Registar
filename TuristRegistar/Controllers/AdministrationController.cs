@@ -11,10 +11,12 @@ using TuristRegistar.Models;
 
 namespace TuristRegistar.Controllers
 {
+    [Authorize(Roles = "ADMIN")]
     public class AdministrationController : Controller
     {
         private readonly IUserAdministration _userAdministration;
         private readonly ITouristObject _touristObject;
+
 
         public AdministrationController(IUserAdministration userAdministration, ITouristObject touristObject)
         {
@@ -59,7 +61,6 @@ namespace TuristRegistar.Controllers
             model.Roles = roles.Select(r => new SelectListItem() { Text = r.Name, Value = r.Id }).ToList();
             model.Roles.Add(new SelectListItem() { Text = "Sve", Value = "" });
 
-            //napravi model
             return View(model);
         }
 
@@ -67,9 +68,7 @@ namespace TuristRegistar.Controllers
         public IActionResult FilterUsersList(AdministrationModel model)
         {
             model.SearchString = model.SearchString == null ? "" : model.SearchString;
-          //  model.CurrPage = model.CurrPage == 0 ? 1 : model.CurrPage;
-          //Ustvari ovdje nek vraća na prvu stranu
-            //Check what is selected roleid, is it roleid or role????
+
             model.Pager = new Pager(_userAdministration.CountUsers(model.SearchString, model.SelectedRole), 1);
             var myusers = _userAdministration.GetUsers(model.Pager.CurrentPage, model.Pager.PageSize, model.SearchString, model.SelectedRole);
 
@@ -97,12 +96,6 @@ namespace TuristRegistar.Controllers
                 );
             }
 
-            //Ovo ovdje vjerovatno ne treba,, check!!!!
-            //var roles = _userAdministration.GetAllRoles();
-            //model.Roles = roles.Select(r => new SelectListItem() { Text = r.Name, Value = r.Id }).ToList();
-            //model.Roles.Add(new SelectListItem() { Text = "Sve", Value = "" });
-
-            //Napravi partial
             return PartialView("_UsersListed", model);
         }
 
@@ -141,12 +134,6 @@ namespace TuristRegistar.Controllers
                 );
             }
 
-            //Ovo ovdje vjerovatno ne treba,, check!!!!
-            //var roles = _userAdministration.GetAllRoles();
-            //model.Roles = roles.Select(r => new SelectListItem() { Text = r.Name, Value = r.Id }).ToList();
-            //model.Roles.Add(new SelectListItem() { Text = "Sve", Value = "" });
-
-            //Napravi partial
             return PartialView("_UsersListed", model);
         }
 
@@ -207,7 +194,6 @@ namespace TuristRegistar.Controllers
         public IActionResult RemoveCountry(int countryId)
         {
             _userAdministration.RemoveCountry(countryId);
-            //see more
             return Ok();
         }
         public IActionResult EditCountry(CountriesEditModel countriesEditModel)
@@ -254,6 +240,7 @@ namespace TuristRegistar.Controllers
                 case "Sačuvaj":
                     return EditCity(model);
             }
+            //return error page
             return null;
         }
         public IActionResult AddCity(CitiesEditModel model)
@@ -441,7 +428,6 @@ namespace TuristRegistar.Controllers
             return Ok();
         }
 
-        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> _EditCurrencies()
         {
             var model = new CurrencyEditModel()

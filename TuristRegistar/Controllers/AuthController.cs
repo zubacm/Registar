@@ -78,7 +78,8 @@ namespace TuristRegistar.Controllers
                     await _user.AddLegalPerson(userLPPP);
                 else
                     await _user.AddLegalPerson(userLPPP);
-                return Ok(new { Username = user.UserName });
+                TempData["Notification"] = "Uspješno ste se registrovali";
+                return RedirectToAction("Index", "Home");
             }
             return View(model);
 
@@ -98,24 +99,22 @@ namespace TuristRegistar.Controllers
         {
             if (ModelState.IsValid)
             {
-               
+
                 var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false/*Input.RememberMe*/, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     TempData["Notification"] = "Uspješno ste se prijavili";
                     return RedirectToAction("Index", "Home");
                 }
-                //if (result.IsLockedOut)
-                //{
-                //    return RedirectToPage("./Lockout");
-                //}
-                //else
-                //{
-                //    ModelState.AddModelError(string.Empty, "Neuspješan pokušaj prijave.");
-                //    return Page();
-                //}
+                if (result.IsLockedOut)
+                {
+                    var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+                    return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
+                }
             }
-            return Unauthorized();
+            var errormodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", errormodel);
+           // return Unauthorized();
         }
 
         //[Route("signout")] // /logout
@@ -136,7 +135,7 @@ namespace TuristRegistar.Controllers
         }
 
 
-        //[Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> UserSettingsAdmin(String identUserId)
         {
             var user = await _userManager.FindByIdAsync(identUserId);
@@ -193,7 +192,7 @@ namespace TuristRegistar.Controllers
             return RedirectToAction("Settings", "Auth");
         }
 
-
+        [Authorize]
         public async Task<IActionResult> _UpdateUser()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -209,21 +208,8 @@ namespace TuristRegistar.Controllers
             return PartialView(model);
         }
 
-        //public async Task<IActionResult> _UpdateUserAdmin(String identUserId)
-        //{
-        //    var user = await _userManager.FindByIdAsync(identUserId);
-        //    if (user == null)
-        //    {
-        //        return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
-        //    }
-        //    var model = new UserViewModel()
-        //    {
-        //        Id = user.Id,
-        //        Username = user.UserName,
-        //    };
-        //    return PartialView(model);
-        //}
 
+        [Authorize]
         public IActionResult UpdateUser(UserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -273,32 +259,6 @@ namespace TuristRegistar.Controllers
             return View(model);
         }
 
-        //[Authorize]
-        //public async Task<IActionResult> _UpdateProfileAdmin(String identUserId)
-        //{
-        //    var user = await _userManager.FindByIdAsync(identUserId);
-        //    if (user == null)
-        //    {
-        //        return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
-        //    }
-
-        //    var current_user = _user.GetUser(user.Id);
-
-        //    UpdateProfileViewModel model = new UpdateProfileViewModel()
-        //    {
-        //        KorisnikId = current_user.Id,
-        //        UserId = current_user.IdentUserId,
-        //        Username = current_user.UserName,
-        //        Name = current_user.Name,
-        //        LegalPerson = current_user.LegalPerson,
-        //        LastName = current_user.LastName,
-        //        Email = current_user.Email,
-        //        ContactAddress = current_user.ContactAddress,
-        //        Phone = current_user.PhoneNumber,
-        //    };
-
-        //    return View(model);
-        //}
 
         [HttpPost]
         [Authorize]

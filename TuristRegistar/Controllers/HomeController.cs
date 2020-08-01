@@ -34,6 +34,17 @@ namespace TuristRegistar.Controllers
             return View();
         }
 
+        public IActionResult Error(int? statusCode)
+        {
+            if (statusCode.HasValue)
+            {
+                    var model = new ErrorViewModel() { RequestId = statusCode.ToString(), };
+                    return View("~/Views/Shared/Error.cshtml", model);
+            }
+            return View("~/Views/Shared/Error.cshtml", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+
+        }
+
         [Route("objectlist")] // /objectlist
         public async Task<IActionResult> ObjectList()
         {
@@ -57,10 +68,7 @@ namespace TuristRegistar.Controllers
             }
 
             var pager = new Pager(_touristObject.CountObjects(), 1);
-            //if (model.CurrPage == 0)
-            //    pager.CurrentPage = pager.EndPage;
-
-            //nekretnine = _nekretnina.GetNekretnine(pager.CurrentPage, pager.PageSize);
+           
             model.Pager = pager;
             
             model.ObjectsList = _touristObject.GetObjects(pager.CurrentPage, pager.PageSize)
@@ -88,47 +96,6 @@ namespace TuristRegistar.Controllers
             return View(model);
         }
 
-        [HttpPost]//not used...
-        public IActionResult ObjectListPost(ObjectsViewModel model)
-        {
-
-            model.Search = new Search()
-            {
-                ObjectAttributes = _touristObject.GetAllObjectAttributes()
-                            .Select(atr => new ObjectAttributesModel() { Id = atr.Id, Name = atr.Name, Selected = false }).ToList(),
-                ObjectTypes = _touristObject.GetObjectTypes()
-                        .Select(type => new ObjectTypeModel() { Id = type.Id, Name = type.Name, Selected = false }).ToList(),
-            };
-
-            //model = FilterObjectList(model);
-
-            var pager = new Pager(_touristObject.CountObjects(), model.CurrPage);
-            if (model.CurrPage == 0)
-                pager.CurrentPage = pager.EndPage;
-
-            //nekretnine = _nekretnina.GetNekretnine(pager.CurrentPage, pager.PageSize);
-            model.Pager = pager;
-
-            model.ObjectsList = _touristObject.GetObjects(pager.CurrentPage, pager.PageSize)
-                               .Select(ob => new ObjectItemModel()
-                               {
-                                   Id = ob.Id,
-                                   Name = ob.Name,
-                                   Location = ob.City != null ? ob.Address + ", " + ob.City.Name : ob.Address,
-                                   ImgSrc = ob.ObjectImages.Count > 0 ? ob.ObjectImages.ElementAt(0).Path : "/pink.png",
-                                   Lat = ob.Lat,
-                                   Lng = ob.Lng,
-                                   Description = ob.Description,
-                                   WebContact = ob.WebContact,
-                                   EmailContact = ob.EmailContact,
-                                   PhoneNumberContact = ob.PhoneNumberContact,
-                                   Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
-                                   NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
-                                   Rating = Math.Round(_touristObject.GetAvarageRating(ob.Id), 2),
-                               }).ToList();
-
-            return View("ObjectList", model);
-        }
 
         public async Task<IActionResult> FilterObjectList(ObjectsViewModel model)
         {
@@ -136,11 +103,7 @@ namespace TuristRegistar.Controllers
             model.Search.CheckIn = model.Search.CheckInString == null ? DateTime.MinValue : DateTime.Parse(model.Search.CheckInString);
             model.Search.CheckOut = model.Search.CheckOutString == null ? DateTime.MinValue : DateTime.Parse(model.Search.CheckOutString);
 
-            //if ((model.Search.PriceBelow != 0 && (model.Search.CheckIn == DateTime.MinValue || model.Search.CheckOut == DateTime.MinValue)) || (model.Search.PriceBelow != 0 && model.Search.Occupancy == 0))
-            //{
-            //    //reset
-            //    model.Search.PriceBelow = 0;
-            //}
+        
 
 
             var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
@@ -221,51 +184,7 @@ namespace TuristRegistar.Controllers
             return PartialView("_ObjectsListed", model);
         }
 
-        //public async Task<IActionResult> GoToFilteredMap(ObjectsViewModel model)
-        //{
-        //    ObjectsMapViewModel mapModel = new ObjectsMapViewModel()
-        //    {
-        //        Search = model.Search,
-        //    };
-
-        //    var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
-
-
-        //    model.ObjectsList = (await _touristObject.GetAllFilteredObjects(mapModel.Search, currency))
-        //        .Select(ob => new ObjectItemModel()
-        //        {
-        //            Id = ob.Id,
-        //            Name = ob.Name,
-        //            Location = ob.City != null ? ob.Address + ", " + ob.City.Name : ob.Address,
-        //            ImgSrc = ob.ObjectImages.Count > 0 ? ob.ObjectImages.ElementAt(0).Path : "/pink.png",
-        //            Lat = ob.Lat,
-        //            Lng = ob.Lng,
-        //            Description = ob.Description,
-        //            WebContact = ob.WebContact,
-        //            EmailContact = ob.EmailContact,
-        //            PhoneNumberContact = ob.PhoneNumberContact,
-        //            Type = ob.ObjectType == null ? "" : ob.ObjectType.Name,
-        //            NumberOfRatings = _touristObject.GetNumberOfRatings(ob.Id),
-        //            Rating = _touristObject.GetAvarageRating(ob.Id),
-        //        }).ToList();
-
-        //    if (!string.IsNullOrWhiteSpace(mapModel.Search.SearchString))
-        //    {
-        //        var coordinates = _touristObject.GetCityCoordinates(model.Search.SearchString);
-        //        if (coordinates == null)
-        //            coordinates = _touristObject.GetCountryCoordinates(mapModel.Search.SearchString);
-
-        //        if (coordinates != null)
-        //        {
-        //            mapModel.CenterLat = coordinates.Lat;
-        //            mapModel.CenterLng = coordinates.Lng;
-        //        }
-        //    }
-
-        //    return View("Map", mapModel);
-        //    //await FilterObjectsMap(mapModel);
-
-      //  }
+       
 
 
         ////[Route("objectsmap")] // /objectlist
@@ -372,11 +291,11 @@ namespace TuristRegistar.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        //public IActionResult Error()
+        //{
+        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        //}
 
 
         public void SetCookieForCurrency(string currency)
@@ -419,7 +338,9 @@ namespace TuristRegistar.Controllers
                 catch (HttpRequestException httpRequestException)
                 {
                     Console.WriteLine(httpRequestException.StackTrace);
+                    
                     return 0;
+                    //ovdje neki error page no connection to server
                     //return new KeyValuePair<string, string> ( "Error", "Error calling API. Please do manual lookup." );
                     //return "Error calling API. Please do manual lookup.";
                 }

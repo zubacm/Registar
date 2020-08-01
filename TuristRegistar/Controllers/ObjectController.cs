@@ -132,7 +132,7 @@ namespace TuristRegistar.Controllers
             }
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         [Route("createobject")] // /createobject
         public async Task<IActionResult> CreateObject(CreateObjectViewModel model)
@@ -747,6 +747,7 @@ namespace TuristRegistar.Controllers
             return Ok(ratingsAndReviwsModel);
         }
 
+
         public IActionResult ChangeReviewsPage(ObjectDetailsViewModel model)
         {
             model.Pager = new Pager(_touristObject.CountRatingsAndReviews(model.Id), model.CurrPage);
@@ -796,7 +797,8 @@ namespace TuristRegistar.Controllers
             _touristObject.DeleteReview(id);
             return Ok();
         }
-        //još delete
+
+        [Authorize]
         public IActionResult DeleteObject(int objectId)
         {
             _touristObject.DeleteObjectAndRelatedColumns(objectId);

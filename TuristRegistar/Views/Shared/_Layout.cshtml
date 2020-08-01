@@ -220,11 +220,6 @@
             $('.fixed-top').css('background', 'rgba(15,29,95, 1)');
         }
     });
-    //$(document).ready(function () {
-
-    //    $('.fixed-top').css('background', 'rgba(0,0,0, 1)');
-
-    //});
 
 </script>
 <script>
@@ -234,11 +229,6 @@
         var expires = "; expires=" + date.toUTCString();
 
         document.cookie = "Currency" + "=" + (value || "") + expires + "; path=/";
-
-        //this reload only this container
-        //$("#currency-container").load(window.location.href + " #currency-container1");
-
-        //this reloads current page
         location.reload();
     }
 </script>

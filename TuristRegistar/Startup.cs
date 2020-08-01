@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using TuristRegistar.Data;
+using TuristRegistar.Models;
 using TuristRegistar.Services;
 
 namespace TuristRegistar
@@ -108,7 +109,17 @@ namespace TuristRegistar
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+            //app.UseStatusCodePages(async context =>
+            //{
+            //    if (context.HttpContext.Response.StatusCode == 403)
+            //    {
+            //        var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
 
+            //         RedirectToActionResult("~/Views/Shared/Error.cshtml", unsucessfulmodel);
+            //    }
+            //});
+            //app.UseStatusCodePagesWithRedirects("~/Views/Shared/Error.cshtml/{0}");
+            app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
             var cultureInfo = new CultureInfo("en-US");
             //cultureInfo.NumberFormat.CurrencySymbol = "€";
 
