@@ -251,12 +251,55 @@
         </form>
     </div>
 </div>
+<!--./Osnovno-->
+<hr />
+<!--Fotografije-->
+<div class="container py-5">
+    <div class="bg-white rounded-lg shadow-sm p-5">
+        <div class="col-md-12">
+            <div class="gallery" id="gallery">
+                @if (Model.ImgsSrc != null)
+                {
+                    @foreach (var item in Model.ImgsSrc)
+                    {
+                        <div href="#imgModal" data-toggle="modal" class="pics animation all" onmouseover="blurImage(this)" onmouseout="unblurImage(this)">
+                            <img img-id="@item.Id" onclick="sendSrcToImgModal(this)" class="img-fluid pointer" src="@item.Path" alt="Forografija se ne može učitati">
+                        </div>
+                    }
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--./Fotografije-->
 @*</form>*@
 @*</div>*@
-<!--./Osnovno-->
+
+<!--Image Modal-->
+<div id="imgModal" class="modal fade">
+    <div class="modal-dialog modal-confirm" style="width:100%; max-width:100%">
+        <div class="modal-content">
+            <div class="modal-header flex-column">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 mb-3">
+                    <img id="img-modal" src="" style="max-width:100%"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal HTML -->
+
 
 
 <script>
+    function sendSrcToImgModal(ev) {
+        console.log($(ev).attr('src'));
+        $('#img-modal').attr('src', ($(ev).attr('src')));
+    }
     function AddReview() {
         //  alert($('#formIndex').serialize
         $.ajax({

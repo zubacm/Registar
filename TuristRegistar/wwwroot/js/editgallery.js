@@ -99,7 +99,12 @@ var Uploadimage = function () {
     });
 };
 
-
+function blurImage(e) {
+    $(e).find('img').css("opacity", "0.4");
+}
+function unblurImage(e) {
+    $(e).find('img').css("opacity", "1");
+}
 function showTrash(e) {
     $(e).find('img').css("opacity", "0.4");
     $(e).find('i').css("display", "block");
