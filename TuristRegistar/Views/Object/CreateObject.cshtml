@@ -392,7 +392,7 @@
                                                     <input type="hidden" asp-for="OccubancBasedPrices" id="occupancybased-prices" />
                                                     <div id="prices">
                                                         <!--see if this works++++-->
-                                                        @if (Model.OccupancyBasedPricing != null)
+                                                        @if (Model.OccupancyBasedPricing != null && Model.OccupancyBasedPricing.Prices != null)
                                                         {
                                                             <label><span class="hidden-xs">Broj posjetilaca</span></label>
                                                             @foreach (var item in Model.OccupancyBasedPricing.Prices)
