@@ -166,5 +166,35 @@ namespace TuristRegistar.Services
             _context.Bookmark.Remove(bookmark);
             _context.SaveChanges();
         }
+
+
+        public async Task<int> AddInitialConversationAsync(Conversations initialConversation)
+        {
+           await _context.Conversations.AddAsync(initialConversation);            
+            _context.SaveChanges();
+            return  initialConversation.Id;
+        }
+
+        public void AddMessageAsync(Messages message)
+        {
+            _context.Messages.AddAsync(message);
+            _context.SaveChangesAsync();
+        }
+
+        public Conversations GetConversationBetweenUsers(String IdentUser1Id, String IdentUser2Id)
+        {
+            return _context.Conversations
+                .FirstOrDefault(c => (c.IdentUser1Id == IdentUser1Id && c.IdentUser2Id == IdentUser2Id) || (c.IdentUser1Id == IdentUser2Id && c.IdentUser2Id == IdentUser1Id));
+        }
+
+        public IEnumerable<Messages> GetConversationMessages(int conversationId, int pagenumber, int pagesize)
+        {
+            var query = _context.Messages.Where(m => m.ConversationId == conversationId).OrderByDescending(m => m.Id);
+            var total = query.Count();
+            var skip = total - (pagenumber * pagesize) < 0 && total - (pagenumber * pagesize) > 0 - pagesize ? 0 : total - (pagenumber * pagesize);
+           return  _context.Messages.Where(m => m.ConversationId == conversationId)
+                                .Skip(skip).Take(pagesize).ToList();
+        }
+
     }
 }

@@ -1,0 +1,248 @@
+﻿@model ConversationViewModel
+
+
+<link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
+<link href="~/css/messaging.css" rel="stylesheet" />
+<script src="~/js/toast-show.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+
+<script src="~/js/ClienSideInputValidation.js"></script>
+<script src="~/lib/signalr/signalr.js"></script>
+<script src="~/js/chat.js"></script>
+<script src="~/lib/jquery/jquery-ajax-unobtrusive.js"></script>
+
+
+@{
+    ViewData["Title"] = "Razgovor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br /><br /><br />
+<div class="container">
+    <h3 class=" text-center">@Model.ReceiverUsername</h3>
+    <div class="messaging">
+        <div class="inbox_msg">
+            @*<div class="inbox_people">
+                <div class="headind_srch">
+                    <div class="recent_heading">
+                        <h4>Recent</h4>
+                    </div>
+                    <div class="srch_bar">
+                        <div class="stylish-input-group">
+                            <input type="text" class="search-bar" placeholder="Search">
+                            <span class="input-group-addon">
+                                <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="inbox_chat">
+                    <div class="chat_list active_chat">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>*@
+                    @*<div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+
+            <div class="mesgs">
+                <div class="msg_history overflow-auto" style="height:80vh" id="DisplayMessages">
+                    @if (Model.Messages != null)
+                    {
+                        @foreach (var item in Model.Messages)
+                        {
+                            @if (item.SendingIdentUserId == Model.SenderId)
+                            {
+                                <div class="outgoing_msg">
+                                    <div class="sent_msg">
+                                        <p>
+                                            @item.Message
+                                        </p>
+                                        <span class="time_date"> @item.DateTime</span>
+                                    </div>
+                                </div>
+
+                            }
+                            else
+                            {
+                                <div class="incoming_msg">
+                                    @*<div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>*@
+                                    <div class="received_msg">
+                                        <div class="received_withd_msg">
+                                            <p>
+                                                @item.Message
+                                            </p>
+                                            <span class="time_date"> @item.DateTime</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                            }
+                        }
+                    }
+
+                </div>
+                <form data-ajax="true" asp-controller="Home" asp-action="AddMessageAsync"
+                      data-ajax-success="sendMessage()" data-ajax-begin=""
+                      data-ajax-complete="" data-ajax-failure="alert('Greška prilikom pribavljanja podataka!')">
+                    <input hidden asp-for="ConversationId" id="convid"/>
+                    <input hidden asp-for="SenderId" type="text"  id="senderid"/>
+                    <input hidden asp-for="ReceiverId" />
+                    <input hidden asp-for="SenderUsername" id="username" />
+                    <div class="type_msg">
+                        <div class="row" style="padding:5px">
+                            @*<div id="DisplayMessages"></div>*@
+                            <div class="col-11">
+                                <input type="text" id="txtMessage" asp-for="Text" class="write_msg" placeholder="Unesite poruku" />
+                            </div>
+                            @*<input type="text" id="txtMessage" asp-for="Text" class="write_msg" placeholder="Unesite poruku" />*@
+                            <div class="col-1">
+                                <button id="sendMessage" class="msg_send_btn" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                            </div>
+                            @*<input type="button" id="sendMessage" value="Send" onclick="sendMessage();" />*@
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+        <p class="text-center top_spac"> Design by <a target="_blank" href="#">Sunil Rajput</a></p>
+
+    </div>
+</div>
+
+<script src="~/js/Navbarcolor.js"></script>
+<script>
+    $("#DisplayMessages").scrollTop($("#DisplayMessages")[0].scrollHeight);
+</script>
+<script>
+    var currentPageNumber = 1;
+    $('#DisplayMessages').scroll(function () {
+        //console.log('gore');
+        if ($('#DisplayMessages').scrollTop() == 0) {
+            currentPageNumber = currentPageNumber + 1;
+            LoadMessages(currentPageNumber);
+        }
+    });
+    function LoadMessages(currentpage) {
+        //var position = document.getElementById('DisplayMessages').scrollTop//.position();
+        var position = (document.getElementById('DisplayMessages').children[0].offsetTop);
+        console.log(position);
+
+        $.ajax({
+            type: 'Post',
+            url: "/Home/LoadMessages",
+            data: { conversationid: $('#convid').val(), pagenumber: currentpage, pagesize: 8 },
+            dataType: 'json',
+            success: function (response) {
+                //$('#obj-container').html(response);
+                var html = "";
+                $(response).each(function (index, mess) {
+                    var addhtml = "";
+                    console.log(mess.SendingIdentUserId +" = "+ $('#senderid').val());
+                    if (mess.SendingIdentUserId == $('#senderid').val()) {
+                        addhtml = "<div class='outgoing_msg'><div class='sent_msg'><p>"
+                            + mess.Message + " </p> <span class='time_date'>" + mess.DateTime + "</span></div></div>";  
+                    }
+                    else {
+                        addhtml = "<div class='incoming_msg'><div class='received_msg'><div class='received_withd_msg'><p>"
+                            + mess.Message + " </p> <span class='time_date'>" + mess.DateTime + "</span></div></div></div>";
+                                           
+                    }
+                    html = html + addhtml;
+                })
+                $('#DisplayMessages').prepend(html);
+
+                $('#DisplayMessages').scrollTop(position *2);
+
+            },
+            //error: function () {
+            //    alert('Greška prilikom pribavljanja podataka.');
+            //}
+        });
+    }
+</script>

@@ -29,7 +29,8 @@
     mycurrency = HttpContextAccessor.HttpContext.Request.Cookies["Currency"];
 }
 
-
+<a asp-action="Conversation" asp-controller="Home" asp-route-withIdentUserId="@Model.IdentUserId">Pošalji poruku</a>
+    <br />
 
 <!--Osnovno-->
 <br />

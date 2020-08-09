@@ -40,6 +40,8 @@ namespace TuristRegistar.Data
         public DbSet<Currencies> Currencies { get; set; }
         public DbSet<ObjectHasAttributes> ObjectHasAttributes { get; set; }
         public DbSet<Bookmark> Bookmark { get; set; }
+        public DbSet<Conversations> Conversations { get; set; }
+        public DbSet<Messages> Messages { get; set; }
 
 
 
@@ -57,6 +59,10 @@ namespace TuristRegistar.Data
                 .HasKey(o => new { o.ObjectId, o.AttributeId });
             modelBuilder.Entity<Bookmark>()
                 .HasKey(o => new { o.ObjectId, o.UserId });
+            modelBuilder.Entity<Conversations>().HasOne(c => c.IdentUser1).WithMany().HasForeignKey(c => c.IdentUser1Id)
+               .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Conversations>().HasOne(c => c.IdentUser2).WithMany().HasForeignKey(c => c.IdentUser2Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
             #region "Seed data"
 

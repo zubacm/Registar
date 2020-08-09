@@ -110,7 +110,7 @@
 
                 @if (roles.Contains("ADMIN"))
                 {
-                     <div class="nav-item dropdown">
+                    <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink2" data-toggle="dropdown"
                            aria-haspopup="true" aria-expanded="false">Administracija</a>
                         <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink2" style="right:5%;left:auto">
@@ -119,12 +119,15 @@
                         </div>
                     </div>
                     <span>&nbsp;</span>
-            }
+                }
             }
 
 
             @if (SignInManager.IsSignedIn(User))
             {
+                <div class="nav-item">
+                    <a asp-controller="Auth" asp-action="Messages"><i class="fa fa-inbox fa-2x text-white" aria-hidden="true"></i></a>
+                </div>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-2x text-white"></i></a>
@@ -135,13 +138,14 @@
                     </div>
                 </div>
                 <span>&nbsp;</span>
+
             }
             else
             {
                 <a asp-controller="Auth" asp-action="Login" data-toggle="tooltip" title="Prijava"> <i class="fas fa-user-circle fa-2x text-white"></i></a>
             }
             @*</div>*@
-            </div>
+        </div>
             <!-- Collapsible content -->
 
         </nav>

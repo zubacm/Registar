@@ -18,6 +18,9 @@ using Microsoft.IdentityModel.Tokens;
 using TuristRegistar.Data;
 using TuristRegistar.Models;
 using TuristRegistar.Services;
+using TuristRegistar.Hubs;
+using System.Net.WebSockets;
+using System.Threading;
 
 namespace TuristRegistar
 {
@@ -87,8 +90,10 @@ namespace TuristRegistar
             //    };
             //});
 
+            services.AddSignalR();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -104,20 +109,28 @@ namespace TuristRegistar
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            
+            //var webSocketOptions = new WebSocketOptions()
+            //{
+            //    KeepAliveInterval = TimeSpan.FromSeconds(120),
+            //    ReceiveBufferSize = 4 * 1024
+            //};
+            
+            //app.UseWebSockets(webSocketOptions);
+            //app.UseCors(builder =>
+            //{
+            //    builder.WithOrigins("http://localhost:44331")
+            //    .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+            //});
+            
+
+                app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
             app.UseAuthentication();
-            //app.UseStatusCodePages(async context =>
-            //{
-            //    if (context.HttpContext.Response.StatusCode == 403)
-            //    {
-            //        var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
 
-            //         RedirectToActionResult("~/Views/Shared/Error.cshtml", unsucessfulmodel);
-            //    }
-            //});
+
             //app.UseStatusCodePagesWithRedirects("~/Views/Shared/Error.cshtml/{0}");
             app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
             var cultureInfo = new CultureInfo("en-US");
@@ -125,6 +138,7 @@ namespace TuristRegistar
 
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+           
 
             app.UseMvc(routes =>
             {
@@ -132,6 +146,18 @@ namespace TuristRegistar
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+            app.UseSignalR(route =>
+            {
+                route.MapHub<ChatHub>("/chat");
+                route.MapHub<NotificationHub>("/NotificationHub");
+            });
+
+
+
+
         }
+
+
     }
+
 }

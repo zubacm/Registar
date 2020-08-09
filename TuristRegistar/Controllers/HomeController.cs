@@ -14,6 +14,7 @@ using TuristRegistar.Data;
 using TuristRegistar.Data.Models;
 using TuristRegistar.Models;
 
+
 namespace TuristRegistar.Controllers
 {
     public class HomeController : Controller
@@ -31,6 +32,12 @@ namespace TuristRegistar.Controllers
 
         public IActionResult Index()
         {
+            return View();
+        }
+
+        public IActionResult Chat()
+        {
+            ViewData["Message"] = "Chat page.";
             return View();
         }
 
@@ -272,6 +279,71 @@ namespace TuristRegistar.Controllers
             ViewData["Message"] = "Your application description page.";
 
             return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Conversation(String withIdentUserId)
+        {
+
+            //String withIdentUserId = "0f1c48be-70a8-475e-b028-b1c1204a8edd";
+            var currentUserId = _userManager.GetUserId(this.User);
+            var conversation = _user.GetConversationBetweenUsers(currentUserId, withIdentUserId);
+            var currentUser = await _userManager.GetUserAsync(User);
+            var model = new ConversationViewModel()
+            {
+                SenderId = currentUserId,
+                ReceiverId = withIdentUserId,
+                SenderUsername = (await _userManager.GetUserAsync(User)).UserName,
+                ReceiverUsername = (await _userManager.FindByIdAsync(withIdentUserId)).UserName,                
+            };
+            var conv = _user.GetConversationBetweenUsers(model.SenderId, model.ReceiverId);
+            model.ConversationId = conv != null ? conv.Id : (int?)null;
+            model.Messages = conv != null ? _user.GetConversationMessages(conv.Id, 1, 8) : null;
+
+            return View(model);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> LoadMessages(int conversationid, int pagenumber, int pagesize)
+        {
+            var messages = _user.GetConversationMessages(conversationid, pagenumber, pagesize);
+            var json = JsonConvert.SerializeObject(messages);
+            return Ok(json);
+        }
+
+
+        [Authorize]
+        public async Task<IActionResult> AddMessageAsync(ConversationViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+
+                if (model.ConversationId == null)
+                {
+                    var conv = new Conversations()
+                    {
+                        IdentUser1Id = model.SenderId,
+                        IdentUser2Id = model.ReceiverId,
+                    };
+
+                    model.ConversationId = await _user.AddInitialConversationAsync(conv);
+                }
+
+                var message = new Messages()
+                {
+                    ConversationId = (int)model.ConversationId,
+                    SendingIdentUserId = model.SenderId,
+                    Message = model.Text,
+                    DateTime = DateTime.Now,
+                };
+
+                //Check if initial conversation has conv.id 
+                _user.AddMessageAsync(message);
+
+                return Ok();
+            }
+
+            return Error(500);
         }
 
         public void Hey()

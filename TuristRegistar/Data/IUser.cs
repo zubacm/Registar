@@ -22,5 +22,10 @@ namespace TuristRegistar.Data
         int CountUserBookmarks(String identUserId);
         void AddBookmark(String identUserId, int objectId);
         void RemoveBookmark(String identUserId, int objectId);
+
+        Task<int> AddInitialConversationAsync(Conversations initialConversation);
+        void AddMessageAsync(Messages message);
+        Conversations GetConversationBetweenUsers(String IdentUser1Id, String IdentUser2Id);
+        IEnumerable<Messages> GetConversationMessages(int conversationId, int pagenumber, int pagesize);
     }
 }
