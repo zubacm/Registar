@@ -4,7 +4,6 @@
 <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
-@*<link href="~/css/regst.css" rel="stylesheet" />*@
 <link href="~/css/tabs.css" rel="stylesheet" />
 <link href="~/css/site.css" rel="stylesheet" />
 <link href="~/css/paying-model-style.css" rel="stylesheet" />
@@ -379,7 +378,7 @@
                                                     <!-- End -->
                                                     <!-- occupancy based model -->               
                                                 <div id="nav-tab-occupancyb" class="tab-pane fade @showoccupancy @occupancyclass">
-                                                    <form method="post" asp-action="EditOccupancyBased" asp-controller="Object">
+                                                    <form method="post" asp-action="EditOccupancyBased" asp-controller="Object" onsubmit="fillEditPrices()">
                                                         <input type="hidden" asp-for="Id" />
                                                         <input type="hidden" asp-for="OccupancyBasedPricing.Id" />
                                                         <div class="row">
@@ -492,7 +491,6 @@
                         <div class="tab-pane fade" id="nav-periods" role="tabpanel" aria-labelledby="nav-periods-tab">
                             <div class="container py-5">
                                 <div class="bg-white rounded-lg shadow-sm p-5">
-                                    @*<input type="hidden" id="unavailable-periods" asp-for="UnavailablePeriodsString" />*@
                                     <div>
                                         <ul id="periods" class="list-group mb-3 m-auto col-md-7">
                                             @if (Model.UnavailablePeriods != null)
@@ -530,35 +528,35 @@
     <!-- ./Tabs -->
 
 
-<!--I ovo govno ne moze ovako možda uopšte ne treba-->
 <!--Ovo ovdje ne treba-->
 <script type="text/javascript">
     $('#submitButton').click(function () {
         //alert("Molimo vas da ispravno popunite sva obavezna polja.");
 
-        //dont know????
         $('input:invalid').each(function () {
             alert('Molimo vas da ispravno popunite sva obavezna polja.');
             // Find the tab-pane that this element is inside, and get the id
             var $closest = $(this).closest('.tab-pane');
             console.log($closest);
-
-            //var id = $closest.attr('id');
-            //console.log($closest);
-            //console.log(id);
-            //// Find the link that corresponds to the pane and have it show
-            //$('.nav a[href="#' + id + '"]').tab('show');
-
-            // Only want to do it once
             return false;
         });
     });
 </script>
-
+<script>
+    function fillEditPrices() {
+            var occ_b_prices = document.getElementById('prices').getElementsByTagName("input");
+            for (i = 0; i < occ_b_prices.length; i += 2) {
+                var visitors = $(occ_b_prices[i]).attr('value');
+                var pricevalue = $(occ_b_prices[i + 1]).val();
+                occupancabasedprices.push(visitors + ":" + pricevalue);
+            }
+            $('#occupancybased-prices').val(occupancabasedprices);
+        }   
+</script>
 
 <script src="~/js/Navbarcolor.js"></script>
 
-@*ovo je za one roza tabove*@
+
 <script>
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()

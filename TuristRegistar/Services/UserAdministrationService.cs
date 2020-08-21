@@ -270,7 +270,7 @@ namespace TuristRegistar.Services
                 try
                 {
                     client.BaseAddress = new Uri("https://free.currencyconverterapi.com");
-                    //f49a41b74f3e1f052200 => this is my api key
+                    //f49a41b74f3e1f052200 => api key
                     var response = await client.GetAsync($"/api/v6/currencies?apiKey=f49a41b74f3e1f052200");
 
                     var stringResult = await response.Content.ReadAsStringAsync();
@@ -296,8 +296,6 @@ namespace TuristRegistar.Services
                 {
                     Console.WriteLine(httpRequestException.StackTrace);
                     return null;
-                    //return new KeyValuePair<string, string> ( "Error", "Error calling API. Please do manual lookup." );
-                    //return "Error calling API. Please do manual lookup.";
                 }
             }
         }

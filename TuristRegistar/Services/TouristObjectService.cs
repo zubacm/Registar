@@ -147,10 +147,8 @@ namespace TuristRegistar.Services
                 .Include(o => o.ObjectType)
                 .Include(o => o.ObjectHasAttributes).ThenInclude(o => o.Attribute)
                 .Include(o => o.CntObjAttributesCount).ThenInclude(o => o.CountableObjAttr)
-                //.ThenInclude(cntAttr => cntAttr.)
                 .Include(o => o.SpecialOffers).ThenInclude(o => o.SpecialOffer)
                 .Include(o => o.UnavailablePeriods)
-                //.Where(c => c.UnavailablePeriods.Any(up => 12 < 5 )
                 .Include(o => o.ObjectImages)
                 .Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
                 .Include(o => o.StandardPricingModel)
@@ -192,7 +190,7 @@ namespace TuristRegistar.Services
         public void DeletePeriod(int id)
         {
             var period = new UnavailablePeriods() { Id = id };
-            _context.AvailablePeriods.Remove(period);//nekad ovo ime promijenit
+            _context.AvailablePeriods.Remove(period);
             _context.SaveChanges();
         }
 
@@ -228,7 +226,7 @@ namespace TuristRegistar.Services
                 try
                 {
                     client.BaseAddress = new Uri("https://free.currencyconverterapi.com");
-                    //f49a41b74f3e1f052200 => this is my api key
+                    //f49a41b74f3e1f052200 => api key
                     var response = await client.GetAsync($"/api/v6/convert?q={from}_{to}&compact=y&apiKey=f49a41b74f3e1f052200");
 
 
@@ -245,8 +243,6 @@ namespace TuristRegistar.Services
                 {
                     Console.WriteLine(httpRequestException.StackTrace);
                     return 0;
-                    //return new KeyValuePair<string, string> ( "Error", "Error calling API. Please do manual lookup." );
-                    //return "Error calling API. Please do manual lookup.";
                 }
             }
         }
@@ -270,6 +266,7 @@ namespace TuristRegistar.Services
             _context.OccupancyBasedPricings.Add(occupancybp);
             _context.Objects.FirstOrDefault(o => o.Id == objectid).OccupancyBasedPricingId = occupancybp.Id;
             _context.Objects.FirstOrDefault(o => o.Id == objectid).OccupancyPricing = true;
+            _context.Objects.FirstOrDefault(o => o.Id == objectid).StandardPricingModelId = null;
             _context.SaveChanges();
         }
 
@@ -279,7 +276,6 @@ namespace TuristRegistar.Services
             _context.SaveChanges();
         }
 
-        //ako ovo bude radilo ++++ msm da radi
         public async Task NewOccupancyBasedPricing(OccupancyBasedPricing occupanybp, int objectid, string currency)
         {
             var curr_correlation = await GetExchangeRate(currency, "BAM");
@@ -294,7 +290,6 @@ namespace TuristRegistar.Services
                 item.PricePerNight *= curr_correlation;
             }
             _context.Add(occupanybp);
-            //_context.SaveChanges();
             _context.Objects.FirstOrDefault(o => o.Id == objectid).OccupancyBasedPricingId = occupanybp.Id;
             _context.SaveChanges();
         }
@@ -398,11 +393,7 @@ namespace TuristRegistar.Services
                 .Include(o => o.ObjectHasAttributes)
                 .Include(o => o.CntObjAttributesCount)
                 .Include(o => o.RatingsAndReviews)
-                //.Include(o => o.SpecialOffers)
-                //.Include(o => o.UnavailablePeriods)
                 .Include(o => o.ObjectImages)
-                //.Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
-                //.Include(o => o.StandardPricingModel);
                 ;
         }
 
@@ -415,11 +406,7 @@ namespace TuristRegistar.Services
                 .Include(o => o.ObjectHasAttributes)
                 .Include(o => o.CntObjAttributesCount)
                 .Include(o => o.RatingsAndReviews)
-                //.Include(o => o.SpecialOffers)
-                //.Include(o => o.UnavailablePeriods)
                 .Include(o => o.ObjectImages)
-                //.Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
-                //.Include(o => o.StandardPricingModel)
                 .Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
         }
 
@@ -563,7 +550,6 @@ namespace TuristRegistar.Services
         }
         private IEnumerable<Objects> GetCheckedRatingAndSearch(Search search)
         {
-            //maybe remove city and country from include because i have fulladdress
             var checkedTypes = search.ObjectTypes.Where(ot => ot.Selected == true).Select(ot => ot.Id).ToList();
             var checkedAttributes = search.ObjectAttributes.Where(oa => oa.Selected == true).Select(oa => oa.Id).ToList();
             if (checkedTypes.Count > 0 && checkedAttributes.Count > 0 && search.RatingAbove != 0 && (!string.IsNullOrWhiteSpace(search.SearchString)))
@@ -985,16 +971,15 @@ namespace TuristRegistar.Services
             _context.SaveChanges();
         }
 
-        //check if its working
-        //slike brisiiiiiiiiiii
         public void DeleteObjectAndRelatedColumns(int objectId)
         {
+            var images = _context.ObjectImages.Where(i => i.Objects.Id == objectId);
+            var periods = _context.AvailablePeriods.Where(a => a.Objects.Id == objectId);
             var bookmarks = _context.Bookmark.Where(b => b.ObjectId == objectId);
             var objHasAttr = _context.ObjectHasAttributes.Where(oha => oha.ObjectId == objectId);
             var spcOffersPrices = _context.SpecialOffersPrices.Where(so => so.ObjectId == objectId);
 
             var obj = _context.Objects.Where(o => o.Id == objectId).FirstOrDefault();
-            //vidi je li null ili nula
             if (obj.StandardPricingModelId != null)
             {
                 var standPM = _context.StandardPricingModels.Where(spm => spm.Id == obj.StandardPricingModelId).FirstOrDefault();//ovo nije range nego jedno
@@ -1008,11 +993,12 @@ namespace TuristRegistar.Services
                 _context.OccupancyBasedPricings.Remove(occupancyBasedModel);
             }
 
+            _context.ObjectImages.RemoveRange(images);
+            _context.AvailablePeriods.RemoveRange(periods);
             _context.Bookmark.RemoveRange(bookmarks);
             _context.ObjectHasAttributes.RemoveRange(objHasAttr);
             _context.SpecialOffersPrices.RemoveRange(spcOffersPrices);
             _context.Objects.Remove(obj);
-
             _context.SaveChanges();
         }
     }

@@ -8,14 +8,3 @@ marker = new google.maps.Marker({
     draggable: false,
     title: "Lokacija"
 });
-
-//map = new google.maps.Map(document.getElementById('map'), {
-//    center: { lat: 43.823508, lng: 18.374364 },
-//    zoom: 7
-//});
-//marker = new google.maps.Marker({
-//    position: { lat: 43.823508, lng: 18.374364 },
-//    map: map,
-//    draggable: true,
-//    title: "Lokacija"
-//});

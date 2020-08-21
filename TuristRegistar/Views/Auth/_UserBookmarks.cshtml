@@ -1,13 +1,10 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿
 @model UserBookmarksModel
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
-@*<link href="~/css/regst.css" rel="stylesheet" />*@
 <link href="~/css/site.css" rel="stylesheet" />
 
 <script src="~/js/toast-show.js"></script>
@@ -88,14 +85,6 @@
                                     }
                                     <i data-toggle="tooltip" title="Ukloni iz zabilješki" class="fas fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="RemoveBookmark(this)" obj-id="@item.Id"></i>
 
-                                    @*@if (item.IsBookmark)
-                                    {
-                                        <i data-toggle="tooltip" title="Ukloni iz zabilješki" class="fas fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@item.Id"></i>
-                                    }
-                                    else
-                                    {
-                                        <i data-toggle="tooltip" title="Sačuvaj" class="far fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@item.Id"></i>
-                                    }*@
                                 </div>
 
                             </div>
@@ -103,9 +92,6 @@
                     }
                 }
 
-
-
-                <!--   <partial name="_ObjectsListed" for="@Model" />-->
             </div>
             <!--./Objects-->
         </div>
@@ -167,38 +153,31 @@
     function goToNext() {
         document.getElementById("CurrPage").value = @Model.Pager.CurrentPage+1;
         ChangePageBookmarks();
-        //document.getElementById("formIndex").submit();
     }
     function goToPrevious() {
         document.getElementById("CurrPage").value = @Model.Pager.CurrentPage-1;
         ChangePageBookmarks();
-        //document.getElementById("formIndex").submit();
     }
     function goToFirst() {
         document.getElementById("CurrPage").value = 1;
         ChangePageBookmarks();
-        //document.getElementById("formIndex").submit();
     }
     function goToLast() {
         document.getElementById("CurrPage").value = @Model.Pager.TotalPages;
         ChangePageBookmarks();
-
-        //document.getElementById("formIndex").submit();
     }
     function goToPage(pagee) {
         document.getElementById("CurrPage").value = pagee;
         ChangePageBookmarks();
-        //document.getElementById("formIndex").submit();
     }
 </script>
 <script>
-    //ne radiiiiiiiiiiiiii
     function ChangePageBookmarks() {
         $.ajax({
             type: 'GET',
             url: "/Auth/UserBookmarksChangePage",
             data: $('#formIndex').serialize(),
-            dataType: 'html', // modify
+            dataType: 'html', 
             contentType: "application/json; charset=utf-8",
             success: function (response) {
                 console.log(response);
@@ -216,14 +195,9 @@
         $.ajax({
             url: "/Auth/RemoveBookmark",
             data: data,
-            type: "POST",
-            /// dataType: 'JSON',
             contentType: 'application/x-www-form-urlencoded',
             success: function (response) {
-                alert("not");
-
                 elem.remove();
-                //  $('#obj-container').html(response);
             },
             error: function () {
                 alert('Greška prilikom pribavljanja podataka.');

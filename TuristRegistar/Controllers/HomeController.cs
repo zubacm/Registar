@@ -30,14 +30,82 @@ namespace TuristRegistar.Controllers
             _user = user;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(bool? login)
         {
+            var lgn = login == null ? false : (bool)login;
+            if (lgn)
+            {
+                SetCookieForNotification(_userManager.GetUserId(this.User));
+            }
             return View();
+        }
+
+ 
+
+        [Authorize]
+        public async Task<IActionResult> Inbox()
+        {
+            var currentUserId = _userManager.GetUserId(this.User);
+            var conversations = _user.GetConversations(currentUserId, 1, 7);
+            var messagesInConv = conversations.Select(c => new InboxConversationsModel()
+            {
+                ConversationId = c.Id,
+                WithIdentUserId = c.IdentUser1Id == currentUserId ? c.IdentUser2Id : c.IdentUser1Id,
+                WithUsername = c.IdentUser1Id == currentUserId ? c.IdentUser2.UserName : c.IdentUser1.UserName,
+                LastMassage = _user.GetLastMessage(c.Id),
+                Unread = c.Unread && c.UnredIdentUserId == currentUserId ? true : false,
+            });
+
+             var model = new InboxViewModel()
+            {
+                IdentUserId = currentUserId,
+                Username = (await _userManager.GetUserAsync(User)).UserName,
+                Conversations = messagesInConv,    
+            };
+
+            return View(model);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> LoadConversations(int pagenumber, int pagesize)
+        {
+            var currentUserId = _userManager.GetUserId(this.User);
+            var conversations = _user.GetConversations(currentUserId, pagenumber, pagesize);
+            var messagesInConv = conversations.Select(c => new InboxConversationsModel()
+            {
+                ConversationId = c.Id,
+                WithIdentUserId = c.IdentUser1Id == currentUserId ? c.IdentUser2Id : c.IdentUser1Id,
+                WithUsername = c.IdentUser1Id == currentUserId ? c.IdentUser2.UserName : c.IdentUser1.UserName,
+                LastMassage = _user.GetLastMessage(c.Id),
+                Unread = c.Unread && c.UnredIdentUserId != currentUserId ? true : false,
+            });
+
+
+            var json = JsonConvert.SerializeObject(messagesInConv);
+            return Ok(json);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> SearchConversation(String search, int pagenumber, int pagesize)
+        {
+            var currentUserId = _userManager.GetUserId(this.User);
+            var conversations = _user.SearchForConversations(search, currentUserId, pagenumber, pagesize);
+            var messagesInConv = conversations.Select(c => new InboxConversationsModel()
+            {
+                ConversationId = c.Id,
+                WithIdentUserId = c.IdentUser1Id == currentUserId ? c.IdentUser2Id : c.IdentUser1Id,
+                WithUsername = c.IdentUser1Id == currentUserId ? c.IdentUser2.UserName : c.IdentUser1.UserName,
+                LastMassage = _user.GetLastMessage(c.Id),
+                Unread = c.Unread && c.UnredIdentUserId != currentUserId ? true : false,
+            });
+
+
+            var json = JsonConvert.SerializeObject(messagesInConv);
+            return Ok(json);
         }
 
         public IActionResult Chat()
         {
-            ViewData["Message"] = "Chat page.";
             return View();
         }
 
@@ -194,7 +262,6 @@ namespace TuristRegistar.Controllers
        
 
 
-        ////[Route("objectsmap")] // /objectlist
         public IActionResult Map()
         {
 
@@ -232,7 +299,6 @@ namespace TuristRegistar.Controllers
             return View(model);
         }
 
-        //test this the last for map
         public async Task<IActionResult> FilterObjectsMap(ObjectsMapViewModel model)
         {
             var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
@@ -281,11 +347,18 @@ namespace TuristRegistar.Controllers
             return View();
         }
 
+        public void SetCookieForNotification(String currentUserId)
+        {
+            var option = new CookieOptions();
+            option.Expires = DateTime.Now.AddDays(1);
+            var notifications = _user.CheckForUnreadMessages(currentUserId);
+            Response.Cookies.Append("Notification", notifications.ToString(), option);
+        }
+
         [Authorize]
         public async Task<IActionResult> Conversation(String withIdentUserId)
         {
 
-            //String withIdentUserId = "0f1c48be-70a8-475e-b028-b1c1204a8edd";
             var currentUserId = _userManager.GetUserId(this.User);
             var conversation = _user.GetConversationBetweenUsers(currentUserId, withIdentUserId);
             var currentUser = await _userManager.GetUserAsync(User);
@@ -299,6 +372,11 @@ namespace TuristRegistar.Controllers
             var conv = _user.GetConversationBetweenUsers(model.SenderId, model.ReceiverId);
             model.ConversationId = conv != null ? conv.Id : (int?)null;
             model.Messages = conv != null ? _user.GetConversationMessages(conv.Id, 1, 8) : null;
+
+            if (model.ConversationId != null && model.ConversationId != 0)
+                _user.SetConversationRead((int)model.ConversationId);
+
+            SetCookieForNotification(currentUserId);
 
             return View(model);
         }
@@ -324,9 +402,16 @@ namespace TuristRegistar.Controllers
                     {
                         IdentUser1Id = model.SenderId,
                         IdentUser2Id = model.ReceiverId,
+                        Unread = true,
+                        UnredIdentUserId = model.ReceiverId,
+                        LastIneractionDateTime = DateTime.Now,
                     };
 
                     model.ConversationId = await _user.AddInitialConversationAsync(conv);
+                }
+                else
+                {
+                    _user.SetUnreadConversation(model.ReceiverId, (int)model.ConversationId, DateTime.Now);
                 }
 
                 var message = new Messages()
@@ -346,28 +431,6 @@ namespace TuristRegistar.Controllers
             return Error(500);
         }
 
-        public void Hey()
-        {
-            GetExchangeRate("BAM","EUR");
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
 
 
         public void SetCookieForCurrency(string currency)
@@ -378,25 +441,23 @@ namespace TuristRegistar.Controllers
         }
 
 
-        //public async Task<KeyValuePair<string,string>> GetExchangeRate(string from, string to)
+        public IActionResult SetNotificationTrue()
+        {
+            var option = new CookieOptions();
+            option.Expires = DateTime.Now.AddDays(1);
+            Response.Cookies.Append("Notification", "True", option);
+            return Ok();
+        }
+
         public async Task<Decimal> GetExchangeRate(string from, string to)
         {
-            //Examples:
-            //from = "EUR"
-            //to = "USD"
             using (var client = new HttpClient())
             {
                 try
                 {
                     client.BaseAddress = new Uri("https://free.currencyconverterapi.com");
                     //f49a41b74f3e1f052200
-                    var response = await client.GetAsync($"/api/v6/convert?q={from}_{to}&compact=y&apiKey=f49a41b74f3e1f052200");
-                    //var stringResult = await response.Content.ReadAsStringAsync();
-                    //dynamic data = JObject.Parse(stringResult);
-
-                    //data = {"EUR_USD":{"val":1.140661}}
-                    //I want to return 1.140661
-                    //EUR_USD is dynamic depending on what from/to is
+                    var response = await client.GetAsync($"/api/v6/convert?q={from}_{to}&compact=y&apiKey=f49a41b74f3e1f052200");                
                     var stringResult = await response.Content.ReadAsStringAsync();
                     var dictResult = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(stringResult);
 
@@ -405,16 +466,12 @@ namespace TuristRegistar.Controllers
                     var myval = dictResult.ElementAt(0).Value.ElementAt(0).Value;
                     //value
                     return Convert.ToDecimal(dictResult.ElementAt(0).Value.ElementAt(0).Value);
-                    //return dictResult[$"{from}_{to}"]["val"];
                 }
                 catch (HttpRequestException httpRequestException)
                 {
                     Console.WriteLine(httpRequestException.StackTrace);
                     
-                    return 0;
-                    //ovdje neki error page no connection to server
-                    //return new KeyValuePair<string, string> ( "Error", "Error calling API. Please do manual lookup." );
-                    //return "Error calling API. Please do manual lookup.";
+                    return 0;                  
                 }
             }
         }

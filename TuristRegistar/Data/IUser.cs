@@ -26,6 +26,13 @@ namespace TuristRegistar.Data
         Task<int> AddInitialConversationAsync(Conversations initialConversation);
         void AddMessageAsync(Messages message);
         Conversations GetConversationBetweenUsers(String IdentUser1Id, String IdentUser2Id);
+        Conversations GetConversationBetweenUsers(int conversaionId);
         IEnumerable<Messages> GetConversationMessages(int conversationId, int pagenumber, int pagesize);
+        IEnumerable<Conversations> SearchForConversations(String search, String identUserId, int pagenumber, int pagesize);
+        void SetUnreadConversation(String receiverIdentUserId, int conversationId, DateTime lastInteraction);
+        IEnumerable<Conversations> GetConversations(String identUserId, int pagenumber, int pagesize);
+        Messages GetLastMessage(int conversationid);
+        bool CheckForUnreadMessages(String identUserId);
+        void SetConversationRead(int conversationId);
     }
 }

@@ -5,9 +5,6 @@
 @inject UserManager<IdentityUser> UserManager
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @inject TuristRegistar.Data.IUser MyService
-@using Microsoft.AspNetCore.Identity
-@inject UserManager<IdentityUser> UserManag
-@inject SignInManager<IdentityUser> SignInManager
 
 <!DOCTYPE html>
 <html>
@@ -15,17 +12,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TuristRegistar</title>
-
-    @*<environment include="Development">
-            <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-            <link rel="stylesheet" href="~/css/site.css" />
-        </environment>
-        <environment exclude="Development">
-            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
-                  asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
-                  asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-            <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-        </environment>*@
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/css/bootstrap.css" />
     </environment>
@@ -122,12 +108,26 @@
                 }
             }
 
-
             @if (SignInManager.IsSignedIn(User))
             {
-                <div class="nav-item">
-                    <a asp-controller="Auth" asp-action="Messages"><i class="fa fa-inbox fa-2x text-white" aria-hidden="true"></i></a>
-                </div>
+                    <div class="nav-item" id="not-div">
+                        @{
+                            var notif = "false";
+                            var textstyle = "text-white";
+                            var spandisplay = "none";
+                        }
+                        @if (HttpContextAccessor.HttpContext.Request.Cookies["Notification"] != null)
+                        {
+                            notif = HttpContextAccessor.HttpContext.Request.Cookies["Notification"];
+                        }
+                        @if (notif == "True")
+                        {
+                            textstyle = "text-danger";
+                            spandisplay = "";
+                        }
+                        <span id="message-number" class="text-danger" style="display:@spandisplay; position:relative; top:-9px; right:-25px;font-family:'Segoe UI'; font-weight:900; ">!</span>
+                        <a asp-controller="Home" asp-action="Inbox" data-toggle="tooltip" title="Poruke"><i id="message-logo" class="far fa-comment-alt @textstyle fa-2x"></i></a>
+                    </div>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-2x text-white"></i></a>
@@ -182,26 +182,7 @@
         </footer>
     </div>
 
-    @*<environment include="Development">
-            <script src="~/lib/jquery/dist/jquery.js"></script>
-            <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-            <script src="~/js/site.js" asp-append-version="true"></script>
-        </environment>
-        <environment exclude="Development">
-            <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
-                    asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
-                    asp-fallback-test="window.jQuery"
-                    crossorigin="anonymous"
-                    integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT">
-            </script>
-            <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
-                    asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
-                    asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
-                    crossorigin="anonymous"
-                    integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd">
-            </script>
-            <script src="~/js/site.min.js" asp-append-version="true"></script>
-        </environment>*@
+   
     <environment include="Development">
         <script src="~/lib/bootstrap/js/bootstrap.js"></script>
         <script src="~/lib/jquery/jquery.js"></script>
@@ -233,6 +214,14 @@
         var expires = "; expires=" + date.toUTCString();
 
         document.cookie = "Currency" + "=" + (value || "") + expires + "; path=/";
+        location.reload();
+    }
+    function setNotificationCookie(value) {
+        var date = new Date();
+        date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000));
+        var expires = "; expires=" + date.toUTCString();
+
+        document.cookie = "Notification" + "=" + (value || "") + expires + "; path=/";
         location.reload();
     }
 </script>

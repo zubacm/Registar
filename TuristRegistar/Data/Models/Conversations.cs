@@ -16,5 +16,10 @@ namespace TuristRegistar.Data.Models
 
         public String IdentUser2Id { get; set; }
         public IdentityUser IdentUser2 { get; set; }
+
+        public bool Unread { get; set; }
+        public String UnredIdentUserId { get; set; }
+
+        public DateTime LastIneractionDateTime { get; set; }
     }
 }

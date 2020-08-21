@@ -1,4 +1,6 @@
 ﻿@model ObjectsViewModel
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
 
 <input asp-for="@Model.IdentUserId" id="ident-user-id" type="hidden" />
 @if (Model.ObjectsList != null)
@@ -9,11 +11,11 @@
         <div class="card">
             <div class="card-body pointer">
                 <div class="row">
+
                     <div class="card-img card-group col-sm-4">
                         <a asp-action="ObjectDetails" asp-controller="Object" asp-route-id="@item.Id" asp-route-occupancy="@Model.Search.Occupancy" asp-route-checkin="@Model.Search.CheckIn" asp-route-checkout="@Model.Search.CheckOut">
                             <img src="@item.ImgSrc" alt="Unable to load image" style="max-width:100%" />
                         </a>
-
                     </div>
                     <a asp-action="ObjectDetails" asp-controller="Object" asp-route-id="@item.Id" asp-route-occupancy="@Model.Search.Occupancy" asp-route-checkin="@Model.Search.CheckIn" asp-route-checkout="@Model.Search.CheckOut">
 
@@ -40,6 +42,7 @@
 
                 </div>
             </div>
+
             <div class="card-body">
                 <div class="col-sm-12">
                     @if (!string.IsNullOrWhiteSpace(item.Type))
@@ -48,13 +51,16 @@
                             @item.Type
                         </span>
                     }
-                    @if (item.IsBookmark)
+                    @if (SignInManager.IsSignedIn(User))
                     {
-                        <i data-toggle="tooltip" title="Ukloni iz zabilješki" class="fas fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@item.Id"></i>
-                    }
-                    else
-                    {
-                        <i data-toggle="tooltip" title="Sačuvaj" class="far fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@item.Id"></i>
+                        @if (item.IsBookmark)
+                        {
+                            <i data-toggle="tooltip" title="Ukloni iz zabilješki" class="fas fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@item.Id"></i>
+                        }
+                        else
+                        {
+                            <i data-toggle="tooltip" title="Sačuvaj" class="far fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@item.Id"></i>
+                        }
                     }
                 </div>
 
@@ -119,12 +125,10 @@
                 url: "/Auth/RemoveBookmark",
                 data: data,
                 type: "POST",
-                /// dataType: 'JSON',
                 contentType: 'application/x-www-form-urlencoded',
                 success: function (response) {
                     $(el).removeClass('far');
                     $(el).addClass('fas');
-                    //  $('#obj-container').html(response);
                 },
                 error: function () {
                     alert('Greška prilikom pribavljanja podataka.');
@@ -135,16 +139,13 @@
         else {
 
             $.ajax({
-                // type: 'GET',
                 url: "/Auth/AddBookmark",
                 data: data,
                 type: "POST",
-                /// dataType: 'JSON',
                 contentType: 'application/x-www-form-urlencoded',
                 success: function (response) {
                     $(el).removeClass('fas');
                     $(el).addClass('far');
-                    //  $('#obj-container').html(response);
                 },
                 error: function () {
                     alert('Greška prilikom pribavljanja podataka.');

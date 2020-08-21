@@ -64,12 +64,7 @@ function RecreateDatePicker2() {
 function AddPeriod() {
     var checkin = $('#datepicker1').val();
     var checkout = $('#datepicker2').val();
-    //var myhtml = '<li checkin="' + checkin + '" checkout="' + checkout + '" class="list-group-item row no-gutters  d-flex justify-content-between lh-condensed" >'
-    //    + '<div class="list-group-item row "><i class="fas fa-sign-out-alt fa-2x"></i>&nbsp;&nbsp;<h4>' + checkin + '</h4></div>'
-    //    + '<div class="list-group-item row"><i class="fas fa-sign-out-alt fa-2x fa-flip-horizontal"></i>&nbsp;&nbsp;<h4>' + checkout + '</h4></div>'
-    //    + '<div><a onclick="removePeriod(this)" class="btn pointer"><i class="fa fa-times"></i></a></div>'
-    //    + '</li>';
-    //$('#periods').append(myhtml);
+
 
     var objId = $('#objectid').val();
 

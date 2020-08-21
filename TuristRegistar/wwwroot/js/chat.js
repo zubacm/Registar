@@ -1,12 +1,13 @@
-﻿let connection = new signalR.HubConnectionBuilder()
+﻿
+
+let connection = new signalR.HubConnectionBuilder()
     .withUrl("/chat")
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
 connection.start();
 
-connection.on('send', (userid, data) => {
-    console.log("odavde" + userid);
+connection.on('send', (userid, receiverid, data) => {
     var currentdate = new Date();
     var when =
         (currentdate.getMonth() + 1) + "/"
@@ -14,15 +15,19 @@ connection.on('send', (userid, data) => {
         + currentdate.getFullYear() + " "
         + currentdate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
     DisplayMessagesDiv = document.getElementById("DisplayMessages");
-    if (userid === document.getElementById("senderid").value) {
+    var currentuserid = getCurrentUserId();
+    if (userid === currentuserid) {
         DisplayMessagesDiv.innerHTML += "<div class='outgoing_msg'><div class='sent_msg'><p>"
             + data + " </p> <span class='time_date'>" + when + "</span></div></div>";
     }
-    else {
+    else if (receiverid === currentuserid) { 
+
         DisplayMessagesDiv.innerHTML += "<div class='incoming_msg'><div class='received_msg'><div class='received_withd_msg'><p>"
             + data + " </p> <span class='time_date'>" + when + "</span></div></div></div>";
+        setCookieForNotification();
+        document.getElementById('message-logo').classList.add('text-danger');
+        document.getElementById('message-number').style.display = "inline";
     }
-    
 
     SendMessageInput = document.getElementById('txtMessage');
     SendMessageInput.value = "";
@@ -32,8 +37,42 @@ connection.on('send', (userid, data) => {
 
 function sendMessage() {
     var userid = document.getElementById("senderid").value;
+    var receiverid = document.getElementById("receiverid").value;
     var msg = document.getElementById("txtMessage").value;
-    connection.invoke('send', userid, msg);
+    connection.invoke('send', userid, receiverid, msg);
 }
 
+
+function setCookieForNotification() {
+        $.ajax({
+            type: 'GET',
+            url: "/Home/SetNotificationTrue",
+            dataType: 'html',
+            contentType: "application/json; charset=utf-8",
+            success: function () {
+            },
+            error: function () {
+                alert('Greška.');
+            }
+        });
+}
+function getCurrentUserId() {
+        var userid = $.ajax({
+            type: 'GET',
+            url: "/Auth/GetCurrentUserIdentId",
+            dataType: 'html',
+            async: false,
+            global: false,
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                return response;
+            },
+            error: function () {
+                alert('Greška prilikom pribavljanja podataka.');
+            }
+        }).responseText;
+
+        
+        return userid;
+}
 

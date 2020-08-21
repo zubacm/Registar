@@ -36,12 +36,12 @@ namespace TuristRegistar
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
+            //services.Configure<CookiePolicyOptions>(options =>
+            //{
+            //    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+            //    options.CheckConsentNeeded = context => true;
+            //    options.MinimumSameSitePolicy = SameSiteMode.None;
+            //});
 
             //Za cookie
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -71,6 +71,13 @@ namespace TuristRegistar
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                  .AddDefaultTokenProviders();
             services.ConfigureApplicationCookie(options => options.LoginPath = "/login");
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => false;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
             //services.AddAuthentication(option =>
             //{
             //    option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -93,6 +100,8 @@ namespace TuristRegistar
             services.AddSignalR();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddDistributedMemoryCache(); // Adds a default in-memory implementation of IDistributedCache
+            services.AddSession();
 
         }
 
@@ -110,21 +119,8 @@ namespace TuristRegistar
             }
 
             
-            //var webSocketOptions = new WebSocketOptions()
-            //{
-            //    KeepAliveInterval = TimeSpan.FromSeconds(120),
-            //    ReceiveBufferSize = 4 * 1024
-            //};
-            
-            //app.UseWebSockets(webSocketOptions);
-            //app.UseCors(builder =>
-            //{
-            //    builder.WithOrigins("http://localhost:44331")
-            //    .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-            //});
-            
 
-                app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
@@ -138,7 +134,8 @@ namespace TuristRegistar
 
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-           
+            app.UseSession();
+
 
             app.UseMvc(routes =>
             {
@@ -149,7 +146,6 @@ namespace TuristRegistar
             app.UseSignalR(route =>
             {
                 route.MapHub<ChatHub>("/chat");
-                route.MapHub<NotificationHub>("/NotificationHub");
             });
 
 

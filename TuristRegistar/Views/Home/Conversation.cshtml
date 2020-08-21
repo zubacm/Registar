@@ -25,108 +25,7 @@
     <h3 class=" text-center">@Model.ReceiverUsername</h3>
     <div class="messaging">
         <div class="inbox_msg">
-            @*<div class="inbox_people">
-                <div class="headind_srch">
-                    <div class="recent_heading">
-                        <h4>Recent</h4>
-                    </div>
-                    <div class="srch_bar">
-                        <div class="stylish-input-group">
-                            <input type="text" class="search-bar" placeholder="Search">
-                            <span class="input-group-addon">
-                                <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="inbox_chat">
-                    <div class="chat_list active_chat">
-                        <div class="chat_people">
-                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                            <div class="chat_ib">
-                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                                <p>
-                                    Test, which is a new approach to have all solutions
-                                    astrology under one roof.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chat_list">
-                        <div class="chat_people">
-                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                            <div class="chat_ib">
-                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                                <p>
-                                    Test, which is a new approach to have all solutions
-                                    astrology under one roof.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chat_list">
-                        <div class="chat_people">
-                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                            <div class="chat_ib">
-                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                                <p>
-                                    Test, which is a new approach to have all solutions
-                                    astrology under one roof.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chat_list">
-                        <div class="chat_people">
-                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                            <div class="chat_ib">
-                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                                <p>
-                                    Test, which is a new approach to have all solutions
-                                    astrology under one roof.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chat_list">
-                        <div class="chat_people">
-                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                            <div class="chat_ib">
-                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                                <p>
-                                    Test, which is a new approach to have all solutions
-                                    astrology under one roof.
-                                </p>
-                            </div>
-                        </div>
-                    </div>*@
-                    @*<div class="chat_list">
-                        <div class="chat_people">
-                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                            <div class="chat_ib">
-                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                                <p>
-                                    Test, which is a new approach to have all solutions
-                                    astrology under one roof.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chat_list">
-                        <div class="chat_people">
-                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                            <div class="chat_ib">
-                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                                <p>
-                                    Test, which is a new approach to have all solutions
-                                    astrology under one roof.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>*@
-
+           
             <div class="mesgs">
                 <div class="msg_history overflow-auto" style="height:80vh" id="DisplayMessages">
                     @if (Model.Messages != null)
@@ -169,19 +68,16 @@
                       data-ajax-complete="" data-ajax-failure="alert('Greška prilikom pribavljanja podataka!')">
                     <input hidden asp-for="ConversationId" id="convid"/>
                     <input hidden asp-for="SenderId" type="text"  id="senderid"/>
-                    <input hidden asp-for="ReceiverId" />
+                    <input hidden asp-for="ReceiverId" id="receiverid"/>
                     <input hidden asp-for="SenderUsername" id="username" />
                     <div class="type_msg">
                         <div class="row" style="padding:5px">
-                            @*<div id="DisplayMessages"></div>*@
                             <div class="col-11">
                                 <input type="text" id="txtMessage" asp-for="Text" class="write_msg" placeholder="Unesite poruku" />
                             </div>
-                            @*<input type="text" id="txtMessage" asp-for="Text" class="write_msg" placeholder="Unesite poruku" />*@
                             <div class="col-1">
                                 <button id="sendMessage" class="msg_send_btn" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
                             </div>
-                            @*<input type="button" id="sendMessage" value="Send" onclick="sendMessage();" />*@
                         </div>
                     </div>
                 </form>
@@ -189,8 +85,6 @@
             </div>
         </div>
 
-
-        <p class="text-center top_spac"> Design by <a target="_blank" href="#">Sunil Rajput</a></p>
 
     </div>
 </div>
@@ -245,4 +139,8 @@
             //}
         });
     }
+
+    $(document).ready(function updateNotDiv() {
+        $("#not-div").load(window.location.href + " #not-div");
+    });
 </script>

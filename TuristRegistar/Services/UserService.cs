@@ -77,11 +77,7 @@ namespace TuristRegistar.Services
                 .Include(o => o.ObjectHasAttributes)
                 .Include(o => o.CntObjAttributesCount)
                 .Include(o => o.RatingsAndReviews)
-                //.Include(o => o.SpecialOffers)
-                //.Include(o => o.UnavailablePeriods)
                 .Include(o => o.ObjectImages)
-                //.Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
-                //.Include(o => o.StandardPricingModel)
                 .Where(o => o.IdentUserId == identUserId)
                 .Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
         }
@@ -94,7 +90,6 @@ namespace TuristRegistar.Services
 
         public IEnumerable<int> GetAllUserBookmarksId(String identUserId)
         {
-            //Check this shit
             return _context.Bookmark
                 .Where(b => b.UserId == identUserId)
                 .Select(b => b.ObjectId)
@@ -119,11 +114,7 @@ namespace TuristRegistar.Services
                 .Include(o => o.ObjectHasAttributes)
                 .Include(o => o.CntObjAttributesCount)
                 .Include(o => o.RatingsAndReviews)
-                //.Include(o => o.SpecialOffers)
-                //.Include(o => o.UnavailablePeriods)
                 .Include(o => o.ObjectImages)
-                //.Include(o => o.OccupancyBasedPricing).Include(o => o.OccupancyBasedPricing.Prices)
-                //.Include(o => o.StandardPricingModel)
                 .Where(o => bookmarksObjectsId.Contains(o.Id))
                 .Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
                 
@@ -131,7 +122,6 @@ namespace TuristRegistar.Services
 
         public int CountUserBookmarks(String identUserId)
         {
-            //Check this shit
             var bookmarksObjectsId = _context.Bookmark
                 .Where(b => b.UserId == identUserId)
                 .Select(b => b.ObjectId)
@@ -186,6 +176,11 @@ namespace TuristRegistar.Services
             return _context.Conversations
                 .FirstOrDefault(c => (c.IdentUser1Id == IdentUser1Id && c.IdentUser2Id == IdentUser2Id) || (c.IdentUser1Id == IdentUser2Id && c.IdentUser2Id == IdentUser1Id));
         }
+        public Conversations GetConversationBetweenUsers(int conversaionId)
+        {
+            return _context.Conversations
+                .FirstOrDefault(c => c.Id == conversaionId);
+        }
 
         public IEnumerable<Messages> GetConversationMessages(int conversationId, int pagenumber, int pagesize)
         {
@@ -194,6 +189,58 @@ namespace TuristRegistar.Services
             var skip = total - (pagenumber * pagesize) < 0 && total - (pagenumber * pagesize) > 0 - pagesize ? 0 : total - (pagenumber * pagesize);
            return  _context.Messages.Where(m => m.ConversationId == conversationId)
                                 .Skip(skip).Take(pagesize).ToList();
+        }
+
+        public void SetUnreadConversation(String receiverIdentUserId, int conversationId, DateTime lastInteraction)
+        {
+            var conversation = _context.Conversations.FirstOrDefault(c => c.Id == conversationId);
+            conversation.Unread = true;
+            conversation.UnredIdentUserId = receiverIdentUserId;
+            conversation.LastIneractionDateTime = lastInteraction;
+            _context.Conversations.Attach(conversation);
+
+            _context.SaveChanges();
+        }
+
+        public IEnumerable<Conversations> GetConversations(String identUserId, int pagenumber, int pagesize)
+        {
+            return _context.Conversations.Where(c => c.IdentUser1Id == identUserId || c.IdentUser2Id == identUserId)
+                .OrderByDescending(c => c.LastIneractionDateTime)
+                .Include(c => c.IdentUser1)
+                .Include(c => c.IdentUser2)
+                .Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
+        }
+        public IEnumerable<Conversations> SearchForConversations(String search, String identUserId, int pagenumber, int pagesize)
+        {
+            return _context.Conversations.Where(c => c.IdentUser1Id == identUserId || c.IdentUser2Id == identUserId)
+                .Where(c => c.IdentUser1Id != identUserId ? c.IdentUser1.UserName.ToLower().Contains(search.ToLower()) : c.IdentUser2.UserName.ToLower().Contains(search.ToLower()) )
+               .OrderByDescending(c => c.LastIneractionDateTime)
+               .Include(c => c.IdentUser1)
+               .Include(c => c.IdentUser2)
+               .Skip((pagenumber - 1) * pagesize).Take(pagesize).ToList();
+        }
+
+
+        public Messages GetLastMessage(int conversationid)
+        {
+            return _context.Messages.Where(m => m.ConversationId == conversationid)
+                .OrderByDescending(m => m.DateTime)
+                .FirstOrDefault();
+        }
+
+        public bool CheckForUnreadMessages(String identUserId)
+        {
+            return _context.Conversations.Where(c => c.Unread && c.UnredIdentUserId == identUserId).Count() > 0 ?
+                 true : false;
+        }
+
+        public void SetConversationRead(int conversationId)
+        {
+            var conversation = _context.Conversations.FirstOrDefault(c => c.Id == conversationId);
+            conversation.Unread = false;
+            _context.Conversations.Attach(conversation);
+
+            _context.SaveChanges();
         }
 
     }

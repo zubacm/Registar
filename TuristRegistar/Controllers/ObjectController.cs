@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -64,7 +65,6 @@ namespace TuristRegistar.Controllers
             IEnumerable<ObjectTypes> objecttypes = _touristObject.GetObjectTypes();
             model.ObjectTypes = objecttypes.Select(ot => new SelectListItem() { Text = ot.Name, Value = ot.Id.ToString() }).ToList();
 
-            //attributes are for attributes and specialoffers
             IEnumerable<ObjectAttributes> attributes = _touristObject.GetAllObjectAttributes();
             model.Offers = attributes.Select(a => new SelectListItem() { Text = a.Name, Value = a.Id.ToString() }).ToList();
             model.SpecialOffers = model.Offers;
@@ -86,7 +86,6 @@ namespace TuristRegistar.Controllers
             IEnumerable<ObjectTypes> objecttypes = _touristObject.GetObjectTypes();
             model.ObjectTypes = objecttypes.Select(ot => new SelectListItem() { Text = ot.Name, Value = ot.Id.ToString() }).ToList();
 
-            //attributes are for attributes and specialoffers
             IEnumerable<ObjectAttributes> attributes = _touristObject.GetAllObjectAttributes();
             model.Offers = attributes.Select(a => new SelectListItem() { Text = a.Name, Value = a.Id.ToString() }).ToList();
             model.SpecialOffers = model.Offers;
@@ -185,7 +184,6 @@ namespace TuristRegistar.Controllers
                 OccupancyBasedPricing = model.OccupancyPricing ? model.OccupancyBasedPricing : null,
                 FullAddress = model.Address + (Convert.ToInt32(model.SelectedCity) == 0 ? "" : _touristObject.GetCityName(Convert.ToInt32(model.SelectedCity)))
                 + (Convert.ToInt32(model.SelectedCity) == 0 ? "" : _touristObject.GetCoutnryName(Convert.ToInt32(model.SelectedCountry))),
-                ////CreatorId = null,
                 IdentUserId = _userManager.GetUserId(this.User),
                 ObjectImages = CopyFiles(Path.Combine(_hostingEnvironment.WebRootPath, "Temp"), Path.Combine(_hostingEnvironment.WebRootPath, "UploadedImages")),
             };
@@ -200,15 +198,19 @@ namespace TuristRegistar.Controllers
         }
 
         [Authorize]
-       // [Route("editobject")] // /editobject
         public async Task<IActionResult> EditObject(int id)
-        {
-            //if user admin or owns object
-            //Napravit servis da li korisik owns object
+        {       
             var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
             var myobject = await _touristObject.GetObject(id, currency);
 
-            var model = new EditObjectViewModel()
+            var userId = _userManager.GetUserId(User);
+            if ((!IsUserAuthorized(userId, myobject.IdentUserId)) && (!(await IsCurrentUserInRoleAsync("ADMIN"))))
+            {
+                var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+                return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
+            }
+
+                var model = new EditObjectViewModel()
             {
                 Id = myobject.Id,
                 Name = myobject.Name,
@@ -239,7 +241,6 @@ namespace TuristRegistar.Controllers
         }
 
 
-        //try private
         public IActionResult GetCitiesInCountry(int countryId)
         {
             var cities = _touristObject.GetCitiesFromCountry(countryId);
@@ -262,7 +263,6 @@ namespace TuristRegistar.Controllers
 
                 var path  = Path.Combine(_hostingEnvironment.WebRootPath, "Temp" , file.FileName);
 
-                //file.SaveAs(path);
                 using (var fileStream = new FileStream(path, FileMode.Create))
                 {
                     await file.CopyToAsync(fileStream);
@@ -400,12 +400,11 @@ namespace TuristRegistar.Controllers
             return model;
         }
 
-        //Bili su u temp folderu i na save se sačuvavaju 
+        //Čuvanje slika iz temp foldera 
         public List<ObjectImages> CopyFiles(string sourcePath, string destinationPath)
         {
             var imgs = new List<ObjectImages>();
             
-            //System.IO.Directory.CreateDirectory(destinationPath);
             try
             {
                 foreach (var file in new DirectoryInfo(sourcePath).GetFiles())
@@ -456,170 +455,231 @@ namespace TuristRegistar.Controllers
         }
 
         [Authorize]
-        public IActionResult DeletePeriod(EditObjectViewModel model)
+        public async Task<IActionResult> DeletePeriod(EditObjectViewModel model)
         {
-            //Admin ili owner
-            _touristObject.DeletePeriod(model.DeletePeriodId);
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
+            {
+                _touristObject.DeletePeriod(model.DeletePeriodId);
 
-            return Ok();
+                return Ok();
+            }
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
         }
 
         [Authorize]
-        public IActionResult AddPeriod(EditObjectViewModel model)
+        public async Task<IActionResult> AddPeriod(EditObjectViewModel model)
         {
-            //admin ili owner
-            if (!string.IsNullOrWhiteSpace(model.UnavailablePeriodsString))
-                model.UnavailablePeriods = (_touristObject.ParseDates(model.UnavailablePeriodsString))
-                    .Select(item => new UnavailablePeriods() { From = item.Key, To = item.Value }).ToList();
-            var id = _touristObject.AddPeriod(model.UnavailablePeriods[0], model.Id);
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
+            {
+                if (!string.IsNullOrWhiteSpace(model.UnavailablePeriodsString))
+                    model.UnavailablePeriods = (_touristObject.ParseDates(model.UnavailablePeriodsString))
+                        .Select(item => new UnavailablePeriods() { From = item.Key, To = item.Value }).ToList();
+                var id = _touristObject.AddPeriod(model.UnavailablePeriods[0], model.Id);
 
-            return Json(id);
+                return Json(id);
+            }
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
         }
 
 
         [HttpPost]
-        [Authorize]//admin ili owner
-        public IActionResult EditOccupancyBased(EditObjectViewModel model)
+        [Authorize]
+        public async Task<IActionResult> EditOccupancyBased(EditObjectViewModel model)
         {
-            model.OccupancyPricing = true;
-            if ( (!string.IsNullOrWhiteSpace(model.OccubancBasedPrices)))
-                model.OccupancyBasedPricing.Prices = (_touristObject.ParseStringToKeyValue(model.OccubancBasedPrices))
-                    .Select(item => new OccupancyBasedPrices() { Occupancy = item.Key, PricePerNight = item.Value }).ToList();
-
-            if (!CheckPricing(model))
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
             {
-                TempData["Error-Notification"] = "Ispravno popunite neophodna polja!";
-                //redirect to edit umjesto ovog
-                return View(model);
-            }
-            //var occupancyBasedPricing = model.OccupancyBasedPricing;
-            //ili možda null
-            var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
+                model.OccupancyPricing = true;
+                if ((!string.IsNullOrWhiteSpace(model.OccubancBasedPrices)))
+                    model.OccupancyBasedPricing.Prices = (_touristObject.ParseStringToKeyValue(model.OccubancBasedPrices))
+                        .Select(item => new OccupancyBasedPrices() { Occupancy = item.Key, PricePerNight = item.Value }).ToList();
 
-            if (model.OccupancyBasedPricing.Id != 0)
-            {//i ovdje currency
-                _touristObject.NewOccupancyBasedPricing(model.OccupancyBasedPricing, model.Id, currency);
-            }
-            else
-            {
-                _touristObject.DeleteStandardModel(model.Id);//ovdje treba currency converting
-                _touristObject.AddOccupancyBasedModel(model.OccupancyBasedPricing, model.Id, currency);
-                //add occupancy
-            }
-            ViewData["Notification"] = "Uspješno sačuvane izmjene";
-            return null;
-            //return RedirectToAction("Index", "Object");
-        }
+                if (!CheckPricing(model))
+                {
+                    TempData["Error-Notification"] = "Ispravno popunite neophodna polja!";
+                    return RedirectToAction("EditObject", new { id = model.Id } ); ;
+                }
 
-        [Authorize]//admin ili owner ili jednostavno stavit httppost
-        public IActionResult EditStandardModel(EditObjectViewModel model)
-        {
-            model.OccupancyPricing = false;
+                var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
 
-            if (!CheckPricing(model))
-            {
-                TempData["Error-Notification"] = "Ispravno popunite neophodna polja!";
-                //redirect to edit umjesto ovog
-                return View(model);
+                if (model.OccupancyBasedPricing.Id != 0)
+                {
+                   await _touristObject.NewOccupancyBasedPricing(model.OccupancyBasedPricing, model.Id, currency);
+                }
+                else
+                {
+                    _touristObject.DeleteStandardModel(model.Id);
+                    await _touristObject.AddOccupancyBasedModel(model.OccupancyBasedPricing, model.Id, currency);
+                }
+                ViewData["Notification"] = "Uspješno sačuvane izmjene";
+                return RedirectToAction("EditObject", new { id = model.Id});
             }
 
-            var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
-            //test test when done
-            if (model.StandardPricingModel.Id == 0)
-            {
-                _touristObject.DeleteOccupancyBasedModel(model.Id);//isto currency
-                _touristObject.AddStandardModel(model.StandardPricingModel, model.Id, currency);
-            }
-            else
-            {
-                _touristObject.EditStandardModel(model.StandardPricingModel, currency);
-            }
-
-            //ove nalove
-            return null;
-        }
-
-        [Authorize]//isto
-        public IActionResult DeleteObjectHasAttribute(EditObjectViewModel model)
-        {
-            _touristObject.DeleteObjectHasAttributes(model.Id, model.DeleteAttributeId);
-            return Ok();
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
         }
 
         [Authorize]
-        public IActionResult AddObjectHasAttribute(EditObjectViewModel model)
+        public async Task<IActionResult> EditStandardModel(EditObjectViewModel model)
         {
-            var objHasAttribute = new ObjectHasAttributes()
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
             {
-                ObjectId = model.Id,
-                AttributeId = model.AddAttributeId,
-            };
-            _touristObject.AddObjectHasAttribute(objHasAttribute);
-            return Ok();
+                model.OccupancyPricing = false;
+
+                if (!CheckPricing(model))
+                {
+                    TempData["Error-Notification"] = "Ispravno popunite neophodna polja!";
+                    return RedirectToAction("EditObject", new { id = model.Id });
+                }
+
+                var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
+                if (model.StandardPricingModel.Id == 0)
+                {
+                    _touristObject.DeleteOccupancyBasedModel(model.Id);
+                    await _touristObject.AddStandardModel(model.StandardPricingModel, model.Id, currency);
+                }
+                else
+                {
+                    await _touristObject.EditStandardModel(model.StandardPricingModel, currency);
+                }
+                ViewData["Notification"] = "Uspješno sačuvane izmjene";
+                return RedirectToAction("EditObject", new { id = model.Id });
+
+            }
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
         }
 
-        [Authorize]//Isto
-        public IActionResult AddCntAttribute(EditObjectViewModel model)
+        [Authorize]
+        public async Task<IActionResult> DeleteObjectHasAttribute(EditObjectViewModel model)
         {
-            var cntObjAttribute = new CntObjAttributesCount()
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
             {
-                ObjectId = model.Id,
-                CountableObjAttrId = model.AddCntAttributeId,
-                Count = model.AddCntAttributeValue,
-            };
-            _touristObject.AddCntAttributeCount(cntObjAttribute);
+                _touristObject.DeleteObjectHasAttributes(model.Id, model.DeleteAttributeId);
             return Ok();
-        }
-        [Authorize]//isto
-        public IActionResult DeleteCntAttribute(EditObjectViewModel model)
-        {
-            _touristObject.DeleteCntAttributeCount(model.Id, model.DeleteCntAttributeId);
-            return Ok();
+             }
+
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
         }
 
-        [Authorize]//isto
-        public IActionResult AddSpecialOffer(EditObjectViewModel model)
+        [Authorize]
+        public async Task<IActionResult> AddObjectHasAttribute(EditObjectViewModel model)
         {
-            var specialoffer = new SpecialOffersPrices()
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
             {
-                ObjectId = model.Id,
-                SpecialOfferId = model.AddSpecialOfferId,
-                Price = model.AddSpecialOfferValue,
-            };
-            _touristObject.AddSpecialOffer(specialoffer);
-            return Ok();
-        }
-        [Authorize]//isto
-        public IActionResult DeleteSpecialOffer(EditObjectViewModel model)
-        {
-            _touristObject.DeleteSpecialOffer(model.Id, model.DeleteSpecialOfferId);
-            return Ok();
+                var objHasAttribute = new ObjectHasAttributes()
+                {
+                    ObjectId = model.Id,
+                    AttributeId = model.AddAttributeId,
+                };
+                _touristObject.AddObjectHasAttribute(objHasAttribute);
+                return Ok();
+            }
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
         }
 
-        [Authorize]//isto
-        public IActionResult EditObjectBasic(EditObjectViewModel model)
+        [Authorize]
+        public async Task<IActionResult> AddCntAttribute(EditObjectViewModel model)
         {
-            Objects myobject = new Objects()
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
             {
-                Id = model.Id,
-                Name = model.Name,
-                Lat = model.Lat,
-                Lng = model.Lng,
-                Address = model.Address,
-                EmailContact = model.EmailContact,
-                PhoneNumberContact = model.PhoneNumberContact,
-                WebContact = model.WebContact,
-                Description = model.Description,
-                Surface = model.Surface,
-                CountryId = Convert.ToInt32(model.SelectedCountry) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCountry),
-                CityId = Convert.ToInt32(model.SelectedCity) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCity),
-                ObjectTypeId = Convert.ToInt32(model.SelectedObjectType) == 0 ? null : (int?)Convert.ToInt32(model.SelectedObjectType),
-                FullAddress = model.Address + (Convert.ToInt32(model.SelectedCity) == 0 ? "" : _touristObject.GetCityName(Convert.ToInt32(model.SelectedCity)))
+                var cntObjAttribute = new CntObjAttributesCount()
+                {
+                    ObjectId = model.Id,
+                    CountableObjAttrId = model.AddCntAttributeId,
+                    Count = model.AddCntAttributeValue,
+                };
+                _touristObject.AddCntAttributeCount(cntObjAttribute);
+                return Ok();
+            }
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
+        }
+        [Authorize]
+        public async Task<IActionResult> DeleteCntAttribute(EditObjectViewModel model)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
+            {
+                _touristObject.DeleteCntAttributeCount(model.Id, model.DeleteCntAttributeId);
+                return Ok();
+            }
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> AddSpecialOffer(EditObjectViewModel model)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
+            {
+                var specialoffer = new SpecialOffersPrices()
+                {
+                    ObjectId = model.Id,
+                    SpecialOfferId = model.AddSpecialOfferId,
+                    Price = model.AddSpecialOfferValue,
+                };
+                _touristObject.AddSpecialOffer(specialoffer);
+                return Ok();
+            }
+
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
+        }
+        [Authorize]
+        public async Task<IActionResult> DeleteSpecialOffer(EditObjectViewModel model)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
+            {
+                _touristObject.DeleteSpecialOffer(model.Id, model.DeleteSpecialOfferId);
+                return Ok();
+            }
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> EditObjectBasic(EditObjectViewModel model)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (IsUserAuthorized(userId, model.IdentUserId) || (await IsCurrentUserInRoleAsync("ADMIN")))
+            {
+                Objects myobject = new Objects()
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Lat = model.Lat,
+                    Lng = model.Lng,
+                    Address = model.Address,
+                    EmailContact = model.EmailContact,
+                    PhoneNumberContact = model.PhoneNumberContact,
+                    WebContact = model.WebContact,
+                    Description = model.Description,
+                    Surface = model.Surface,
+                    CountryId = Convert.ToInt32(model.SelectedCountry) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCountry),
+                    CityId = Convert.ToInt32(model.SelectedCity) == 0 ? null : (int?)Convert.ToInt32(model.SelectedCity),
+                    ObjectTypeId = Convert.ToInt32(model.SelectedObjectType) == 0 ? null : (int?)Convert.ToInt32(model.SelectedObjectType),
+                    FullAddress = model.Address + (Convert.ToInt32(model.SelectedCity) == 0 ? "" : _touristObject.GetCityName(Convert.ToInt32(model.SelectedCity)))
                 + (Convert.ToInt32(model.SelectedCity) == 0 ? "" : _touristObject.GetCoutnryName(Convert.ToInt32(model.SelectedCountry))),
-            };
-            _touristObject.EditObjectBasic(myobject);
-            ViewData["Notification"] = "Uspješno sačuvane izmjene";
-            return RedirectToAction("EditObject", "Object", new { id = model.Id });
+                };
+                _touristObject.EditObjectBasic(myobject);
+                ViewData["Notification"] = "Uspješno sačuvane izmjene";
+                return RedirectToAction("EditObject", "Object", new { id = model.Id });
+            }
+            var unsucessfulmodel = new ErrorViewModel() { RequestId = 403.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", unsucessfulmodel);
         }
 
         public async Task<IActionResult> ObjectDetails(int id, int occupancy, DateTime checkin, DateTime checkout)
@@ -717,7 +777,6 @@ namespace TuristRegistar.Controllers
         [Authorize]
         public IActionResult AddReview(ObjectDetailsViewModel model)
         {
-           // var user = await _userManager.GetUserAsync(User);
             var identUserId = _userManager.GetUserId(this.User);
             var currentUser = _user.GetUserFromIdentUser(identUserId);
 
@@ -731,7 +790,6 @@ namespace TuristRegistar.Controllers
 
             _touristObject.AddRatingAndReview(ratingAndReview);
 
-            //this will be first page
             var ratingsAndReviews = _touristObject.GetRatingsAndReviews(1,5,model.Id);
 
             var ratingsAndReviwsModel = ratingsAndReviews.Select(rr => new Review()
@@ -743,7 +801,6 @@ namespace TuristRegistar.Controllers
                 User = rr.User
             }).ToList();
 
-           // TempData["Notification"] = "Uspješno ste dodali utisak i ocjenu.";
             return Ok(ratingsAndReviwsModel);
         }
 
@@ -773,7 +830,6 @@ namespace TuristRegistar.Controllers
             if (!(model.CheckIn != DateTime.MinValue && model.CheckIn != DateTime.MinValue && model.SelectedOccupancy > 0))
             {
                 ViewData["Error-Notification"] = "Unesite ispravne podatke";
-                //da li radi?
                 return View(model);
             }
             var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
@@ -805,6 +861,22 @@ namespace TuristRegistar.Controllers
 
             TempData["Notification"] = "Izmjene su uspješno sačuvane";
             return View("Index");
+        }
+
+
+        private async Task<bool> IsCurrentUserInRoleAsync(string role)
+        {
+            var user = await _userManager.FindByIdAsync(this.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles.Contains(role))
+                return true;
+
+            return false;
+        }
+
+        private bool IsUserAuthorized(String userId, String ownerId)
+        {
+            return userId == ownerId ? true : false;
         }
     }
 }

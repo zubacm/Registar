@@ -35,73 +35,63 @@
 <div id="obj-container">
     <div class="col-sm-12">
         <!--Objects-->
-        <div class="container" >
+        <div class="container">
             @if (Model.ObjectsList != null)
-{
-            @foreach (var item in Model.ObjectsList)
+            {
+                @foreach (var item in Model.ObjectsList)
                 {
-            <br />
-            <div class="card">
-                <div class="card-body pointer">
-                    <div class="row">
-                        <div class="card-img card-group col-sm-4">
-                            <a asp-action="ObjectDetails" asp-controller="Object" asp-route-id="@item.Id">
-                                <img src="@item.ImgSrc" alt="Unable to load image" style="max-width:100%" />
-                            </a>
+                    <br />
+                    <div class="card">
+                            <div class="card-body pointer">
+                                <div class="row">
+                                    <div class="card-img card-group col-sm-4">
+                                        <a asp-action="ObjectDetails" asp-controller="Object" asp-route-id="@item.Id">
+                                        <img src="@item.ImgSrc" alt="Unable to load image" style="max-width:100%" />
+                                        </a>
 
-                        </div>
-                        <a asp-action="ObjectDetails" asp-controller="Object">
+                                    </div>
+                                    <a asp-action="ObjectDetails" asp-controller="Object" asp-route-id="@item.Id">
 
-                            <div class="card-title card-group col-sm-8">
-                                <div class="col-sm-12">
-                                    <h4 class="col-sm-12">
-                                        @item.Name
-                                        <span class="float-right">
-                                            <span class="text-warning"><i class="fas fa-star"></i>&nbsp;@item.Rating</span>
-                                            <br />
-                                            <span class="text-muted" style="font-size:14px;">broj ocjena: @item.NumberOfRatings</span>
-                                        </span>
-                                    </h4>
-                                    <a href="#" class="text-primary">
-                                        <i class="fa fa-map-marker-alt"></i>&nbsp;@item.Location
+                                        <div class="card-title card-group col-sm-8">
+                                            <div class="col-sm-12">
+                                                <h4 class="col-sm-12">
+                                                    @item.Name
+                                                    <span class="float-right">
+                                                        <span class="text-warning"><i class="fas fa-star"></i>&nbsp;@item.Rating</span>
+                                                        <br />
+                                                        <span class="text-muted" style="font-size:14px;">broj ocjena: @item.NumberOfRatings</span>
+                                                    </span>
+                                                </h4>
+                                                <a href="#" class="text-primary">
+                                                    <i class="fa fa-map-marker-alt"></i>&nbsp;@item.Location
+                                                </a>
+
+                                            </div>
+                                            <div class="col-sm-12">
+                                                @item.Description
+                                            </div>
+                                        </div>
                                     </a>
 
                                 </div>
-                                <div class="col-sm-12">
-                                    @item.Description
-                                </div>
                             </div>
-                        </a>
+                            <div class="card-body">
+                                <div class="col-sm-12">
+                                    @if (!string.IsNullOrWhiteSpace(item.Type))
+                                    {
+                                        <span class="btn-sm bg-danger text-white" style="margin-top:8px!important;">
+                                            @item.Type
+                                        </span>
+                                    }
 
+                                </div>
+
+                            </div>
                     </div>
-                </div>
-                <div class="card-body">
-                    <div class="col-sm-12">
-                        @if (!string.IsNullOrWhiteSpace(item.Type))
-                        {
-                            <span class="btn-sm bg-danger text-white" style="margin-top:8px!important;">
-                                @item.Type
-                            </span>
-                        }
-                        @*@if (item.IsBookmark)
-                        {
-                            <i data-toggle="tooltip" title="Ukloni iz zabilješki" class="fas fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@item.Id"></i>
-                        }
-                        else
-                        {
-                            <i data-toggle="tooltip" title="Sačuvaj" class="far fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@item.Id"></i>
-                        }*@
-                    </div>
+                 }
+             }
 
                 </div>
-            </div>
-                }
-}
-
-
-
-            <!--   <partial name="_ObjectsListed" for="@Model" />-->
-        </div>
         <!--./Objects-->
     </div>
 

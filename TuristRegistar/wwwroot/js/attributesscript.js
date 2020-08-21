@@ -66,7 +66,6 @@ function GetAttributes() {
         myhtml
     );
     offers.push(sel.value);
-    //var dataToSend = JSON.stringify(offers);
     $("#added-offers").val(offers);
 
     RefreshOffersSelectList();
@@ -86,7 +85,6 @@ function RefreshOffersSelectList() {
                 '<option disabled selected>Izaberite...</option>'
             );
 
-            //console.log(data);//Da vidiš u konzoli
             $.each(data, function (index, model) {
                 offersSelectList.append(
                     $('<option>', {
@@ -161,7 +159,6 @@ function RefreshCntOffersSelectList() {
                 '<option disabled selected>Izaberite...</option>'
             );
 
-            //console.log(data);//Da vidiš u konzoli
             $.each(data, function (index, model) {
                 offersSelectList.append(
                     $('<option>', {
@@ -225,7 +222,6 @@ function RefreshSpecialOffersSelectList() {
                 '<option disabled selected>Izaberite...</option>'
             );
 
-            //console.log(data);//Da vidiš u konzoli
             $.each(data, function (index, model) {
                 offersSelectList.append(
                     $('<option>', {
@@ -320,7 +316,6 @@ function ReloadSelectLists() {
     var mylist = document.getElementById('countable-attr-container').getElementsByTagName("li");
     for (var i = 0; i < mylist.length; i++) {
         var idvalue = $(mylist[i]).attr('id-value');
-        //var myvalue = $(mylist[i]).find('input')[0].value;
         countableOffers.push(idvalue);
     }
     $("#selectlist-cntoffers").val(countableOffers);
@@ -329,7 +324,6 @@ function ReloadSelectLists() {
     var specialofferslist = document.getElementById('specialoffers-container').getElementsByTagName("li");
     for (i = 0; i < specialofferslist.length; i++) {
         var idvalueso = $(specialofferslist[i]).attr('id-value');
-        //var myvalueso = $(specialofferslist[i]).find('input')[0].value;
         payedOffers.push(idvalueso);
     }
     $("#selectlist-specialoffers").val(payedOffers);

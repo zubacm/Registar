@@ -9,10 +9,8 @@ $('input[type="file"]').change(function (e) {
 
     var reader = new FileReader();
     reader.onload = function (e) {
-        // get loaded data and render thumbnail.
         document.getElementById("preview").src = e.target.result;
     };
-    // read the image file as a data URL.
     reader.readAsDataURL(this.files[0]);
 });
 
@@ -87,7 +85,6 @@ var Uploadimage = function () {
                 + '<img class="img-fluid" src="/Temp/' + response + '" alt="Forografija se ne može učitati">'
                 + '<i class="fa fa-trash fa-7x text-dark trach-icon" onclick="deleteImg(this)"></i></div>';
             $('#gallery').append(myhtml);
-            //$("#uploadedImage").append('<img src="/Temp/' + response + '" class="img-responsive thumbnail" style="object-fit: contain"/>');
 
 
         }
@@ -111,7 +108,6 @@ function deleteImg(e) {
     $.ajax({
         type: 'POST',
         url: "/Object/DeleteImageTemp",
-        //contentType: "application/json",
         data: data,
         contentType: false,
         processData: false,

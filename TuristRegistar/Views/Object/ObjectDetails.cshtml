@@ -8,7 +8,6 @@
 <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
-@*<link href="~/css/regst.css" rel="stylesheet" />*@
 <link href="~/css/tabs.css" rel="stylesheet" />
 <link href="~/css/site.css" rel="stylesheet" />
 <link href="~/css/paying-model-style.css" rel="stylesheet" />
@@ -28,9 +27,6 @@
 {
     mycurrency = HttpContextAccessor.HttpContext.Request.Cookies["Currency"];
 }
-
-<a asp-action="Conversation" asp-controller="Home" asp-route-withIdentUserId="@Model.IdentUserId">Pošalji poruku</a>
-    <br />
 
 <!--Osnovno-->
 <br />
@@ -197,6 +193,10 @@
 
     @*mapa i delete*@
     <div class="col-md-4 order-md-2 mb-4">
+        <div class="col-mb-3">
+            <a  asp-action="Conversation" asp-controller="Home" asp-route-withIdentUserId="@Model.IdentUserId" class="btn btn-primary text-white pointer btn-block pointer m-auto"><i class="far fa-comment"></i>&nbsp;&nbsp;Pošalji poruku korisniku</a>
+        </div>
+        <br />
         @if (SignInManager.IsSignedIn(User))
         {
 
@@ -274,8 +274,7 @@
     </div>
 </div>
 <!--./Fotografije-->
-@*</form>*@
-@*</div>*@
+
 
 <!--Image Modal-->
 <div id="imgModal" class="modal fade">
@@ -302,7 +301,6 @@
         $('#img-modal').attr('src', ($(ev).attr('src')));
     }
     function AddReview() {
-        //  alert($('#formIndex').serialize
         $.ajax({
             type: 'GET',
             url: "/Object/AddReview",
@@ -333,28 +331,22 @@
     function goToNext() {
         document.getElementById("CurrPage").value = @Model.Pager.CurrentPage+1;
         ChangePage();
-        //document.getElementById("formIndex").submit();
     }
     function goToPrevious() {
         document.getElementById("CurrPage").value = @Model.Pager.CurrentPage-1;
         ChangePage();
-        //document.getElementById("formIndex").submit();
     }
     function goToFirst() {
         document.getElementById("CurrPage").value = 1;
         ChangePage();
-        //document.getElementById("formIndex").submit();
     }
     function goToLast() {
         document.getElementById("CurrPage").value = @Model.Pager.TotalPages;
         ChangePage();
-
-        //document.getElementById("formIndex").submit();
     }
     function goToPage(pagee) {
         document.getElementById("CurrPage").value = pagee;
         ChangePage();
-        //document.getElementById("formIndex").submit();
     }
 
 
@@ -363,7 +355,7 @@
             type: 'GET',
             url: "/Object/ChangeReviewsPage",
             data: $('#reviewsForm').serialize(),
-            dataType: 'html', // modify
+            dataType: 'html', 
             contentType: "application/json; charset=utf-8",
             success: function (response) {
                 $('#reviews-container').html(response);
@@ -472,14 +464,12 @@
             }
         }
         var currentcheckin = $('#datepicker1').val();
-        //if (checkout && currentcheckin)
-        //    $('#period-btn').prop('disabled', false);
+       
         $DPicker1.destroy();
         $DPicker1.datepicker({
             uiLibrary: 'bootstrap4',
             format: 'yyyy-mm-dd',
             value: currentcheckin,
-            //minDate: new Date(new Date() - (24 * 60 * 60 * 1000)),
             minDate: mindate,
             maxDate: maxDate,
             disableDates: unavailableperiods,
@@ -541,12 +531,10 @@
                 url: "/Auth/RemoveBookmark",
                 data: data,
                 type: "POST",
-                /// dataType: 'JSON',
                 contentType: 'application/x-www-form-urlencoded',
                 success: function (response) {
                     $(el).removeClass('far');
                     $(el).addClass('fas');
-                    //  $('#obj-container').html(response);
                 },
                 error: function () {
                     alert('Greška prilikom pribavljanja podataka.');
@@ -560,12 +548,10 @@
                 url: "/Auth/AddBookmark",
                 data: data,
                 type: "POST",
-                /// dataType: 'JSON',
                 contentType: 'application/x-www-form-urlencoded',
                 success: function (response) {
                     $(el).removeClass('fas');
                     $(el).addClass('far');
-                    //  $('#obj-container').html(response);
                 },
                 error: function () {
                     alert('Greška prilikom pribavljanja podataka.');
@@ -580,7 +566,5 @@
 <script src="~/js/editgallery.js"></script>
 <script src="~/js/editattributesscript.js"></script>
 <script src="~/js/ClienSideInputValidation.js"></script>
-@*<script src="~/js/editdatepicker.js"></script>*@
-@*<script src="~/js/mapa.js"></script>*@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQTT3_LSN4fZn3vqJRVhQylgR4_53qbb0&callback=initMap"></script>
 <script src="~/js/mapdetails.js"></script>

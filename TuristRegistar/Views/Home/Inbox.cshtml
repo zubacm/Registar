@@ -1,8 +1,219 @@
-﻿
+﻿@model TuristRegistar.Models.InboxViewModel
+
 @{
     ViewData["Title"] = "Inbox";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Inbox</h2>
+<link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
+<link href="~/css/messaging.css" rel="stylesheet" />
+<script src="~/js/toast-show.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
 
+<script src="~/js/ClienSideInputValidation.js"></script>
+<script src="~/lib/signalr/signalr.js"></script>
+<script src="~/js/chat.js"></script>
+<script src="~/lib/jquery/jquery-ajax-unobtrusive.js"></script>
+
+
+<br /><br /><br />
+            <div class="messaging" style="margin-top:20px;">
+                <div class="inbox_msg">
+                    <div class="inbox_people">
+                        <div class="headind_srch">
+                            <div class="recent_heading">
+                                <h4>Poruke</h4>
+                            </div>
+                            <form asp-action="SearchConversation" asp-controller="Home">
+                                <input hidden asp-for="@Model.IdentUserId" />
+                                <div class="srch_bar">
+                                    <div class="stylish-input-group">
+                                        <input id="search" type="text" class="search-bar" placeholder="Pretraga">
+                                        <span class="input-group-addon">
+                                            <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="inbox_chat" id="inboxchat">
+                            @foreach (var item in Model.Conversations)
+                            {
+                                <input hidden type="text" asp-for="@item.ConversationId" />
+                                <input hidden type="text" asp-for="@item.WithIdentUserId" />
+                                var activechat = "";
+                                @if (item.Unread == true)
+                                {
+                                    activechat = "active_chat";
+                                }
+                                <a asp-action="Conversation" asp-controller="Home" asp-route-withIdentUserId="@item.WithIdentUserId">
+                                    <div class="chat_list @activechat">
+
+                                        <div class="chat_people">
+                                            <div class="chat_img"> <img src="/pink.png" alt="sunil"> </div>
+                                            <div class="chat_ib">
+                                                <h5>@item.WithUsername <span class="chat_date">@item.LastMassage.DateTime</span></h5>
+                                                <p>
+                                                    @item.LastMassage.Message
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            }
+
+
+                            @*<div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat_list">
+                        <div class="chat_people">
+                            <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>
+                                    Test, which is a new approach to have all solutions
+                                    astrology under one roof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                        </div>*@
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+                </div>
+
+                <p class="text-center top_spac"> Design by <a target="_blank" href="#">Sunil Rajput</a></p>
+
+                <script src="~/js/Navbarcolor.js"></script>
+
+<script>
+    var currentPageNumber = 1;
+    var activesearch = false;
+    $('#inboxchat').scroll(function () {
+        //console.log('gore');
+        var elem = $('inboxchat');
+        if (elem[0].scrollHeight - elem.scrollTop() == elem.outerHeight()) {
+            currentPageNumber = currentPageNumber + 1;
+            LoadConversations(currentPageNumber);
+        }
+    });
+
+    function Search() {
+        if ($('#search').val() !== "" && activesearch === false ) {
+            activesearch = true;
+            currentPageNumber = 1;
+            $('#inboxchat').empty();
+            LoadConversations(currentPageNumber);
+        }
+    }
+
+    function LoadConversations(currentpage) {
+        //var position = document.getElementById('DisplayMessages').scrollTop//.position();
+        //        var position = (document.getElementById('DisplayMessages').children[0].offsetTop);
+        var url = "/Home/LoadConversations";
+        var data = { pagenumber: currentpage, pagesize: 7 };
+        if (activesearch === true) {
+            url = "/Home/SearchConversation";
+            data = { search: $('#search'), pagenumber: currentpage, pagesize: 7 };
+        }
+
+        $.ajax({
+            type: 'Post',
+            url: url,
+            data: data,
+            dataType: 'json',
+            success: function (response) {
+                //$('#obj-container').html(response);
+                var html = "";
+                $(response).each(function (index, data) {
+                    var addhtml = "";
+                    var activechat = "";
+                    if (data.ItemUnread === true) {
+                        activechat = "active_chat";
+                    }
+                    var addhtml = "<input hidden type='text' asp-for='" + data.ConversationId + "' /><input hidden type='text' asp-for='" + data.WithIdentUserId + "'/>"
+                        + "<div class='chat_list'><div class='chat_people " + activechat + "'>"
+                           +"<div class='chat_img'> <img src='https://ptetutorials.com/images/user-profile.png' alt='sunil'> </div>"
+                                +"<div class='chat_ib'><h5>"+data.WithUsername+" <span class='chat_date'>"+data.LastMassage.DateTim+"e</span></h5><p>"
+                                               +data.LastMassage.Message
+                                            +"</p></div></div></div>";
+
+                    html = html + addhtml;
+                })
+                $('#inboxchat').append(html);
+
+                //$('#DisplayMessages').scrollTop(position * 2);
+
+            },
+            //error: function () {
+            //    alert('Greška prilikom pribavljanja podataka.');
+            //}
+        });
+    }
+</script>

@@ -27,7 +27,6 @@ namespace TuristRegistar.Controllers
 
         public IActionResult UsersList(AdministrationModel model)
         {
-            //Ovo ne treba jer će sve biti asinhrono filteri i mijenjanje strana
             model.SearchString = model.SearchString == null ? "" : model.SearchString;
             model.CurrPage = model.CurrPage == 0 ? 1 : model.CurrPage;
 
@@ -99,7 +98,6 @@ namespace TuristRegistar.Controllers
             return PartialView("_UsersListed", model);
         }
 
-        //test this
         public IActionResult ChangePageUsersList(AdministrationModel model)
         {
             var pager =  new Pager((_userAdministration.CountUsers(model.SearchString, model.SelectedRole)), model.CurrPage);
@@ -139,7 +137,6 @@ namespace TuristRegistar.Controllers
 
         public IActionResult ChangeUserRole(String roleId, String identUserId)
         {
-            //ovdje ako je banovan da ga fino banuje
             if (_userAdministration.CheckIfUserIsBanned(identUserId) && roleId != "3")
             {
                 _userAdministration.CancelBan(identUserId);
@@ -148,7 +145,7 @@ namespace TuristRegistar.Controllers
             {
                 _userAdministration.BanUser(identUserId);
             }
-            //check if lockedout to remove it
+
             _userAdministration.ChangeUserRoleAsync(roleId, identUserId);
             return Ok();
         }
@@ -240,8 +237,8 @@ namespace TuristRegistar.Controllers
                 case "Sačuvaj":
                     return EditCity(model);
             }
-            //return error page
-            return null;
+            var errormodel = new ErrorViewModel() { RequestId = 422.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", errormodel);
         }
         public IActionResult AddCity(CitiesEditModel model)
         {
@@ -295,8 +292,8 @@ namespace TuristRegistar.Controllers
                 case "Sačuvaj":
                     return EditType(model);
             }
-            //return errorpage
-            return null;
+            var errormodel = new ErrorViewModel() { RequestId = 422.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", errormodel);
         }
         public IActionResult AddType(TypesEditModel model)
         {
@@ -345,8 +342,8 @@ namespace TuristRegistar.Controllers
                 case "Sačuvaj":
                     return EditAttribute(model);
             }
-            //return errorpage
-            return null;
+            var errormodel = new ErrorViewModel() { RequestId = 422.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", errormodel);
         }
         public IActionResult AddAttribute(AttributesEditModel model)
         {
@@ -395,8 +392,8 @@ namespace TuristRegistar.Controllers
                 case "Sačuvaj":
                     return EditCntAttribute(model);
             }
-            //return errorpage
-            return null;
+            var errormodel = new ErrorViewModel() { RequestId = 422.ToString(), };
+            return View("~/Views/Shared/Error.cshtml", errormodel);
         }
         public IActionResult AddCntAttribute(CntAttributesEditModel model)
         {

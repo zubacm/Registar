@@ -4,7 +4,6 @@
 <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
-@*<link href="~/css/regst.css" rel="stylesheet" />*@
 <link href="~/css/tabs.css" rel="stylesheet" />
 <link href="~/css/site.css" rel="stylesheet" />
 <link href="~/css/paying-model-style.css" rel="stylesheet" />
@@ -270,7 +269,6 @@
                                         </select>
                                     </div>
                                 </div>
-                                @*<a href="#" onclick="fillValues()">hej</a>*@
                             </div>
                         </div>
                         <!--./Ponude-->
@@ -391,7 +389,6 @@
                                                     <hr />
                                                     <input type="hidden" asp-for="OccubancBasedPrices" id="occupancybased-prices" />
                                                     <div id="prices">
-                                                        <!--see if this works++++-->
                                                         @if (Model.OccupancyBasedPricing != null && Model.OccupancyBasedPricing.Prices != null)
                                                         {
                                                             <label><span class="hidden-xs">Broj posjetilaca</span></label>
@@ -485,7 +482,6 @@
                                         </div>
                                         <button id="period-btn" onclick="AddPeriod()" type="button" disabled class="btn btn-outline-dark">Dodaj period&nbsp;<i class="fas fa-plus"></i></button>
                                     </div>
-                                    @*<a href="#" onclick="fillValues()">Filllllll</a>*@
                                 </div>
                             </div>
                         </div>
@@ -494,7 +490,7 @@
                 </div>
             </div>
             <div class="col-md-8 m-auto">
-                <input id="submitButton" class="btn btn-primary btn-lg btn-block" type="submit" value="Dodaj objekt">
+                <input id="submitButton" class="btn btn-primary btn-lg btn-block" type="submit" value="Dodaj ponudu">
             </div>
         </div>
     </section>
@@ -504,22 +500,11 @@
 
 <script type="text/javascript">
     $('#submitButton').click(function () {
-        //alert("Molimo vas da ispravno popunite sva obavezna polja.");
-
-        //dont know????
         $('input:invalid').each(function () {
             alert('Molimo vas da ispravno popunite sva obavezna polja.');
-            // Find the tab-pane that this element is inside, and get the id
             var $closest = $(this).closest('.tab-pane');
             console.log($closest);
 
-            //var id = $closest.attr('id');
-            //console.log($closest);
-            //console.log(id);
-            //// Find the link that corresponds to the pane and have it show
-            //$('.nav a[href="#' + id + '"]').tab('show');
-
-            // Only want to do it once
             return false;
         });
     });
@@ -528,7 +513,6 @@
 
 <script src="~/js/Navbarcolor.js"></script>
 
-@*ovo je za one roza tabove*@
 <script>
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
