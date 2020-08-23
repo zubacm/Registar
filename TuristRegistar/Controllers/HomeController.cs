@@ -422,7 +422,6 @@ namespace TuristRegistar.Controllers
                     DateTime = DateTime.Now,
                 };
 
-                //Check if initial conversation has conv.id 
                 _user.AddMessageAsync(message);
 
                 return Ok();

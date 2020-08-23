@@ -13,7 +13,7 @@ namespace TuristRegistar.Data.Models
         public Nullable<Decimal> StandardPricePerNight { get; set; }
         [Display(Name = "Standardan broj posjetilaca")]
         public Nullable<int> StandardOccupancy { get; set; }
-        [Display(Name = "Mininmalan broj posjetilaca")]
+        [Display(Name = "Minimalan broj posjetilaca")]
         public Nullable<int> MinOccupancy { get; set; }
         [Display(Name = "Maksimalan broj posjetilaca")]
         public Nullable<int> MaxOccupancy { get; set; }

@@ -193,7 +193,7 @@ namespace TuristRegistar.Controllers
             var currency = Request.Cookies["Currency"] == null ? "BAM" : Request.Cookies["Currency"];
             await _touristObject.AddObject(newobject, currency);
 
-            TempData["Notification"] = "Uspješno ste dodali objekt";
+            TempData["Notification"] = "Uspješno ste dodali ponudu";
             return Redirect("createobject");
         }
 

@@ -116,10 +116,12 @@
                             var textstyle = "text-white";
                             var spandisplay = "none";
                         }
+
                         @if (HttpContextAccessor.HttpContext.Request.Cookies["Notification"] != null)
                         {
                             notif = HttpContextAccessor.HttpContext.Request.Cookies["Notification"];
                         }
+
                         @if (notif == "True")
                         {
                             textstyle = "text-danger";
@@ -230,5 +232,28 @@
 <script>
     $(document).ready(function () {
         $('.toast').toast('show');
+        CheckForNotification();
     });
+
+    function CheckForNotification() {
+        if (getCookie("Notification") === "True") {
+            document.getElementById('message-logo').classList.add('text-danger');
+            document.getElementById('message-number').style.display = "inline";
+        }
+    }
+
+    function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
 </script>
