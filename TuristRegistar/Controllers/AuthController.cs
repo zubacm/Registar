@@ -293,7 +293,7 @@ namespace TuristRegistar.Controllers
             return View();
         }
 
-        [Authorize]
+       // [Authorize]
         public async Task<IActionResult> _UserObjects(String identUserId)
         {
             IdentityUser user;
@@ -453,6 +453,33 @@ namespace TuristRegistar.Controllers
             _user.RemoveBookmark(identUserId, objectId);
 
             return Ok();
+        }
+
+        public async Task<IActionResult> UserDetails(String identUserId)
+        {
+            var user = await _userManager.FindByIdAsync(identUserId.ToString());
+
+            if (user == null)
+            {
+                return NotFound($"Nemoguće je pronaći korisnika koji ima ID '{_userManager.GetUserId(User)}'.");
+            }
+            var current_user = _user.GetUser(user.Id);
+
+            var model = new UserDetails() {
+                IdentUserId = identUserId,
+                KorisnikId = current_user.Id,
+                //UserId = current_user.IdentUserId,
+                Username = current_user.UserName,
+                Name = current_user.Name,
+                LegalPerson = current_user.LegalPerson,
+                LastName = current_user.LastName,
+                Email = current_user.Email,
+                ContactAddress = current_user.ContactAddress,
+                Phone = current_user.PhoneNumber,
+                AdminAction = identUserId == null ? false : true,
+            };
+
+            return View(model);
         }
 
         [Authorize]

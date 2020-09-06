@@ -42,7 +42,7 @@
                 <div class="row ">
                     <h2 class="text-capitalize">
                         @Model.Name
-                        <br /><a href="#" class="" style="font-size:20px;">@Model.CreatorName</a>
+                        <br /><a asp-action="UserDetails" asp-controller="Auth" asp-route-identUserId="@Model.IdentUserId" class="" style="font-size:20px;">@Model.CreatorName</a>
                     </h2>
                     <h4 class="ml-auto">
 

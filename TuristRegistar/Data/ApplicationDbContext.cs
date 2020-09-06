@@ -19,8 +19,6 @@ namespace TuristRegistar.Data
             : base(options)
         {
         }
-
-        //change later the name
         public DbSet<UnavailablePeriods> AvailablePeriods { get; set; }
         public DbSet<CountableObjectAttributes> CountableObjectAttributes { get; set; }
         public DbSet<ObjectAttributes> ObjectAttributes { get; set; }

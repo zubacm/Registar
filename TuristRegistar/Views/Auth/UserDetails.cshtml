@@ -1,0 +1,158 @@
+﻿<link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet" />
+<link href="~/css/regst.css" rel="stylesheet" />
+<link href="~/css/tabs.css" rel="stylesheet" />
+<link href="~/css/site.css" rel="stylesheet" />
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+
+
+@model TuristRegistar.Models.UserDetails
+
+@{
+    ViewData["Title"] = "UserDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<input id="user-id" asp-for="IdentUserId" type="hidden" />
+<!-- Tabs -->
+<section id="tabs">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-lg-12">
+                <nav>
+                    <div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+                        <a class="nav-item nav-link active" id="nav-userdetails-tab" style="background-color:transparent" data-toggle="tab" href="#nav-userdetails" role="tab" aria-controls="nav-userdetails" aria-selected="true">Osnovni podaci</a>
+                        <a class="nav-item nav-link" id="nav-userobjects-tab" style="background-color:transparent" data-toggle="tab" href="#nav-userobjects" role="tab" aria-controls="nav-userobjects" aria-selected="false">Ponude</a>
+                    </div>
+                </nav>
+                <div class="tab-content py-3 px-3 px-sm-0" id="nav-tabContent">
+                    <div class="tab-pane fade" id="nav-userobjects" role="tabpanel" aria-labelledby="nav-userobjects-tab">
+                    </div>
+                    <div class="tab-pane fade show active" id="nav-userdetails" role="tabpanel" aria-labelledby="nav-userdetails-tab">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+                                    @{ var legal_cls = "";
+                                        var physical_cls = "";}
+                                    @if (Model.LegalPerson)
+                                    {
+                                        legal_cls = "active";
+                                        <li class="nav-item">
+                                            <a style="background-color:transparent" class="nav-link @legal_cls sub-tabs-clr" id="legal-tab" data-toggle="tab" href="#legal" role="tab" aria-controls="legal" aria-selected="true">Poslovno lice</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        physical_cls = "active";
+                                        <li class="nav-item">
+                                            <a style="background-color:transparent" class="nav-link @physical_cls sub-tabs-clr" id="physical-tab" data-toggle="tab" href="#physical" role="tab" aria-controls="physical" aria-selected="false">Fizičko lice</a>
+                                        </li>
+                                    }
+
+
+                                </ul>
+                            </div>
+                            <div class="tab-content m-auto col-md-6" id="myTabContent">
+                                <div class="tab-pane fade @legal_cls show " id="legal" role="tabpanel" aria-labelledby="legal-tab">
+                                    <input type="hidden" asp-for="LegalPerson" value="true" />
+                                    <br />
+                                    <div class="mb-3">
+                                        <label asp-for="Name"></label>
+                                        <div class="input-group">
+                                            <input type="text" asp-for="Name" class="form-control" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label asp-for="Email"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                            </div>
+                                            <input type="email" asp-for="Email" class="form-control" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label asp-for="ContactAddress"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="ContactAddress" class="form-control" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label asp-for="Phone"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="Phone" class="form-control" disabled>
+                                        </div>
+                                    </div>
+
+                                    <br /><br />
+
+                                </div>
+                                <div class="tab-pane fade @physical_cls show" id="physical" role="tabpanel" aria-labelledby="physical-tab">
+                                    <input type="hidden" asp-for="LegalPerson" value="false" />
+                                    <br />
+                                    <div class="mb-3">
+                                        <label asp-for="Name"></label>
+                                        <div class="input-group">
+                                            <input type="text" asp-for="Name" class="form-control" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label asp-for="LastName"></label>
+                                        <div class="input-group">
+                                            <input type="text" asp-for="LastName" class="form-control" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label asp-for="Email"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                            </div>
+                                            <input type="email" asp-for="Email" class="form-control" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label asp-for="ContactAddress"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="ContactAddress" class="form-control" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label asp-for="Phone"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="Phone" class="form-control" disabled>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ./Tabs -->
+<script src="~/js/Navbarcolor.js"></script>
+<script>
+    $.get('@Url.Action("_UserObjects", "Auth", new { identUserId = Model.IdentUserId })', function (content) {
+        $("#nav-userobjects").html(content);
+    });
+</script>

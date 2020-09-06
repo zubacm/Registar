@@ -24,11 +24,10 @@ namespace TuristRegistar.Data.Models
         public String FullAddress { get; set; }
 
         public ICollection<ObjectHasAttributes> ObjectHasAttributes { get; set; }
-        //public ICollection<CountableObjectAttributes> CountableObjectAttributes { get; set; }
         public ICollection<CntObjAttributesCount> CntObjAttributesCount { get; set; }
         public ICollection<RatingsAndReviews> RatingsAndReviews { get; set; }
         public ICollection<SpecialOffersPrices> SpecialOffers { get; set; }
-        public ICollection<UnavailablePeriods> UnavailablePeriods { get; set; }//This will become unavailable periods
+        public ICollection<UnavailablePeriods> UnavailablePeriods { get; set; }
         public ICollection<ObjectImages> ObjectImages { get; set; }
         public Nullable<int> ObjectTypeId { get; set; }
         public ObjectTypes ObjectType { get; set; }
