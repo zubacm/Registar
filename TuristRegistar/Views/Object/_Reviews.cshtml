@@ -3,121 +3,122 @@
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-
-<div class="card">
-    <input asp-for="Review.Rating" type="hidden" id="ocjena" />
-    <div class="card-header">
-        <div class="row">
-            <i class="far fa-star fa-lg pointer" style="color:black;" id="rating1" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
-            <i class="far fa-star fa-lg pointer" style="color:black;" id="rating2" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
-            <i class="far fa-star fa-lg pointer" style="color:black;" id="rating3" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
-            <i class="far fa-star fa-lg pointer" style="color:black;" id="rating4" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
-            <i class="far fa-star fa-lg pointer" style="color:black;" id="rating5" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="card">
+        <input asp-for="Review.Rating" type="hidden" id="ocjena" />
+        <div class="card-header">
+            <div class="row">
+                <i class="far fa-star fa-lg pointer" style="color:black;" id="rating1" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
+                <i class="far fa-star fa-lg pointer" style="color:black;" id="rating2" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
+                <i class="far fa-star fa-lg pointer" style="color:black;" id="rating3" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
+                <i class="far fa-star fa-lg pointer" style="color:black;" id="rating4" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
+                <i class="far fa-star fa-lg pointer" style="color:black;" id="rating5" onclick="setRating(this)" onmouseover="changeColor(this)" onmouseout="resetColor()"></i>
+            </div>
+        </div>
+        <div class="card-body">
+            <textarea asp-for="Review.Text" id="review-textarea" placeholder="Vaš utisak..." class="form-control" style="font-size:15px; margin-bottom:7px"></textarea>
+            <a class="pointer text-white btn btn-primary float-right" onclick="AddReview()">Dodaj utisak</a>
+            <br />
         </div>
     </div>
-    <div class="card-body">
-        <textarea asp-for="Review.Text" id="review-textarea" placeholder="Vaš utisak..." class="form-control" style="font-size:15px; margin-bottom:7px"></textarea>
-        <a class="pointer text-white btn btn-primary float-right" onclick="AddReview()">Dodaj utisak</a>
-        <br />
+    <div id="rat-rew-container">
+
     </div>
-</div>
-<div id="rat-rew-container">
-
-</div>
-<br />
-
-@if (Model.Reviews != null)
-{
-    @foreach (var item in Model.Reviews)
+    <br />
+}
+    @if (Model.Reviews != null)
     {
-        <div class="card">
-            <div class="card-body">
-                <h6 class="col-sm-12 text-info">
-                    @item.User.Name @item.User.LastName
-                    <span class="float-right">
-                        <span class="text-warning"><i class="fas fa-star"></i>&nbsp;@item.Rating</span>
-                    </span>
-                </h6>
+        @foreach (var item in Model.Reviews)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="col-sm-12 text-info">
+                        @item.User.Name @item.User.LastName
+                        <span class="float-right">
+                            <span class="text-warning"><i class="fas fa-star"></i>&nbsp;@item.Rating</span>
+                        </span>
+                    </h6>
 
-                @item.Text
+                    @item.Text
 
-                @if (SignInManager.IsSignedIn(User))
-                {
-                    
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+
                         var user = await UserManager.FindByIdAsync(UserManager.GetUserId(User));
                         var roles = await UserManager.GetRolesAsync(user);
-                    
-                    @if (roles.Contains("ADMIN"))
-                    {
-                        <div>
-                            <i class="fa fa-trash pointer fa-2x float-right" aria-hidden="true" review-id="@item.Id" onclick="RemoveReview(this)"></i>
-                        </div>
+
+                        @if (roles.Contains("ADMIN"))
+                        {
+                            <div>
+                                <i class="fa fa-trash pointer fa-2x float-right" aria-hidden="true" review-id="@item.Id" onclick="RemoveReview(this)"></i>
+                            </div>
+                        }
                     }
-                  }
                 </div>
-        </div>
+            </div>
+        }
     }
-}
 
 
-<br />
-<!-- Pager -->
-<div class="col-sm-12" id="pager">
-    @if (Model.Pager.EndPage > 1)
-    {
-        <ul class="pagination m-auto">
-            @if (Model.Pager.CurrentPage > 1)
-            {
-                <li class="page-item">
-                    <a href="#" onclick="goToFirst()" class="page-link">&laquo;</a>
-                </li>
-                <li class="page-item">
-                    <a href="#" onclick="goToPrevious()" class="page-link">&lang;</a>
-                </li>
-            }
+    <br />
+    <!-- Pager -->
+    <div class="col-sm-12" id="pager">
+        @if (Model.Pager.EndPage > 1)
+        {
+            <ul class="pagination m-auto">
+                @if (Model.Pager.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a href="#" onclick="goToFirst()" class="page-link">&laquo;</a>
+                    </li>
+                    <li class="page-item">
+                        <a href="#" onclick="goToPrevious()" class="page-link">&lang;</a>
+                    </li>
+                }
 
-            @for (var pagee = Model.Pager.StartPage; pagee <= Model.Pager.EndPage; pagee++)
-            {
-                <li class="@(pagee == Model.Pager.CurrentPage ? "active-page" : "") hidden-sm hidden-xs page-link" style="@(pagee == Model.Pager.CurrentPage ? "font-weight:bolder" : "")">
-                    <a href="#" onclick="goToPage(@pagee)">@pagee</a>
-                </li>
-            }
+                @for (var pagee = Model.Pager.StartPage; pagee <= Model.Pager.EndPage; pagee++)
+                {
+                    <li class="@(pagee == Model.Pager.CurrentPage ? "active-page" : "") hidden-sm hidden-xs page-link" style="@(pagee == Model.Pager.CurrentPage ? "font-weight:bolder" : "")">
+                        <a href="#" onclick="goToPage(@pagee)">@pagee</a>
+                    </li>
+                }
 
-            @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
-            {
-                <li class="page-item">
-                    <a href="#" onclick="goToNext()" class="page-link">&rang;</a>
-                </li>
-                <li class="page-item">
-                    <a href="#" onclick="goToLast()" class="page-link">&raquo;</a>
-                </li>
-            }
-        </ul>
-    }
-</div>
-
-
+                @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                {
+                    <li class="page-item">
+                        <a href="#" onclick="goToNext()" class="page-link">&rang;</a>
+                    </li>
+                    <li class="page-item">
+                        <a href="#" onclick="goToLast()" class="page-link">&raquo;</a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
 
 
 
 
-<script>
-    function RemoveReview(el) {
-        var elem = $(el).parent().parent().parent();
-        var data = { 'id': $(el).attr('review-id') };
-        $.ajax({
-            url: "/Object/RemoveReview",
-            data: data,
-            type: "POST",
-            contentType: 'application/x-www-form-urlencoded',
-            success: function (response) {
-                elem.remove();
-            },
-            error: function () {
-                alert('Greška prilikom pribavljanja podataka.');
-            }
-        });
-    }
-</script>
 
-<script src="~/js/ratings.js"></script>
+
+    <script>
+        function RemoveReview(el) {
+            var elem = $(el).parent().parent().parent();
+            var data = { 'id': $(el).attr('review-id') };
+            $.ajax({
+                url: "/Object/RemoveReview",
+                data: data,
+                type: "POST",
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (response) {
+                    elem.remove();
+                },
+                error: function () {
+                    alert('Greška prilikom pribavljanja podataka.');
+                }
+            });
+        }
+    </script>
+
+    <script src="~/js/ratings.js"></script>

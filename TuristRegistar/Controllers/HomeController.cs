@@ -66,6 +66,8 @@ namespace TuristRegistar.Controllers
             return View(model);
         }
 
+
+
         [Authorize]
         public async Task<IActionResult> LoadConversations(int pagenumber, int pagesize)
         {

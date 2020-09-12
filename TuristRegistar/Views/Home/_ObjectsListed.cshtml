@@ -29,7 +29,7 @@
                                         <span class="text-muted" style="font-size:14px;">broj ocjena: @item.NumberOfRatings</span>
                                     </span>
                                 </h4>
-                                <a href="#" class="text-primary">
+                                <a asp-action="ObjectDetails" asp-controller="Object" asp-route-id="@item.Id" asp-route-occupancy="@Model.Search.Occupancy" asp-route-checkin="@Model.Search.CheckIn" asp-route-checkout="@Model.Search.CheckOut" class="text-primary">
                                     <i class="fa fa-map-marker-alt"></i>&nbsp;@item.Location
                                 </a>
 

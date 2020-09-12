@@ -194,7 +194,7 @@
     @*mapa i delete*@
     <div class="col-md-4 order-md-2 mb-4">
         <div class="col-mb-3">
-            <a  asp-action="Conversation" asp-controller="Home" asp-route-withIdentUserId="@Model.IdentUserId" class="btn btn-primary text-white pointer btn-block pointer m-auto"><i class="far fa-comment"></i>&nbsp;&nbsp;Pošalji poruku korisniku</a>
+            <a asp-action="Conversation" asp-controller="Home" asp-route-withIdentUserId="@Model.IdentUserId" class="btn btn-primary text-white pointer btn-block pointer m-auto"><i class="far fa-comment"></i>&nbsp;&nbsp;Pošalji poruku korisniku</a>
         </div>
         <br />
         @if (SignInManager.IsSignedIn(User))
@@ -215,16 +215,17 @@
                 </div>
                 <br />
             }
-        }
-        @if (Model.IsBookmark)
-        {
-            <i data-toggle="tooltip" title="Ukloni iz zabilješki" class="fas fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@Model.Id"></i>
-        }
-        else
-        {
-            <i data-toggle="tooltip" title="Sačuvaj" class="far fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@Model.Id"></i>
-        }
 
+
+            @if (Model.IsBookmark)
+            {
+                <i data-toggle="tooltip" title="Ukloni iz zabilješki" class="fas fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@Model.Id"></i>
+            }
+            else
+            {
+                <i data-toggle="tooltip" title="Sačuvaj" class="far fa-bookmark fa-2x float-right align-text-bottom pointer" onmouseover="changecolor(this)" onmouseout="changecolor(this)" onclick="addRemoveBookmark(this)" obj-id="@Model.Id"></i>
+            }
+        }
         <h4 class="d-flex justify-content-between align-items-center mb-3">
             <span class="text-muted">Mapa</span>
         </h4>
@@ -274,8 +275,6 @@
     </div>
 </div>
 <!--./Fotografije-->
-
-
 <!--Image Modal-->
 <div id="imgModal" class="modal fade">
     <div class="modal-dialog modal-confirm" style="width:100%; max-width:100%">
@@ -285,15 +284,13 @@
             </div>
             <div class="modal-body">
                 <div class="col-md-12 mb-3">
-                    <img id="img-modal" src="" style="max-width:100%"/>
+                    <img id="img-modal" src="" style="max-width:100%" />
                 </div>
             </div>
         </div>
     </div>
 </div>
 <!-- Modal HTML -->
-
-
 
 <script>
     function sendSrcToImgModal(ev) {
@@ -355,7 +352,7 @@
             type: 'GET',
             url: "/Object/ChangeReviewsPage",
             data: $('#reviewsForm').serialize(),
-            dataType: 'html', 
+            dataType: 'html',
             contentType: "application/json; charset=utf-8",
             success: function (response) {
                 $('#reviews-container').html(response);
@@ -464,7 +461,7 @@
             }
         }
         var currentcheckin = $('#datepicker1').val();
-       
+
         $DPicker1.destroy();
         $DPicker1.datepicker({
             uiLibrary: 'bootstrap4',

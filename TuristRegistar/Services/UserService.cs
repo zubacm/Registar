@@ -167,7 +167,7 @@ namespace TuristRegistar.Services
 
         public void AddMessageAsync(Messages message)
         {
-            _context.Messages.AddAsync(message);
+            _context.Messages.Add(message);
             _context.SaveChangesAsync();
         }
 
@@ -186,6 +186,8 @@ namespace TuristRegistar.Services
         {
             var query = _context.Messages.Where(m => m.ConversationId == conversationId).OrderByDescending(m => m.Id);
             var total = query.Count();
+            if (total == 0)
+                return new List<Messages>();
             var skip = total - (pagenumber * pagesize) < 0 && total - (pagenumber * pagesize) > 0 - pagesize ? 0 : total - (pagenumber * pagesize);
            return  _context.Messages.Where(m => m.ConversationId == conversationId)
                                 .Skip(skip).Take(pagesize).ToList();

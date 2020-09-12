@@ -102,10 +102,8 @@ namespace TuristRegistar
             app.UseAuthentication();
 
 
-            //app.UseStatusCodePagesWithRedirects("~/Views/Shared/Error.cshtml/{0}");
             app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
             var cultureInfo = new CultureInfo("en-US");
-            //cultureInfo.NumberFormat.CurrencySymbol = "€";
 
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;

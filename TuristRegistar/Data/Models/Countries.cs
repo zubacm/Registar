@@ -10,7 +10,6 @@ namespace TuristRegistar.Data.Models
         public int Id { get; set; }
         public String Name { get; set; }
 
-        //center
         public Double Lat { get; set; }
         public Double Lng { get; set; }
 
