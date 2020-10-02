@@ -135,18 +135,18 @@ namespace TuristRegistar.Controllers
             return PartialView("_UsersListed", model);
         }
 
-        public IActionResult ChangeUserRole(String roleId, String identUserId)
+        public async Task<IActionResult> ChangeUserRole(String roleId, String identUserId)
         {
             if (_userAdministration.CheckIfUserIsBanned(identUserId) && roleId != "3")
             {
-                _userAdministration.CancelBan(identUserId);
+                await _userAdministration.CancelBan(identUserId);
             }
             if (roleId == "3")
             {
-                _userAdministration.BanUser(identUserId);
+                await _userAdministration.BanUser(identUserId);
             }
 
-            _userAdministration.ChangeUserRoleAsync(roleId, identUserId);
+            _userAdministration.ChangeUserRole(roleId, identUserId);
             return Ok();
         }
 

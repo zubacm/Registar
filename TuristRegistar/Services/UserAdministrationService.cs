@@ -29,21 +29,21 @@ namespace TuristRegistar.Services
             return _context.Roles.ToList();   
         }
 
-        public void BanUser(String userId)
+        public async Task BanUser(String userId)
         {
             var lockoutEndDate = new DateTime(2999, 01, 01);
             var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-            _userManager.SetLockoutEnabledAsync(user, true);
-            _userManager.SetLockoutEndDateAsync(user, lockoutEndDate);
-            _userManager.UpdateAsync(user);
+            await _userManager.SetLockoutEnabledAsync(user, true);
+            await _userManager.SetLockoutEndDateAsync(user, lockoutEndDate);
+            await _userManager.UpdateAsync(user);
 
         }
 
-        public void CancelBan(String userId)
+        public async Task CancelBan(String userId)
         {
             var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-            _userManager.SetLockoutEnabledAsync(user, true);
-            _userManager.SetLockoutEndDateAsync(user, null);
+            await _userManager.SetLockoutEnabledAsync(user, true);
+            await _userManager.SetLockoutEndDateAsync(user, null);
             _context.SaveChanges();
         }
 
@@ -82,17 +82,14 @@ namespace TuristRegistar.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task ChangeUserRoleAsync(String roleId, String identUserId)
+        public void ChangeUserRole(String roleId, String identUserId)
         {
             var userrole = _context.UserRoles.Where(ur => ur.UserId == identUserId).FirstOrDefault();
             _context.UserRoles.Remove(userrole);
             _context.SaveChanges();
-
-            String query = "Insert into AspNetUserRoles (UserId, RoleId) Values('" + identUserId + "', '" + roleId + "')";
-#pragma warning disable EF1000 // Possible SQL injection vulnerability.
-            _context.Database.ExecuteSqlCommand(query);
-#pragma warning restore EF1000 // Possible SQL injection vulnerability.
-            await _context.SaveChangesAsync();
+            var newuserrole = new IdentityUserRole<string> { RoleId = roleId, UserId = identUserId };
+            _context.UserRoles.Add(newuserrole);
+            _context.SaveChanges();
         }
 
         public int CountUsers()

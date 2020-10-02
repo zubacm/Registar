@@ -379,6 +379,7 @@ namespace TuristRegistar.Services
             obj.CountryId = myobject.CountryId;
             obj.CityId = myobject.CityId;
             obj.ObjectTypeId = myobject.ObjectTypeId;
+            obj.FullAddress = myobject.FullAddress;
 
             _context.Objects.Attach(obj);
             _context.SaveChanges();

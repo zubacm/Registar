@@ -860,7 +860,7 @@ namespace TuristRegistar.Controllers
             _touristObject.DeleteObjectAndRelatedColumns(objectId);
 
             TempData["Notification"] = "Izmjene su uspješno sačuvane";
-            return View("Index");
+            return RedirectToAction("Index", "Home");
         }
 
 

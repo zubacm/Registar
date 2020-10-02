@@ -14,13 +14,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using TuristRegistar.Data;
-using TuristRegistar.Models;
 using TuristRegistar.Services;
 using TuristRegistar.Hubs;
-using System.Net.WebSockets;
-using System.Threading;
+
 
 namespace TuristRegistar
 {

@@ -190,3 +190,41 @@
 <script src="~/js/Navbarcolor.js"></script>
 <script src="~/js/gallery.js"></script>
 <script src="~/js/datepickergijgo.js"></script>
+<script>
+    function SearchObjects() {
+        if ($('#datepicker2').val() === '' && $('#datepicker1').val() !== '')
+            alert('Unesite datum za odlazak!');
+        else if ($('#datepicker2').val() !== '' && $('#datepicker1').val() === '')
+            alert('Unesite datum za dolazak!');
+        else if ($('#price-below').val() !== '' && +($('#price-below').val()) <= 0)
+            alert('Unesite ispravnu cijenu!');
+        else if ($('#occupancy').val() !== '' && +($('#occupancy').val()) <= 0)
+            alert('Unesite ispravan broj osoba!');
+        else if (+($('#price-below').val()) > 0 && $('#occupancy').val() === '')
+            alert('Unesite broj osoba!');
+        else if (+($('#price-below').val()) > 0 && $('#datepicker1').val() === '')
+            alert('Unesite datum za dolazak!')
+        else if (+($('#price-below').val()) > 0 && $('#datepicker2').val() === '')
+            alert('Unesite datum za odlazak!')
+        else
+            FilterObjects();
+    }
+
+        function FilterObjects() {
+            $(this).scrollTop(0);
+
+        $.ajax({
+            type: 'GET',
+        url: "/Home/FilterObjectsMap",
+        data: $('#formIndex').serialize(),
+        dataType: 'html',
+        contentType: "application/json; charset=utf-8",
+            success: function (response) {
+            $('#obj-container').html(response);
+        },
+            error: function () {
+            alert('Greška prilikom pribavljanja podataka.');
+            }
+    });
+}
+</script>
