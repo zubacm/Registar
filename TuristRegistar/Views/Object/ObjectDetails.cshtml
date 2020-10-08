@@ -203,7 +203,7 @@
             var user = await UserManager.FindByIdAsync(UserManager.GetUserId(User));
             var roles = await UserManager.GetRolesAsync(user);
             var id = UserManager.GetUserId(User);
-            if (id == Model.IdentUserId)
+            if (roles.Contains("ADMIN") || (id == Model.IdentUserId))
             {
                 <a asp-action="EditObject" asp-controller="Object" asp-route-id="@Model.Id" class="btn btn-secondary text-white pointer btn-block pointer m-auto">Izmijeni</a>
                 <br />

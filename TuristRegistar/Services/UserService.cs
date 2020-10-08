@@ -139,7 +139,6 @@ namespace TuristRegistar.Services
             ObjectId = objectId,
             UserId = identUserId,
             };
-
             _context.Bookmark.Add(bookmark);
             _context.SaveChanges();
         }
